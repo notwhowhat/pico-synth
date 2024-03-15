@@ -1,0 +1,87 @@
+This is the general(ish) design document a synthesizer using the RP2040
+
+Minimum software requirements:
+- Eight voices of polyphony
+- One oscillator per voice, with four waveforms.
+	- One oscillator per voice, with four waveforms. Every waveform will have it's own "texture" type,
+	  which is controlled by the nob with the same name. Available waveforms, aswell as texture type:
+		- Sine (Organ type harmonics_
+		- Triangle (None for now, maybe some fancy FM later on)
+		- Saw (Supersaw/detune)
+		- Square (Pulse width)
+	  The oscillators will consist of wavetables (haven't decided, but probably 128, 256 or 360 indexes).
+	  This is for speed, because the synth won't have samples to store, so I can have pregenerated values
+	  instead. Check the python synth for oscillator design.
+- One filter per voice, with three different types.
+	- The filter will have both a cutoff nob, aswell as resonance and a mode controlling button.
+	  All of the modes will hopefully be 12dB/oct filters, which sound decent, and aren't too slow.
+	  The filter modes will be:
+		- Lowpass
+		- Highpass
+		- Bandpass (Might be a lower order filter, because it needs both a highpass and lowpass to function.
+- Two envelope generators per voice. One for the amplifier and one for the filter. They will have four stages:
+	- Attack (0 - 2)
+	- Decay (2 - Sustain)
+	- Sustain (Some value between 0 and 2)
+	- Release (Sustain, 0)
+	
+	- The algorithm for these will be just like in a math class. The values will be how many samples the note has
+	  been playing for. The leaning will be calculated in realtime if a nob has changed with (delta y) / (delta x),
+	  and then just using f(x) = kx + m
+- One LFO per voice. It will have three modes, and it will be reset/retriggered at a new note press. The modes are
+  modulating the amp, pitch and the filter.
+
+Materials (Ingredients for a metal monster):
+- Raspberry Pi Pico
+- PWM filtering (Get two modules of this for stereo):
+	- Resistor, 220 ohm
+	- Resistor, 100 ohm
+	- Resistor, 1.8K ohm
+	- Capacitor, 100nF
+	- Capacitor, 47µF
+- IO (Analog):
+	- 10x, Potentiometer, 10K ohm
+	- 2x, Multiplexer, 74HC4051 DIP-16
+- IO (Digital):
+	- Yx, Pushbutton
+	- Leds
+	- Midi in (https://diyelectromusic.wordpress.com/2021/02/15/midi-in-for-3-3v-microcontrollers):
+		- Optoisolator, H11L1
+		- Diode, 1N914
+		- Resistor, 220 ohm
+		- Resistor, 470 ohm
+		- Resistor, 4.7K ohm
+		- Capacitor, 100nF
+		- 5 pin DIN socket
+BOM:
+- 3x 220 ohm resistor !
+- 2x 100 ohm resistor !
+- 2x 1.8k ohm resistor !
+- 470 ohm resistor !
+- 4.7k ohm resistor !
+- 10k ohm resistor !
+
+- 3x 100nf ceramic capacitor !
+- 2x 47µf ceramic capacitor !
+- 2x 20pf ceramic capacitor !
+- 10uf electrolytic capacitor !
+
+- H11L1 optoisolator !
+
+- 1n914 diode !
+- 16Mhz crystal !
+
+- 5 pin DIN in socket !
+
+- Raspberry Pi Pico H (it's actually cheaper than seperate headers)
+- AtMega328
+
+
+
+
+
+
+	
+
+
+
