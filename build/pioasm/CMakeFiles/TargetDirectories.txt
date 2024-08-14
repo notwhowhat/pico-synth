@@ -1,0 +1,3 @@
+/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/pioasm/CMakeFiles/rebuild_cache.dir
+/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/pioasm/CMakeFiles/edit_cache.dir
+/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/pioasm/CMakeFiles/pioasm.dir
