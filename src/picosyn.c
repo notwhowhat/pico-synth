@@ -12,6 +12,7 @@
 #define AUDIO_PIN 2 
 
 #include "wavetables.h"
+#include "frequencies.h"
 
 int audio_counter = 0;
 float sample_index = 0.0;
@@ -24,6 +25,11 @@ typedef enum {
 
 int gain = 100;
 volatile int note_on = 0;
+
+// this fills it with zeros!
+// two key arrays are needed to be ablet to distinguish between a new and old note for envel
+unsigned char midi_keys[128] = {0};
+unsigned char midi_previous_keys[128] = {0};
 
 /*
 * PWM Interrupt Handler which outputs PWM level and advances the 
@@ -56,13 +62,28 @@ void pwm_interrupt_handler() {
     audio_counter++;
     pwm_clear_irq(pwm_gpio_to_slice_num(AUDIO_PIN));    
 
+    float master_out = 0.0;
+
     waveform selected_waveform = SAW;
 
-    sample_index += (360 / 100.0);
+    note_on = 0;
+    for (int i = 0; i < 128; i++) {
+        if (midi_keys[i] != 0) {
+            float frequency_ratio = 44100 / FREQUENCIES[i];
+            sample_index += (360 / frequency_ratio);
 
-    if (sample_index > 360) {
-        sample_index -= 360;
+            if (sample_index > 360) {
+                sample_index -= 360;
+            }
+            note_on = 1;
+        }
     }
+    if (note_on == 1) {
+        float sample = oscillator(selected_waveform, sample_index);
+        master_out += sample;
+    }
+
+    
 
     // basically this is mad.
     // it changes the pointer to the next element in p_table
@@ -70,16 +91,11 @@ void pwm_interrupt_handler() {
     //uint16_t sample = 100 * 100 * (uint16_t)(*(p_table + (int)sample_index));
     //uint16_t sample = 100 + 100 * table[(int)sample_index];
 
-    float sample = oscillator(selected_waveform, sample_index);
-
     // this is done to make amplify the signal while making it unsigned in a controlled way
     // TODO: add a compressor like gain, so the volume gets set compared to the maximum size
-    sample = (sample * gain) + gain;
-    if (note_on == 0) {
-        sample = 0.0;
-    }
+    master_out = (master_out * gain) + gain;
 
-    pwm_set_gpio_level(AUDIO_PIN, (uint16_t)sample);
+    pwm_set_gpio_level(AUDIO_PIN, (uint16_t)master_out);
 
     /*
     if (wav_position < (WAV_DATA_LENGTH<<3) - 1) { 
@@ -157,9 +173,7 @@ int main(void) {
     int midi_counter = 0;
     unsigned char midi_cmd[] = {0, 0, 0};
 
-    // this fills it with zeros!
-    unsigned char midi_keys[128] = {0};
-    unsigned char midi_previous_keys[128] = {0};
+    
 
     while (1) {
         while (!uart_is_readable(uart0)) {
@@ -195,19 +209,23 @@ int main(void) {
                 case 128:
                     //gpio_put(ERR_LED_PIN, 0);
                     gpio_put(MIDI_LED_PIN, 0);
-                    note_on = 0;
+                    //note_on = 0;
                     //gain = 0;
-                    midi_keys[midi_cmd[1]] = midi_cmd[2];
+                    midi_keys[midi_cmd[1]] = 0;
                     break;
                 case 144:
                     //gpio_put(ERR_LED_PIN, 1);
                     gpio_put(MIDI_LED_PIN, 1);
-                    note_on = 1;
+                    //note_on = 1;
 
                     // this should work, but it's risky. check if it's a correct value
                     midi_keys[midi_cmd[1]] = midi_cmd[2];
                     break;
             }
+
+            midi_cmd[0] = 0;
+            midi_cmd[1] = 0;
+            midi_cmd[2] = 0;
         }
 
         // not anymore! __wfi(); // Wait for Interrupt

@@ -21,12 +21,12 @@ float sin_table[] = {
 
 //float table[360];
 
-void square_table() {
-    for (int i = 0; i < 360; i++) {
-        if (i < 180) {
-            table[i] = 1.0;
-        } else {
-            table[i] = -1.0;
-        }
-    }
-}
+//void square_table() {
+//    for (int i = 0; i < 360; i++) {
+//        if (i < 180) {
+//            table[i] = 1.0;
+//        } else {
+//            table[i] = -1.0;
+//        }
+//    }
+//}
