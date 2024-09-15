@@ -1,4 +1,22 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/audio/audio_device.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/hid/hid_device.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/midi/midi_device.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/msc/msc_device.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ncm_device.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/video/video_device.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/common/tusb_fifo.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd_control.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/tusb.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/common/pico_sync/critical_section.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/common/pico_sync/lock_core.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/common/pico_sync/mutex.c.obj"
@@ -12,6 +30,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_divider/divider.S.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/dma.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_irq/irq_handler_chain.S.obj"
@@ -30,6 +49,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_double/double_init_rom.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_double/double_math.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_double/double_v1_rom_shim.S.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_float/float_aeabi.S.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_float/float_init_rom.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_float/float_math.c.obj"
@@ -42,16 +62,19 @@ file(REMOVE_RECURSE
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/binary_info.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/crt0.S.obj"
-  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdlib/stdlib.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.obj"
   "CMakeFiles/picosyn.dir/src/picosyn.c.obj"
   "picosyn.elf"
   "picosyn.pdb"
 )
 
 # Per-language clean rules from dependency scanning.
-foreach(lang ASM C CXX)
+foreach(lang ASM C)
   include(CMakeFiles/picosyn.dir/cmake_clean_${lang}.cmake OPTIONAL)
 endforeach()

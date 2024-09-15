@@ -515,22 +515,9 @@ CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_l
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_42) "Building ASM object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/crt0.S.obj"
 	/usr/bin/arm-none-eabi-gcc $(ASM_DEFINES) $(ASM_INCLUDES) $(ASM_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/crt0.S.obj   -c /home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/crt0.S
 
-CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp.obj: CMakeFiles/picosyn.dir/flags.make
-CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp.obj: /home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_43) "Building CXX object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp.obj"
-	/usr/bin/arm-none-eabi-g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp.obj -c /home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp
-
-CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp.i"
-	/usr/bin/arm-none-eabi-g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp.i
-
-CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp.s"
-	/usr/bin/arm-none-eabi-g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp.s
-
 CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/binary_info.c.obj: CMakeFiles/picosyn.dir/flags.make
 CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/binary_info.c.obj: /home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/binary_info.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_44) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/binary_info.c.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_43) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/binary_info.c.obj"
 	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/binary_info.c.obj   -c /home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/binary_info.c
 
 CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/binary_info.c.i: cmake_force
@@ -543,7 +530,7 @@ CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_l
 
 CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.obj: CMakeFiles/picosyn.dir/flags.make
 CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.obj: /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_45) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_44) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.obj"
 	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.obj   -c /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c
 
 CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.i: cmake_force
@@ -556,7 +543,7 @@ CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio/stdi
 
 CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.obj: CMakeFiles/picosyn.dir/flags.make
 CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.obj: /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_46) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_45) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.obj"
 	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.obj   -c /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c
 
 CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.i: cmake_force
@@ -567,9 +554,321 @@ CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_uart
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.s"
 	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.s
 
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.c.obj: /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_46) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.c.obj   -c /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.c.obj: /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_47) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.c.obj   -c /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.c.obj: /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_48) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.c.obj   -c /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.obj: /home/whowhat/pico/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_49) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.obj   -c /home/whowhat/pico/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.obj: /home/whowhat/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_50) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.obj   -c /home/whowhat/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c.obj: /home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_51) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c.obj   -c /home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c.obj: /home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_52) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c.obj   -c /home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd.c.obj: /home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_53) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd.c.obj   -c /home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd_control.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd_control.c.obj: /home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd_control.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_54) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd_control.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd_control.c.obj   -c /home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd_control.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd_control.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd_control.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd_control.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd_control.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd_control.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd_control.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd_control.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd_control.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/audio/audio_device.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/audio/audio_device.c.obj: /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/audio/audio_device.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_55) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/audio/audio_device.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/audio/audio_device.c.obj   -c /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/audio/audio_device.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/audio/audio_device.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/audio/audio_device.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/audio/audio_device.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/audio/audio_device.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/audio/audio_device.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/audio/audio_device.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/audio/audio_device.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/audio/audio_device.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.c.obj: /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_56) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.c.obj   -c /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.c.obj: /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_57) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.c.obj   -c /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.c.obj: /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_58) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.c.obj   -c /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/hid/hid_device.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/hid/hid_device.c.obj: /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/hid/hid_device.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_59) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/hid/hid_device.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/hid/hid_device.c.obj   -c /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/hid/hid_device.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/hid/hid_device.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/hid/hid_device.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/hid/hid_device.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/hid/hid_device.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/hid/hid_device.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/hid/hid_device.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/hid/hid_device.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/hid/hid_device.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/midi/midi_device.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/midi/midi_device.c.obj: /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/midi/midi_device.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_60) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/midi/midi_device.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/midi/midi_device.c.obj   -c /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/midi/midi_device.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/midi/midi_device.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/midi/midi_device.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/midi/midi_device.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/midi/midi_device.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/midi/midi_device.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/midi/midi_device.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/midi/midi_device.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/midi/midi_device.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/msc/msc_device.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/msc/msc_device.c.obj: /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/msc/msc_device.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_61) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/msc/msc_device.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/msc/msc_device.c.obj   -c /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/msc/msc_device.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/msc/msc_device.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/msc/msc_device.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/msc/msc_device.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/msc/msc_device.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/msc/msc_device.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/msc/msc_device.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/msc/msc_device.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/msc/msc_device.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.c.obj: /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_62) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.c.obj   -c /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ncm_device.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ncm_device.c.obj: /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ncm_device.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_63) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ncm_device.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ncm_device.c.obj   -c /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ncm_device.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ncm_device.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ncm_device.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ncm_device.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ncm_device.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ncm_device.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ncm_device.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ncm_device.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ncm_device.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.c.obj: /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_64) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.c.obj   -c /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.c.obj: /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_65) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.c.obj   -c /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/video/video_device.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/video/video_device.c.obj: /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/video/video_device.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_66) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/video/video_device.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/video/video_device.c.obj   -c /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/video/video_device.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/video/video_device.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/video/video_device.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/video/video_device.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/video/video_device.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/video/video_device.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/video/video_device.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/video/video_device.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/video/video_device.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/tusb.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/tusb.c.obj: /home/whowhat/pico/pico-sdk/lib/tinyusb/src/tusb.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_67) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/tusb.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/tusb.c.obj   -c /home/whowhat/pico/pico-sdk/lib/tinyusb/src/tusb.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/tusb.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/tusb.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/lib/tinyusb/src/tusb.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/tusb.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/tusb.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/tusb.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/lib/tinyusb/src/tusb.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/tusb.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/common/tusb_fifo.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/common/tusb_fifo.c.obj: /home/whowhat/pico/pico-sdk/lib/tinyusb/src/common/tusb_fifo.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_68) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/common/tusb_fifo.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/common/tusb_fifo.c.obj   -c /home/whowhat/pico/pico-sdk/lib/tinyusb/src/common/tusb_fifo.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/common/tusb_fifo.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/common/tusb_fifo.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/lib/tinyusb/src/common/tusb_fifo.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/common/tusb_fifo.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/common/tusb_fifo.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/common/tusb_fifo.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/lib/tinyusb/src/common/tusb_fifo.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/common/tusb_fifo.c.s
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c.obj: /home/whowhat/pico/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_69) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c.obj   -c /home/whowhat/pico/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c.s
+
 CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/dma.c.obj: CMakeFiles/picosyn.dir/flags.make
 CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/dma.c.obj: /home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/dma.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_47) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/dma.c.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_70) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/dma.c.obj"
 	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/dma.c.obj   -c /home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/dma.c
 
 CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/dma.c.i: cmake_force
@@ -582,7 +881,7 @@ CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/dm
 
 CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/pio.c.obj: CMakeFiles/picosyn.dir/flags.make
 CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/pio.c.obj: /home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/pio.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_48) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/pio.c.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_71) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/pio.c.obj"
 	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/pio.c.obj   -c /home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/pio.c
 
 CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/pio.c.i: cmake_force
@@ -637,10 +936,33 @@ picosyn_OBJECTS = \
 "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_malloc/pico_malloc.c.obj" \
 "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_mem_ops/mem_ops_aeabi.S.obj" \
 "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/crt0.S.obj" \
-"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp.obj" \
 "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/binary_info.c.obj" \
 "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.obj" \
 "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd_control.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/audio/audio_device.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/hid/hid_device.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/midi/midi_device.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/msc/msc_device.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ncm_device.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/video/video_device.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/tusb.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/common/tusb_fifo.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c.obj" \
 "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/dma.c.obj" \
 "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/pio.c.obj"
 
@@ -689,16 +1011,39 @@ picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pi
 picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_malloc/pico_malloc.c.obj
 picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_mem_ops/mem_ops_aeabi.S.obj
 picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/crt0.S.obj
-picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/new_delete.cpp.obj
 picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_standard_link/binary_info.c.obj
 picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.obj
 picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/reset_interface.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/stdio_usb_descriptors.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/device/usbd_control.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/audio/audio_device.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/dfu/dfu_rt_device.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/hid/hid_device.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/midi/midi_device.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/msc/msc_device.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ecm_rndis_device.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/net/ncm_device.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/usbtmc/usbtmc_device.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/video/video_device.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/tusb.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/common/tusb_fifo.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c.obj
 picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/dma.c.obj
 picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/pio.c.obj
 picosyn.elf: CMakeFiles/picosyn.dir/build.make
 picosyn.elf: pico-sdk/src/rp2_common/boot_stage2/bs2_default_padded_checksummed.S
 picosyn.elf: CMakeFiles/picosyn.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_49) "Linking CXX executable picosyn.elf"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_72) "Linking C executable picosyn.elf"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/picosyn.dir/link.txt --verbose=$(VERBOSE)
 	/usr/bin/arm-none-eabi-objcopy -Oihex /mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/picosyn.elf picosyn.hex
 	/usr/bin/arm-none-eabi-objcopy -Obinary /mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/picosyn.elf picosyn.bin
