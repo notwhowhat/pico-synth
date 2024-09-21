@@ -49,7 +49,7 @@ volatile struct voice voices[VOICE_COUNT] = {0};
 void initialize_voice(volatile struct voice *v) {
     v->used = false;
     v->note = 0;
-    v->selected_waveform = SQUARE;
+    v->selected_waveform = SAW;
     v->table_index = 0.0;
 }
 
@@ -118,10 +118,12 @@ void on_pwm_interrupt() {
 
     float master_out = 0.0;
 
+    /*
     // i could use a linked list. but do i actually want to?
     int new_notes[VOICE_COUNT] = {0};
     int new_note_counter = 0;
 
+    // finds new notes
     for (int i = 0; i < 128; i++) {
         // i can integrate this with where the values are first recieved in process midi
         // a new note!
@@ -139,6 +141,7 @@ void on_pwm_interrupt() {
     struct voice *free_voices[VOICE_COUNT];
     int free_voice_counter = 0;
 
+    // gets free voices and steals the lowest voice
     if (new_notes[0] != 0) {
         for (int i = 0; i < VOICE_COUNT; i++) {
             if (!voices[i].used) {
@@ -147,17 +150,22 @@ void on_pwm_interrupt() {
             } else {
                 // the voice with the lowest note gets stolen
                 if (voices[i].note < lowest_voice_note->note) {
+                    // technically it should sort all of the voices and put them in 
+                    // order, but i don't have time for that
                     lowest_voice_note = &voices[i];
                 }
             }
         }
-
+        
+        // goes through the free voices and sets the new notes to them
         // this is a wip. it shouldn't and doesn't work
+        // i actually think that this is intentional.
         for (int i = 0; i < new_note_counter; i++) {
             free_voices[i]->note = new_notes[i];
             free_voices[i]->used = true;
         }
     }
+    */
 
     // i forgot to add notes to free voices ;)
 
@@ -173,19 +181,20 @@ void on_pwm_interrupt() {
         if (midi_keys[voices[i].note] != 0) {
             // not off
             // performance problem
-            //voices[i].table_index += (360 / (44100 / FREQUENCIES[i]));
-            //if (voices[i].table_index > 360.0F) {
-            //    voices[i].table_index = voices[i].table_index - 360.0F;
-            //}
+            voices[i].table_index += (360 / (44100 / FREQUENCIES[voices[i].note]));
+            //voices[i].table_index += ((44100 / FREQUENCIES[i]) / 360);
+            if (voices[i].table_index > 360.0F) {
+                voices[i].table_index = voices[i].table_index - 360.0F;
+            }
 
-            //master_out += oscillator(voices[i].selected_waveform, voices[i].table_index);
+            master_out += oscillator(voices[i].selected_waveform, voices[i].table_index);
         } else {
             // envelopes are note available
             voices[i].used = false;
         }
     }
     
-    waveform selected_waveform = SIN;
+    //waveform selected_waveform = SIN;
 
     //note_on = 0;
     //for (int i = 0; i < 128; i++) {
@@ -262,7 +271,7 @@ void process_midi(void) {
                 // this should have fixed most of the problems
                 // what i think was happening before is that it was trying to 
                 // recieve a note off using a note on cc 
-                // status uint8_t
+                // status byte
                 midi_cmd[0] = midi_input;
                 midi_counter++;
             }
@@ -286,20 +295,63 @@ void process_midi(void) {
     // i'll keep it temporarily so that i don't break anything more
     if (midi_counter == 3) {
         midi_counter = 0;
+
         uint8_t status = midi_cmd[0] & 240;
         uint8_t channel = midi_cmd[1] & 15;
 
+        // i could use a linked list. but do i actually want to?
+        int new_notes[VOICE_COUNT] = {0};
+        int new_note_counter = 0;
+
         switch (status) {
-            case 128:
+            case 128: // note off
                 gpio_put(MIDI_LED_PIN, 0);
                 midi_previous_keys[midi_cmd[1]] = midi_keys[midi_cmd[1]];
                 midi_keys[midi_cmd[1]] = 0;
                 break;
-            case 144:
+            case 144: // note on
+                // refactor this complete dumpsterfire
+
                 gpio_put(MIDI_LED_PIN, 1);
                 // this should work, but it's risky. check if it's a correct value
                 midi_previous_keys[midi_cmd[1]] = midi_keys[midi_cmd[1]];
                 midi_keys[midi_cmd[1]] = midi_cmd[2];
+                
+                // so that the synth doesn't have do redo the whole operation if someone plays way to many keys
+                if (new_note_counter < VOICE_COUNT) {
+                    new_notes[new_note_counter] = midi_cmd[1];
+                    new_note_counter++;
+                }
+
+                struct voice *lowest_voice_note = voices;
+                struct voice *free_voices[VOICE_COUNT];
+                int free_voice_counter = 0;
+
+                // gets free voices and steals the lowest voice
+                if (new_notes[0] != 0) {
+                    for (int i = 0; i < VOICE_COUNT; i++) {
+                        if (!voices[i].used) {
+                            free_voices[free_voice_counter] = &voices[i];
+                            free_voice_counter++;
+                        } else {
+                            // the voice with the lowest note gets stolen
+                            if (voices[i].note < lowest_voice_note->note) {
+                                // technically it should sort all of the voices and put them in 
+                                // order, but i don't have time for that
+                                lowest_voice_note = &voices[i];
+                                // 8 levels of indentation
+                            }
+                        }
+                    }
+                    
+                    // goes through the free voices and sets the new notes to them
+                    // this is a wip. it shouldn't and doesn't work
+                    // i actually think that this is intentional.
+                    for (int i = 0; i < new_note_counter; i++) {
+                        free_voices[i]->note = new_notes[i];
+                        free_voices[i]->used = true;
+                    }
+                }
                 break;
         }
 
@@ -375,70 +427,5 @@ int main(void) {
 
     while (1) {
         process_midi();
-        /*
-        while (!uart_is_readable(uart0)) {
-        }
-        uint8_t midi_input = uart_getc(uart0);
-
-        switch (midi_counter) {
-            case 0:
-                if (midi_input != 0) {
-                    // this should have fixed most of the problems
-                    // what i think was happening before is that it was trying to 
-                    // recieve a note off using a note on cc 
-                    // status uint8_t
-                    midi_cmd[0] = midi_input;
-                    midi_counter++;
-                }
-                break;
-            case 1:
-                midi_cmd[1] = midi_input;
-                midi_counter++;
-                break;
-            case 2:
-                midi_cmd[2] = midi_input;
-                midi_counter++;
-                break;
-        }
-
-        // this might result in a bug if the velocity is zero (note off)
-        // TODO: i think that this might be the bug
-        // i can change the use of midi_counter
-        //if (midi_cmd[2] != 0) {
-
-        // this midi_counter==3 code shouldn't be needed with the new code added
-        // i'll keep it temporarily so that i don't break anything more
-        if (midi_counter == 3) {
-            midi_counter = 0;
-            uint8_t status = midi_cmd[0] & 240;
-            uint8_t channel = midi_cmd[1] & 15;
-
-            switch (status) {
-                case 128:
-                    //gpio_put(ERR_LED_PIN, 0);
-                    gpio_put(MIDI_LED_PIN, 0);
-                    //note_on = 0;
-                    //gain = 0;
-                    midi_previous_keys[midi_cmd[1]] = midi_keys[midi_cmd[1]];
-                    midi_keys[midi_cmd[1]] = 0;
-                    //printf("noff");
-                    break;
-                case 144:
-                    //gpio_put(ERR_LED_PIN, 1);
-                    gpio_put(MIDI_LED_PIN, 1);
-                    //note_on = 1;
-
-                    // this should work, but it's risky. check if it's a correct value
-                    midi_previous_keys[midi_cmd[1]] = midi_keys[midi_cmd[1]];
-                    midi_keys[midi_cmd[1]] = midi_cmd[2];
-                    //printf("non");
-                    break;
-            }
-
-            midi_cmd[0] = 0;
-            midi_cmd[1] = 0;
-            midi_cmd[2] = 0;
-        }
-        */
     }
 }
