@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.13)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Debug)
 
 # initalize pico_sdk from installed location
 # (note this can come from environment, CMake cache etc)
@@ -42,6 +42,7 @@ target_link_libraries(picosyn
         hardware_timer
         hardware_clocks
         hardware_pwm
+        pico_multicore
         )
 
 pico_add_extra_outputs(picosyn)

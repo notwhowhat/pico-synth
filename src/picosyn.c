@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "pico/stdlib.h"   // stdlib 
+#include "pico/multicore.h"
 #include "hardware/irq.h"  // interrupts
 #include "hardware/pwm.h"  // pwm 
 #include "hardware/sync.h" // wait for interrupt 
@@ -41,6 +42,7 @@ struct voice {
     int note; // which note in midi_keys it's connected to
     waveform selected_waveform;
     float table_index;
+    float table_increment;
 };
 
 // when set to zero EVERYTHING inside of the structs get too
@@ -51,6 +53,7 @@ void initialize_voice(volatile struct voice *v) {
     v->note = 0;
     v->selected_waveform = SAW;
     v->table_index = 0.0;
+    v->table_increment = 0.0;
 }
 
 /* program flow for voice handler:
@@ -181,8 +184,13 @@ void on_pwm_interrupt() {
         if (midi_keys[voices[i].note] != 0) {
             // not off
             // performance problem
-            voices[i].table_index += (360 / (44100 / FREQUENCIES[voices[i].note]));
+            if (voices[i].table_increment == 0.0) {
+                // this maybe optimizes
+                voices[i].table_increment = (360 / (44100 / FREQUENCIES[voices[i].note]));
+            }
+            //voices[i].table_index += (360 / (44100 / FREQUENCIES[voices[i].note]));
             //voices[i].table_index += ((44100 / FREQUENCIES[i]) / 360);
+            voices[i].table_index += voices[i].table_increment;
             if (voices[i].table_index > 360.0F) {
                 voices[i].table_index = voices[i].table_index - 360.0F;
             }
@@ -191,6 +199,7 @@ void on_pwm_interrupt() {
         } else {
             // envelopes are note available
             voices[i].used = false;
+            voices[i].table_increment = 0.0;
         }
     }
     
@@ -361,6 +370,37 @@ void process_midi(void) {
         }
 }
 
+/* 
+time to implement multithreading! it will be split up in two threads. the load
+won't be balanced in any way, instead, the midi will be on one core, and the audio processing will be on the
+other one. this will probably be the best solution because the audio is triggered by an isr.
+
+i will share the voices in global memory. it's suboptimal, but i will at least be using mutexes instead.
+where should i the audio get processed? probably in the second core? idk.
+*/
+
+void core1_entry() {
+    int audio_pin_slice = pwm_gpio_to_slice_num(AUDIO_PIN);
+
+    // Setup PWM interrupt to fire when PWM cycle is complete
+    // TODO XXX: this should maybe be set last, so that an interrupt doesn't trigger before everything's initialized
+    pwm_clear_irq(audio_pin_slice);
+    pwm_set_irq_enabled(audio_pin_slice, true);
+    // set the handle function above
+    irq_set_exclusive_handler(PWM_IRQ_WRAP, on_pwm_interrupt); 
+    irq_set_enabled(PWM_IRQ_WRAP, true);
+
+    // https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#ga8478ee26cc144e947ccd75b0169059a6
+
+    // Setup PWM for audio output
+    pwm_config config = pwm_get_default_config();
+    pwm_config_set_clkdiv(&config, 14.0f); 
+    pwm_config_set_wrap(&config, 200); 
+    pwm_init(audio_pin_slice, &config, true);
+
+    pwm_set_gpio_level(AUDIO_PIN, 0);
+}
+
 int main(void) {
     /* Overclocking for fun but then also so the system clock is a 
      * multiple of typical audio sampling rates.
@@ -374,6 +414,8 @@ int main(void) {
     
     gpio_set_function(AUDIO_PIN, GPIO_FUNC_PWM);
 
+
+    /*
     int audio_pin_slice = pwm_gpio_to_slice_num(AUDIO_PIN);
     
 
@@ -399,10 +441,13 @@ int main(void) {
     pwm_init(audio_pin_slice, &config, true);
 
     pwm_set_gpio_level(AUDIO_PIN, 0);
+    */
 
     int baud_rate = uart_init(uart0, 31250);
     gpio_set_function(1, GPIO_FUNC_UART);
     uart_set_fifo_enabled(uart0, true);
+
+    core1_entry();
 
     // backup sin generator
     //float increment = 2.0 * M_PI / 360;
