@@ -12,7 +12,7 @@
 #define MIDI_LED_PIN 15
 #define AUDIO_PIN 2 
 
-#define VOICE_COUNT 5
+#define VOICE_COUNT 4
 
 #include "wavetables.h"
 #include "frequencies.h"
@@ -120,56 +120,6 @@ void on_pwm_interrupt() {
     pwm_clear_irq(pwm_gpio_to_slice_num(AUDIO_PIN));    
 
     float master_out = 0.0;
-
-    /*
-    // i could use a linked list. but do i actually want to?
-    int new_notes[VOICE_COUNT] = {0};
-    int new_note_counter = 0;
-
-    // finds new notes
-    for (int i = 0; i < 128; i++) {
-        // i can integrate this with where the values are first recieved in process midi
-        // a new note!
-        if (midi_keys[i] > 0 && midi_previous_keys[i] == 0) {
-
-            // so that the synth doesn't have do redo the whole operation if someone plays way to many keys
-            if (new_note_counter < VOICE_COUNT) {
-              new_notes[new_note_counter] = i;
-              new_note_counter++;
-            }
-        }
-    }
-
-    struct voice *lowest_voice_note = voices;
-    struct voice *free_voices[VOICE_COUNT];
-    int free_voice_counter = 0;
-
-    // gets free voices and steals the lowest voice
-    if (new_notes[0] != 0) {
-        for (int i = 0; i < VOICE_COUNT; i++) {
-            if (!voices[i].used) {
-                free_voices[free_voice_counter] = &voices[i];
-                free_voice_counter++;
-            } else {
-                // the voice with the lowest note gets stolen
-                if (voices[i].note < lowest_voice_note->note) {
-                    // technically it should sort all of the voices and put them in 
-                    // order, but i don't have time for that
-                    lowest_voice_note = &voices[i];
-                }
-            }
-        }
-        
-        // goes through the free voices and sets the new notes to them
-        // this is a wip. it shouldn't and doesn't work
-        // i actually think that this is intentional.
-        for (int i = 0; i < new_note_counter; i++) {
-            free_voices[i]->note = new_notes[i];
-            free_voices[i]->used = true;
-        }
-    }
-    */
-
     // i forgot to add notes to free voices ;)
 
     // TODO: i should actually use static for all of the voices and define them here. i know
@@ -274,43 +224,27 @@ void process_midi(void) {
     }
     uint8_t midi_input = uart_getc(uart0);
 
-    switch (midi_counter) {
-        case 0:
-            if (midi_input != 0) {
-                // this should have fixed most of the problems
-                // what i think was happening before is that it was trying to 
-                // recieve a note off using a note on cc 
-                // status byte
-                midi_cmd[0] = midi_input;
-                midi_counter++;
-            }
-            break;
-        case 1:
-            midi_cmd[1] = midi_input;
+    if (midi_counter == 0) {
+        // so that it only starts parsing when we have something interresting
+        // otherwise it might get offset or not parsed at all!
+        if (midi_input != 0) { 
+            midi_cmd[midi_counter] = midi_input;
             midi_counter++;
-            break;
-        case 2:
-            midi_cmd[2] = midi_input;
-            midi_counter++;
-            break;
+        }
+
+    } else {
+        midi_cmd[midi_counter] = midi_input;
+        midi_counter++;
     }
 
-    // this might result in a bug if the velocity is zero (note off)
-    // TODO: i think that this might be the bug
-    // i can change the use of midi_counter
-    //if (midi_cmd[2] != 0) {
-
-    // this midi_counter==3 code shouldn't be needed with the new code added
-    // i'll keep it temporarily so that i don't break anything more
     if (midi_counter == 3) {
         midi_counter = 0;
 
         uint8_t status = midi_cmd[0] & 240;
         uint8_t channel = midi_cmd[1] & 15;
 
-        // i could use a linked list. but do i actually want to?
-        int new_notes[VOICE_COUNT] = {0};
-        int new_note_counter = 0;
+        // this can probably optimized a bit!
+        // there will only be one new note. so i can remove everything with that.
 
         switch (status) {
             case 128: // note off
@@ -327,40 +261,25 @@ void process_midi(void) {
                 midi_keys[midi_cmd[1]] = midi_cmd[2];
                 
                 // so that the synth doesn't have do redo the whole operation if someone plays way to many keys
-                if (new_note_counter < VOICE_COUNT) {
-                    new_notes[new_note_counter] = midi_cmd[1];
-                    new_note_counter++;
-                }
 
-                struct voice *lowest_voice_note = voices;
-                struct voice *free_voices[VOICE_COUNT];
-                int free_voice_counter = 0;
+                struct voice *selected_voice = voices; // &voices[0], because array's are mad
 
-                // gets free voices and steals the lowest voice
-                if (new_notes[0] != 0) {
-                    for (int i = 0; i < VOICE_COUNT; i++) {
-                        if (!voices[i].used) {
-                            free_voices[free_voice_counter] = &voices[i];
-                            free_voice_counter++;
-                        } else {
-                            // the voice with the lowest note gets stolen
-                            if (voices[i].note < lowest_voice_note->note) {
-                                // technically it should sort all of the voices and put them in 
-                                // order, but i don't have time for that
-                                lowest_voice_note = &voices[i];
-                                // 8 levels of indentation
-                            }
+                for (int i = 0; i < VOICE_COUNT; i++) {
+                    if (!voices[i].used) {
+                        selected_voice = &voices[i];
+                        break;
+                    } else {
+                        // the voice with the lowest note gets stolen i don't know if this is good. 
+                        // i could probably change it if i have timers, but what would happen is that
+                        // the variables would get too long if they would be timed in ms.
+                        if (voices[i].note < selected_voice->note) {
+                            selected_voice = &voices[i];
                         }
                     }
-                    
-                    // goes through the free voices and sets the new notes to them
-                    // this is a wip. it shouldn't and doesn't work
-                    // i actually think that this is intentional.
-                    for (int i = 0; i < new_note_counter; i++) {
-                        free_voices[i]->note = new_notes[i];
-                        free_voices[i]->used = true;
-                    }
                 }
+                
+                selected_voice->note = midi_cmd[1];
+                selected_voice->used = true;
                 break;
         }
 
@@ -399,8 +318,14 @@ void core1_entry() {
     pwm_init(audio_pin_slice, &config, true);
 
     pwm_set_gpio_level(AUDIO_PIN, 0);
+
+    while (1) {
+        tight_loop_contents();
+    }
 }
 
+
+// I SHOULD RUN THE MIDIIII ON A UART INTERRUPT WHY CAN'T I THINKGKKKGKGKGK
 int main(void) {
     /* Overclocking for fun but then also so the system clock is a 
      * multiple of typical audio sampling rates.
@@ -414,40 +339,11 @@ int main(void) {
     
     gpio_set_function(AUDIO_PIN, GPIO_FUNC_PWM);
 
-
-    /*
-    int audio_pin_slice = pwm_gpio_to_slice_num(AUDIO_PIN);
-    
-
-    // Setup PWM interrupt to fire when PWM cycle is complete
-    // TODO XXX: this should maybe be set last, so that an interrupt doesn't trigger before everything's initialized
-    pwm_clear_irq(audio_pin_slice);
-    pwm_set_irq_enabled(audio_pin_slice, true);
-    // set the handle function above
-    irq_set_exclusive_handler(PWM_IRQ_WRAP, on_pwm_interrupt); 
-    irq_set_enabled(PWM_IRQ_WRAP, true);
-
-    // for the midi irq handelling
-    // uart_set_irq_enables()
-    // irq_set_exclusive_handler(UART0_IRQ, midi handler)
-    // i should use UART0_IRQ or UART1_IRQ as the sources
-    // https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#ga8478ee26cc144e947ccd75b0169059a6
-    // ill just have midi in the loop instead :>
-
-    // Setup PWM for audio output
-    pwm_config config = pwm_get_default_config();
-    pwm_config_set_clkdiv(&config, 14.0f); 
-    pwm_config_set_wrap(&config, 200); 
-    pwm_init(audio_pin_slice, &config, true);
-
-    pwm_set_gpio_level(AUDIO_PIN, 0);
-    */
-
     int baud_rate = uart_init(uart0, 31250);
     gpio_set_function(1, GPIO_FUNC_UART);
     uart_set_fifo_enabled(uart0, true);
 
-    core1_entry();
+    //core1_entry();
 
     // backup sin generator
     //float increment = 2.0 * M_PI / 360;
@@ -469,6 +365,8 @@ int main(void) {
     for (int i = 0; i < VOICE_COUNT; i++) {
         initialize_voice(&voices[i]);
     }
+
+    multicore_launch_core1(core1_entry);
 
     while (1) {
         process_midi();
