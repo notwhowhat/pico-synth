@@ -4,6 +4,7 @@
 #include "hardware/irq.h"  // interrupts
 #include "hardware/pwm.h"  // pwm 
 #include "hardware/sync.h" // wait for interrupt 
+#include "hardware/uart.h"
 
 #include "math.h"
 
@@ -12,7 +13,7 @@
 #define MIDI_LED_PIN 15
 #define AUDIO_PIN 2 
 
-#define VOICE_COUNT 4
+#define VOICE_COUNT 16
 
 #include "wavetables.h"
 #include "frequencies.h"
@@ -50,7 +51,7 @@ volatile struct voice voices[VOICE_COUNT] = {0};
 
 void initialize_voice(volatile struct voice *v) {
     v->used = false;
-    v->note = 0;
+    v->note = 60;
     v->selected_waveform = SAW;
     v->table_index = 0.0;
     v->table_increment = 0.0;
@@ -219,24 +220,126 @@ this seems good because it should let the audio process as much as it needs.
 void process_midi(void) {
     static int midi_counter = 0;
     static uint8_t midi_cmd[] = {0, 0, 0};
+    static uint8_t cmd_fn = 0;
 
-    while (!uart_is_readable(uart0)) {
+    // it's actually waiting here quite a bit
+    while (!uart_is_readable(uart1)) {
     }
-    uint8_t midi_input = uart_getc(uart0);
 
-    if (midi_counter == 0) {
-        // so that it only starts parsing when we have something interresting
-        // otherwise it might get offset or not parsed at all!
-        if (midi_input != 0) { 
-            midi_cmd[midi_counter] = midi_input;
-            midi_counter++;
+    uint8_t midi_input = uart_getc(uart1);
+    printf("%d\n", midi_input);
+
+    midi_cmd[midi_counter] = midi_input;
+    midi_counter++;
+
+    // this can probably optimized a bit!
+    // there will only be one new note. so i can remove everything with that.
+
+    // it doesn't send the status byte if it was the same as the last
+    // that's the problem! I FOUUUUNNND IT!
+    // the status byte always starts with a zero, so it's always bigger than 127!!
+
+    // MAKE THIS INTO A FUNCTION BEFORE I GO INSANE
+    // also add voice suppoooorrt
+    if (midi_counter == 2 && midi_cmd[0] < 128) {
+        // this is technicaly unsafe, but come on.
+        if (cmd_fn != 0) { // uninitialized
+            printf("short\n");
+            switch (cmd_fn) {
+                case 128:
+                    gpio_put(MIDI_LED_PIN, 0);
+                    printf("off @ %d\n", midi_cmd[0]);
+                    midi_previous_keys[midi_cmd[0]] = midi_keys[midi_cmd[0]];
+                    midi_keys[midi_cmd[0]] = 0;
+                    break;
+                
+                case 144: // note on
+                    gpio_put(MIDI_LED_PIN, 1);
+                    printf("on @ %d\n", midi_cmd[0]);
+
+                    // this should work, but it's risky. check if it's a correct value
+                    midi_previous_keys[midi_cmd[0]] = midi_keys[midi_cmd[0]];
+                    midi_keys[midi_cmd[0]] = midi_cmd[1];
+                    
+                    // so that the synth doesn't have do redo the whole operation if someone plays way to many keys
+
+                    struct voice *selected_voice = voices; // &voices[0], because array's are mad
+
+                    for (int i = 0; i < VOICE_COUNT; i++) {
+                        if (!voices[i].used) {
+                            selected_voice = &voices[i];
+                            break;
+                        } else {
+                            // the voice with the lowest note gets stolen i don't know if this is good. 
+                            // i could probably change it if i have timers, but what would happen is that
+                            // the variables would get too long if they would be timed in ms.
+                            if (voices[i].note < selected_voice->note) {
+                                selected_voice = &voices[i];
+                            }
+                        }
+                    }
+                    
+                    selected_voice->note = midi_cmd[0];
+                    selected_voice->used = true;
+                    break;
+            }
+        }
+        
+        // process midi with last status byte
+        midi_cmd[0] = 0;
+        midi_cmd[1] = 0;
+        midi_cmd[2] = 0;
+        midi_counter = 0;
+
+    } else if (midi_counter == 3) {
+        printf("new\n");
+        cmd_fn = midi_cmd[0] & 240;
+        switch(cmd_fn) {
+            case 128: // note off
+                gpio_put(MIDI_LED_PIN, 0);
+                printf("off @ %d\n", midi_cmd[1]);
+                midi_previous_keys[midi_cmd[1]] = midi_keys[midi_cmd[1]];
+                midi_keys[midi_cmd[1]] = 0;
+                break;
+            case 144: // note on
+                gpio_put(MIDI_LED_PIN, 1);
+                printf("on @ %d\n", midi_cmd[1]);
+
+                // this should work, but it's risky. check if it's a correct value
+                midi_previous_keys[midi_cmd[1]] = midi_keys[midi_cmd[1]];
+                midi_keys[midi_cmd[1]] = midi_cmd[2];
+                
+                // so that the synth doesn't have do redo the whole operation if someone plays way to many keys
+
+                struct voice *selected_voice = voices; // &voices[0], because array's are mad
+
+                for (int i = 0; i < VOICE_COUNT; i++) {
+                    if (!voices[i].used) {
+                        selected_voice = &voices[i];
+                        break;
+                    } else {
+                        // the voice with the lowest note gets stolen i don't know if this is good. 
+                        // i could probably change it if i have timers, but what would happen is that
+                        // the variables would get too long if they would be timed in ms.
+                        if (voices[i].note < selected_voice->note) {
+                            selected_voice = &voices[i];
+                        }
+                    }
+                }
+                
+                selected_voice->note = midi_cmd[1];
+                selected_voice->used = true;
+                break;
         }
 
-    } else {
-        midi_cmd[midi_counter] = midi_input;
-        midi_counter++;
+
+        midi_cmd[0] = 0;
+        midi_cmd[1] = 0;
+        midi_cmd[2] = 0;
+        midi_counter = 0;
     }
 
+    /*
     if (midi_counter == 3) {
         midi_counter = 0;
 
@@ -246,16 +349,21 @@ void process_midi(void) {
         // this can probably optimized a bit!
         // there will only be one new note. so i can remove everything with that.
 
+        // it doesn't send the status byte if it was the same as the last
+        // that's the problem! I FOUUUUNNND IT!
+        // the status byte always starts with a zero, so it's always bigger than 127!!
+
         switch (status) {
             case 128: // note off
                 gpio_put(MIDI_LED_PIN, 0);
+                printf("off @ %d\n", midi_cmd[1]);
                 midi_previous_keys[midi_cmd[1]] = midi_keys[midi_cmd[1]];
                 midi_keys[midi_cmd[1]] = 0;
                 break;
             case 144: // note on
-                // refactor this complete dumpsterfire
-
                 gpio_put(MIDI_LED_PIN, 1);
+                printf("on @ %d\n", midi_cmd[1]);
+
                 // this should work, but it's risky. check if it's a correct value
                 midi_previous_keys[midi_cmd[1]] = midi_keys[midi_cmd[1]];
                 midi_keys[midi_cmd[1]] = midi_cmd[2];
@@ -287,6 +395,7 @@ void process_midi(void) {
         midi_cmd[1] = 0;
         midi_cmd[2] = 0;
         }
+*/
 }
 
 /* 
@@ -299,10 +408,10 @@ where should i the audio get processed? probably in the second core? idk.
 */
 
 void core1_entry() {
+    gpio_set_function(AUDIO_PIN, GPIO_FUNC_PWM);
+
     int audio_pin_slice = pwm_gpio_to_slice_num(AUDIO_PIN);
 
-    // Setup PWM interrupt to fire when PWM cycle is complete
-    // TODO XXX: this should maybe be set last, so that an interrupt doesn't trigger before everything's initialized
     pwm_clear_irq(audio_pin_slice);
     pwm_set_irq_enabled(audio_pin_slice, true);
     // set the handle function above
@@ -313,6 +422,7 @@ void core1_entry() {
 
     // Setup PWM for audio output
     pwm_config config = pwm_get_default_config();
+    // these values are set to run at the sample rate of 44.1KHz.
     pwm_config_set_clkdiv(&config, 14.0f); 
     pwm_config_set_wrap(&config, 200); 
     pwm_init(audio_pin_slice, &config, true);
@@ -335,13 +445,11 @@ int main(void) {
     // TODO: its the clock frequency that's wrong. at just a tiny bit more it works flawelessly, but 
     // if i just lower it a tiny bit it errors, because of no led output. 
     //set_sys_clock_khz(123480, true); 
-    set_sys_clock_khz(124000, true); 
+    set_sys_clock_khz(124000, true);
     
-    gpio_set_function(AUDIO_PIN, GPIO_FUNC_PWM);
-
-    int baud_rate = uart_init(uart0, 31250);
-    gpio_set_function(1, GPIO_FUNC_UART);
-    uart_set_fifo_enabled(uart0, true);
+    int midi_baud_rate = uart_init(uart1, 31250);
+    gpio_set_function(5, GPIO_FUNC_UART);
+    uart_set_fifo_enabled(uart1, true);
 
     //core1_entry();
 
