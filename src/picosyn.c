@@ -13,7 +13,7 @@
 #define MIDI_LED_PIN 15
 #define AUDIO_PIN 2 
 
-#define VOICE_COUNT 16
+#define VOICE_COUNT 4
 
 #include "wavetables.h"
 #include "frequencies.h"
@@ -44,6 +44,7 @@ struct voice {
     waveform selected_waveform;
     float table_index;
     float table_increment;
+    int age;
 };
 
 // when set to zero EVERYTHING inside of the structs get too
@@ -55,6 +56,7 @@ void initialize_voice(volatile struct voice *v) {
     v->selected_waveform = SAW;
     v->table_index = 0.0;
     v->table_increment = 0.0;
+    v->age = 0;
 }
 
 /* program flow for voice handler:
@@ -154,6 +156,7 @@ void on_pwm_interrupt() {
             voices[i].used = false;
             voices[i].table_increment = 0.0;
             voices[i].table_index = 0.0;
+            voices[1].age = 0.0;
         }
     }
     
@@ -236,6 +239,7 @@ void process_midi_commands(uint8_t cmd_fn, uint8_t note, uint8_t velocity) {
             
             // so that the synth doesn't have do redo the whole operation if someone plays way to many keys
 
+            // the voice stealing is now done so that the lowest note is stolen.
             struct voice *selected_voice = voices; // &voices[0], because array's are mad
 
             for (int i = 0; i < VOICE_COUNT; i++) {
@@ -246,10 +250,14 @@ void process_midi_commands(uint8_t cmd_fn, uint8_t note, uint8_t velocity) {
                     // the voice with the lowest note gets stolen i don't know if this is good. 
                     // i could probably change it if i have timers, but what would happen is that
                     // the variables would get too long if they would be timed in ms.
-                    if (voices[i].note < selected_voice->note) {
+                    if (voices[i].age < selected_voice->age) {
                         selected_voice = &voices[i];
                     }
+                    //if (voices[i].note < selected_voice->note) {
+                    //    selected_voice = &voices[i];
+                    //}
                 }
+                voices[i].age++;
             }
             
             selected_voice->note = note;
