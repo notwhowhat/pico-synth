@@ -29,7 +29,7 @@ typedef enum {
     SQUARE,
 } waveform;
 
-int gain = 100;
+int gain = 50;
 volatile int note_on = 0;
 
 // this fills it with zeros!
@@ -51,7 +51,7 @@ volatile struct voice voices[VOICE_COUNT] = {0};
 
 void initialize_voice(volatile struct voice *v) {
     v->used = false;
-    v->note = 60;
+    v->note = 0;
     v->selected_waveform = SAW;
     v->table_index = 0.0;
     v->table_increment = 0.0;
@@ -133,24 +133,27 @@ void on_pwm_interrupt() {
         
         // this is where the notes get stuck playing
         if (midi_keys[voices[i].note] != 0) {
-            // not off
-            // performance problem
-            if (voices[i].table_increment == 0.0) {
-                // this maybe optimizes
-                voices[i].table_increment = (360 / (44100 / FREQUENCIES[voices[i].note]));
-            }
-            //voices[i].table_index += (360 / (44100 / FREQUENCIES[voices[i].note]));
+            // this could technicaly be used for performance, but it might be causing the vibrato chord bug
+            //if (voices[i].table_increment == 0.0) {
+            //    // this maybe optimizes
+            //    voices[i].table_increment = (360 / (44100 / FREQUENCIES[voices[i].note]));
+            //}
+            voices[i].table_index += (360 / (44100 / FREQUENCIES[voices[i].note]));
             //voices[i].table_index += ((44100 / FREQUENCIES[i]) / 360);
-            voices[i].table_index += voices[i].table_increment;
+            //voices[i].table_index += voices[i].table_increment;
             if (voices[i].table_index > 360.0F) {
                 voices[i].table_index = voices[i].table_index - 360.0F;
             }
 
+            // the gain must be set to something sensible, otherwise the it get's too loud, so the int's
+            // sometimes get overloaded and an lfo-like sound occurs.
             master_out += oscillator(voices[i].selected_waveform, voices[i].table_index);
+
         } else {
             // envelopes are note available
             voices[i].used = false;
             voices[i].table_increment = 0.0;
+            voices[i].table_index = 0.0;
         }
     }
     
@@ -173,8 +176,6 @@ void on_pwm_interrupt() {
     //    master_out += sample;
     //}
 
-    // this is done to make amplify the signal while making it unsigned in a controlled way
-    // TODO: add a compressor like gain, so the volume gets set compared to the maximum size
     master_out = (master_out * gain) + gain;
 
     pwm_set_gpio_level(AUDIO_PIN, (uint16_t)master_out);
@@ -217,10 +218,51 @@ this seems good because it should let the audio process as much as it needs.
 
 */
 
+void process_midi_commands(uint8_t cmd_fn, uint8_t note, uint8_t velocity) {
+    switch(cmd_fn) {
+        case 128:
+            gpio_put(MIDI_LED_PIN, 0);
+            //printf("off @ %d\n", midi_cmd[1]);
+            midi_previous_keys[note] = midi_keys[note];
+            midi_keys[note] = 0;
+            break;
+        case 144:
+            gpio_put(MIDI_LED_PIN, 1);
+            //printf("on @ %d\n", midi_cmd[1]);
+
+            // this should work, but it's risky. check if it's a correct value
+            midi_previous_keys[note] = midi_keys[note];
+            midi_keys[note] = velocity;
+            
+            // so that the synth doesn't have do redo the whole operation if someone plays way to many keys
+
+            struct voice *selected_voice = voices; // &voices[0], because array's are mad
+
+            for (int i = 0; i < VOICE_COUNT; i++) {
+                if (!voices[i].used) {
+                    selected_voice = &voices[i];
+                    break;
+                } else {
+                    // the voice with the lowest note gets stolen i don't know if this is good. 
+                    // i could probably change it if i have timers, but what would happen is that
+                    // the variables would get too long if they would be timed in ms.
+                    if (voices[i].note < selected_voice->note) {
+                        selected_voice = &voices[i];
+                    }
+                }
+            }
+            
+            selected_voice->note = note;
+            selected_voice->used = true;
+            break;
+    }
+}
+
 void process_midi(void) {
     static int midi_counter = 0;
     static uint8_t midi_cmd[] = {0, 0, 0};
     static uint8_t cmd_fn = 0;
+    static uint8_t cmd_channel = 0;
 
     // it's actually waiting here quite a bit
     while (!uart_is_readable(uart1)) {
@@ -239,50 +281,11 @@ void process_midi(void) {
     // that's the problem! I FOUUUUNNND IT!
     // the status byte always starts with a zero, so it's always bigger than 127!!
 
-    // MAKE THIS INTO A FUNCTION BEFORE I GO INSANE
-    // also add voice suppoooorrt
     if (midi_counter == 2 && midi_cmd[0] < 128) {
         // this is technicaly unsafe, but come on.
         if (cmd_fn != 0) { // uninitialized
             printf("short\n");
-            switch (cmd_fn) {
-                case 128:
-                    gpio_put(MIDI_LED_PIN, 0);
-                    printf("off @ %d\n", midi_cmd[0]);
-                    midi_previous_keys[midi_cmd[0]] = midi_keys[midi_cmd[0]];
-                    midi_keys[midi_cmd[0]] = 0;
-                    break;
-                
-                case 144: // note on
-                    gpio_put(MIDI_LED_PIN, 1);
-                    printf("on @ %d\n", midi_cmd[0]);
-
-                    // this should work, but it's risky. check if it's a correct value
-                    midi_previous_keys[midi_cmd[0]] = midi_keys[midi_cmd[0]];
-                    midi_keys[midi_cmd[0]] = midi_cmd[1];
-                    
-                    // so that the synth doesn't have do redo the whole operation if someone plays way to many keys
-
-                    struct voice *selected_voice = voices; // &voices[0], because array's are mad
-
-                    for (int i = 0; i < VOICE_COUNT; i++) {
-                        if (!voices[i].used) {
-                            selected_voice = &voices[i];
-                            break;
-                        } else {
-                            // the voice with the lowest note gets stolen i don't know if this is good. 
-                            // i could probably change it if i have timers, but what would happen is that
-                            // the variables would get too long if they would be timed in ms.
-                            if (voices[i].note < selected_voice->note) {
-                                selected_voice = &voices[i];
-                            }
-                        }
-                    }
-                    
-                    selected_voice->note = midi_cmd[0];
-                    selected_voice->used = true;
-                    break;
-            }
+            process_midi_commands(cmd_fn, midi_cmd[0], midi_cmd[1]);
         }
         
         // process midi with last status byte
@@ -294,108 +297,14 @@ void process_midi(void) {
     } else if (midi_counter == 3) {
         printf("new\n");
         cmd_fn = midi_cmd[0] & 240;
-        switch(cmd_fn) {
-            case 128: // note off
-                gpio_put(MIDI_LED_PIN, 0);
-                printf("off @ %d\n", midi_cmd[1]);
-                midi_previous_keys[midi_cmd[1]] = midi_keys[midi_cmd[1]];
-                midi_keys[midi_cmd[1]] = 0;
-                break;
-            case 144: // note on
-                gpio_put(MIDI_LED_PIN, 1);
-                printf("on @ %d\n", midi_cmd[1]);
-
-                // this should work, but it's risky. check if it's a correct value
-                midi_previous_keys[midi_cmd[1]] = midi_keys[midi_cmd[1]];
-                midi_keys[midi_cmd[1]] = midi_cmd[2];
-                
-                // so that the synth doesn't have do redo the whole operation if someone plays way to many keys
-
-                struct voice *selected_voice = voices; // &voices[0], because array's are mad
-
-                for (int i = 0; i < VOICE_COUNT; i++) {
-                    if (!voices[i].used) {
-                        selected_voice = &voices[i];
-                        break;
-                    } else {
-                        // the voice with the lowest note gets stolen i don't know if this is good. 
-                        // i could probably change it if i have timers, but what would happen is that
-                        // the variables would get too long if they would be timed in ms.
-                        if (voices[i].note < selected_voice->note) {
-                            selected_voice = &voices[i];
-                        }
-                    }
-                }
-                
-                selected_voice->note = midi_cmd[1];
-                selected_voice->used = true;
-                break;
-        }
-
+        cmd_channel = midi_cmd[0] & 15;
+        process_midi_commands(cmd_fn, midi_cmd[1], midi_cmd[2]);
 
         midi_cmd[0] = 0;
         midi_cmd[1] = 0;
         midi_cmd[2] = 0;
         midi_counter = 0;
     }
-
-    /*
-    if (midi_counter == 3) {
-        midi_counter = 0;
-
-        uint8_t status = midi_cmd[0] & 240;
-        uint8_t channel = midi_cmd[1] & 15;
-
-        // this can probably optimized a bit!
-        // there will only be one new note. so i can remove everything with that.
-
-        // it doesn't send the status byte if it was the same as the last
-        // that's the problem! I FOUUUUNNND IT!
-        // the status byte always starts with a zero, so it's always bigger than 127!!
-
-        switch (status) {
-            case 128: // note off
-                gpio_put(MIDI_LED_PIN, 0);
-                printf("off @ %d\n", midi_cmd[1]);
-                midi_previous_keys[midi_cmd[1]] = midi_keys[midi_cmd[1]];
-                midi_keys[midi_cmd[1]] = 0;
-                break;
-            case 144: // note on
-                gpio_put(MIDI_LED_PIN, 1);
-                printf("on @ %d\n", midi_cmd[1]);
-
-                // this should work, but it's risky. check if it's a correct value
-                midi_previous_keys[midi_cmd[1]] = midi_keys[midi_cmd[1]];
-                midi_keys[midi_cmd[1]] = midi_cmd[2];
-                
-                // so that the synth doesn't have do redo the whole operation if someone plays way to many keys
-
-                struct voice *selected_voice = voices; // &voices[0], because array's are mad
-
-                for (int i = 0; i < VOICE_COUNT; i++) {
-                    if (!voices[i].used) {
-                        selected_voice = &voices[i];
-                        break;
-                    } else {
-                        // the voice with the lowest note gets stolen i don't know if this is good. 
-                        // i could probably change it if i have timers, but what would happen is that
-                        // the variables would get too long if they would be timed in ms.
-                        if (voices[i].note < selected_voice->note) {
-                            selected_voice = &voices[i];
-                        }
-                    }
-                }
-                
-                selected_voice->note = midi_cmd[1];
-                selected_voice->used = true;
-                break;
-        }
-
-        midi_cmd[0] = 0;
-        midi_cmd[1] = 0;
-        midi_cmd[2] = 0;
-        }
-*/
 }
 
 /* 

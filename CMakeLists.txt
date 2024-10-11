@@ -42,6 +42,7 @@ target_link_libraries(picosyn
         hardware_timer
         hardware_clocks
         hardware_pwm
+        hardware_uart
         pico_multicore
         )
 
