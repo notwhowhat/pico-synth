@@ -1587,6 +1587,33 @@ home/whowhat/pico/pico-sdk/src/rp2_common/pico_mem_ops/mem_ops_aeabi.S.obj:
 	$(MAKE) -f CMakeFiles/picosyn.dir/build.make CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_mem_ops/mem_ops_aeabi.S.obj
 .PHONY : home/whowhat/pico/pico-sdk/src/rp2_common/pico_mem_ops/mem_ops_aeabi.S.obj
 
+home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.obj: home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
+
+.PHONY : home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.obj
+
+# target to build an object file
+home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj:
+	$(MAKE) -f CMakeFiles/picosyn.dir/build.make CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
+.PHONY : home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
+
+home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.i: home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.i
+
+.PHONY : home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.i
+
+# target to preprocess a source file
+home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.i:
+	$(MAKE) -f CMakeFiles/picosyn.dir/build.make CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.i
+.PHONY : home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.i
+
+home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.s: home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.s
+
+.PHONY : home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.s
+
+# target to generate assembly for a file
+home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.s:
+	$(MAKE) -f CMakeFiles/picosyn.dir/build.make CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.s
+.PHONY : home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.s
+
 home/whowhat/pico/pico-sdk/src/rp2_common/pico_platform/platform.obj: home/whowhat/pico/pico-sdk/src/rp2_common/pico_platform/platform.c.obj
 
 .PHONY : home/whowhat/pico/pico-sdk/src/rp2_common/pico_platform/platform.obj
@@ -2089,6 +2116,9 @@ help:
 	@echo "... home/whowhat/pico/pico-sdk/src/rp2_common/pico_malloc/pico_malloc.i"
 	@echo "... home/whowhat/pico/pico-sdk/src/rp2_common/pico_malloc/pico_malloc.s"
 	@echo "... home/whowhat/pico/pico-sdk/src/rp2_common/pico_mem_ops/mem_ops_aeabi.obj"
+	@echo "... home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.obj"
+	@echo "... home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.i"
+	@echo "... home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.s"
 	@echo "... home/whowhat/pico/pico-sdk/src/rp2_common/pico_platform/platform.obj"
 	@echo "... home/whowhat/pico/pico-sdk/src/rp2_common/pico_platform/platform.i"
 	@echo "... home/whowhat/pico/pico-sdk/src/rp2_common/pico_platform/platform.s"

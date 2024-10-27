@@ -13,7 +13,7 @@
 #define MIDI_LED_PIN 15
 #define AUDIO_PIN 2 
 
-#define VOICE_COUNT 4
+#define VOICE_COUNT 16
 
 #include "wavetables.h"
 #include "frequencies.h"

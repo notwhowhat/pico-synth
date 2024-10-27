@@ -36,6 +36,7 @@ set(CMAKE_TARGET_DEFINITIONS_ASM
   "LIB_PICO_MALLOC=1"
   "LIB_PICO_MEM_OPS=1"
   "LIB_PICO_MEM_OPS_PICO=1"
+  "LIB_PICO_MULTICORE=1"
   "LIB_PICO_PLATFORM=1"
   "LIB_PICO_PRINTF=1"
   "LIB_PICO_PRINTF_PICO=1"
@@ -54,7 +55,7 @@ set(CMAKE_TARGET_DEFINITIONS_ASM
   "LIB_PICO_UTIL=1"
   "PICO_BOARD=\"pico\""
   "PICO_BUILD=1"
-  "PICO_CMAKE_BUILD_TYPE=\"Debug\""
+  "PICO_CMAKE_BUILD_TYPE=\"Release\""
   "PICO_COPY_TO_RAM=0"
   "PICO_CXX_ENABLE_EXCEPTIONS=0"
   "PICO_NO_FLASH=0"
@@ -118,6 +119,7 @@ set(CMAKE_ASM_TARGET_INCLUDE_PATH
   "/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/include"
   "/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/include"
   "/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pwm/include"
+  "/home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/include"
   )
 set(CMAKE_DEPENDS_CHECK_C
   "/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/audio/audio_device.c" "/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/class/audio/audio_device.c.obj"
@@ -168,6 +170,7 @@ set(CMAKE_DEPENDS_CHECK_C
   "/home/whowhat/pico/pico-sdk/src/rp2_common/pico_float/float_init_rom.c" "/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_float/float_init_rom.c.obj"
   "/home/whowhat/pico/pico-sdk/src/rp2_common/pico_float/float_math.c" "/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_float/float_math.c.obj"
   "/home/whowhat/pico/pico-sdk/src/rp2_common/pico_malloc/pico_malloc.c" "/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_malloc/pico_malloc.c.obj"
+  "/home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c" "/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj"
   "/home/whowhat/pico/pico-sdk/src/rp2_common/pico_platform/platform.c" "/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_platform/platform.c.obj"
   "/home/whowhat/pico/pico-sdk/src/rp2_common/pico_printf/printf.c" "/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.obj"
   "/home/whowhat/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c" "/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.obj"
@@ -201,6 +204,7 @@ set(CMAKE_TARGET_DEFINITIONS_C
   "LIB_PICO_MALLOC=1"
   "LIB_PICO_MEM_OPS=1"
   "LIB_PICO_MEM_OPS_PICO=1"
+  "LIB_PICO_MULTICORE=1"
   "LIB_PICO_PLATFORM=1"
   "LIB_PICO_PRINTF=1"
   "LIB_PICO_PRINTF_PICO=1"
@@ -219,7 +223,7 @@ set(CMAKE_TARGET_DEFINITIONS_C
   "LIB_PICO_UTIL=1"
   "PICO_BOARD=\"pico\""
   "PICO_BUILD=1"
-  "PICO_CMAKE_BUILD_TYPE=\"Debug\""
+  "PICO_CMAKE_BUILD_TYPE=\"Release\""
   "PICO_COPY_TO_RAM=0"
   "PICO_CXX_ENABLE_EXCEPTIONS=0"
   "PICO_NO_FLASH=0"
@@ -283,6 +287,7 @@ set(CMAKE_C_TARGET_INCLUDE_PATH
   "/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/include"
   "/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/include"
   "/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pwm/include"
+  "/home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/include"
   )
 
 # Targets to which this target links.
