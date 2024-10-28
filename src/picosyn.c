@@ -13,7 +13,7 @@
 #define MIDI_LED_PIN 15
 #define AUDIO_PIN 2 
 
-#define VOICE_COUNT 16
+#define VOICE_COUNT 1
 
 #include "wavetables.h"
 #include "frequencies.h"
@@ -37,14 +37,46 @@ volatile int note_on = 0;
 uint8_t midi_keys[128] = {0};
 uint8_t midi_previous_keys[128] = {0};
 
+/*
+envelopes will be y=kx+m
+k = max amplitude / env part
+a_mod = 1 / a_time
+d_mod = - 1 / d_time
+r_mod = - 1 / r_time
+if time > a_time then mod * d_mod
+
+envelope controll flow:
+if note is off then do release
+otherwise check if time < a_time then do attack
+otherwise check if time < d_time then do release
+otherwise do sustain
+if it's off then reset time start release
+then check if time
+
+*/
+
 // the voice gets allocated a note, which it reads
 struct voice {
     bool used;
     int note; // which note in midi_keys it's connected to
-    waveform selected_waveform;
+    int age;
+
     float table_index;
     float table_increment;
-    int age;
+
+    waveform selected_waveform;
+
+    // this is ugly. i know. the only envelope now is the volume one;
+    int time;
+
+    int a_time;
+    int d_time;
+    int r_time;
+    
+    float s_mod;
+    float a_mod;
+    float d_mod;
+    float r_mod;
 };
 
 // when set to zero EVERYTHING inside of the structs get too
@@ -53,10 +85,29 @@ volatile struct voice voices[VOICE_COUNT] = {0};
 void initialize_voice(volatile struct voice *v) {
     v->used = false;
     v->note = 0;
-    v->selected_waveform = SAW;
+    v->age = 0;
+
     v->table_index = 0.0;
     v->table_increment = 0.0;
-    v->age = 0;
+
+    v->selected_waveform = SAW;
+
+    v->time = 0;
+
+    v->a_time = 40000;
+    v->d_time = 20000;
+    v->r_time = 20000;
+    
+    v->s_mod = 0.5;
+    v->a_mod = 1.0 / v->a_time;
+
+    // dy = 1 - s_mod
+    // dx = 0 - d_time
+    v->d_mod = (1.0 - v->s_mod) / /*-*/(v->d_time);
+
+    // dy = s_mod - 0
+    // dx = 0 - r_time
+    v->r_mod = v->s_mod / -(v->r_time);
 }
 
 /* program flow for voice handler:
@@ -130,33 +181,99 @@ void on_pwm_interrupt() {
     // will only be accessed in here, and they can be initialized at decleration, without being overwritten.
     // i can use static for voices tooo!!!! i might be happy
 
+
+    /*
+    envelopes will be y=kx+m
+    k = max amplitude / env part
+    a_mod = 1 / a_time
+    d_mod = - 1 / d_time
+    r_mod = - 1 / r_time
+    if time > a_time then mod * d_mod
+
+    envelope controll flow:
+    if note is off then do release
+    otherwise check if time < a_time then do attack
+    otherwise check if time < d_time then do release
+    otherwise do sustain
+    if it's off then reset time start release
+    then check if time
+
+    */
+
     for (int i = 0; i < VOICE_COUNT; i++) {
-        // potential bug
-        
+
+        float vol_mod = 0.0;
+        ///*
+        // when refactoring into a function, make the do's return
+        // it's off (0 = note off)
+        if (midi_keys[voices[i].note] == 0) {
+            // the time only works if it gets reset for the release
+            // it has to check for a new note-off
+            if (midi_previous_keys[voices[i].note != 0]) {
+                // new command
+                voices[i].time = 0;
+            }
+
+            // check if it's releasing or if the note should be off 
+            if (voices[i].time < voices[i].r_time) {
+                // do release
+                vol_mod = voices[i].time * voices[i].r_mod;
+            } else {
+                // reset voice
+                initialize_voice(&voices[i]);
+                //printf("resetting!");
+            }
+        } else {
+            // the note is on!
+            // check first if attack, then decay
+            if (voices[i].time < voices[i].a_time) {
+                // do attack
+                vol_mod = voices[i].time * voices[i].a_mod;
+            } else if (voices[i].time < (voices[i].a_time + voices[i].d_time)) {
+                // do decay
+                // the decay is starting from where the attack is, but it's still going up
+                vol_mod = 1.0 - (voices[i].time - voices[i].a_time) * voices[i].d_mod;
+            } else {
+                // do sustain 
+                vol_mod = voices[i].s_mod;
+            }
+        }
+        // time starts counting up since the start. the envelope has already gone through the attack and decay. (not the problem because of poor code)
+        // the wave also goes out of phase between the envelope period changes. this is probably because the wave is made negative. (this is what causes the click)
+        // so i need to do it in a way without inverting the phase
+        // this could maybe be done by making the mod negative, and then taking it 1-mod or something similar
+        voices[i].time++;
+        //*/
+
+        //printf("%f\n", vol_mod);
+
+
         // this is where the notes get stuck playing
         if (midi_keys[voices[i].note] != 0) {
             // this could technicaly be used for performance, but it might be causing the vibrato chord bug
-            //if (voices[i].table_increment == 0.0) {
-            //    // this maybe optimizes
-            //    voices[i].table_increment = (360 / (44100 / FREQUENCIES[voices[i].note]));
-            //}
-            voices[i].table_index += (360 / (44100 / FREQUENCIES[voices[i].note]));
-            //voices[i].table_index += ((44100 / FREQUENCIES[i]) / 360);
-            //voices[i].table_index += voices[i].table_increment;
+            if (voices[i].table_increment == 0.0) {
+                // this maybe optimizes
+                voices[i].table_increment = (360 / (44100 / FREQUENCIES[voices[i].note]));
+            }
+
+            voices[i].table_index += voices[i].table_increment;
+            //voices[i].table_index += (360 / (44100 / FREQUENCIES[voices[i].note]));
             if (voices[i].table_index > 360.0F) {
                 voices[i].table_index = voices[i].table_index - 360.0F;
             }
 
             // the gain must be set to something sensible, otherwise the it get's too loud, so the int's
             // sometimes get overloaded and an lfo-like sound occurs.
-            master_out += oscillator(voices[i].selected_waveform, voices[i].table_index);
+            master_out += vol_mod * oscillator(voices[i].selected_waveform, voices[i].table_index);
 
         } else {
-            // envelopes are note available
-            voices[i].used = false;
-            voices[i].table_increment = 0.0;
-            voices[i].table_index = 0.0;
-            voices[1].age = 0.0;
+            // no envelopes now. the voice is terminated when the note off is recieved
+            // this is really inefficient. it resets every voice every cycle that it's off
+            initialize_voice(&voices[i]);
+            //voices[i].used = false;
+            //voices[i].table_increment = 0.0;
+            //voices[i].table_index = 0.0;
+            //voices[1].age = 0;
         }
     }
     
@@ -263,6 +380,14 @@ void process_midi_commands(uint8_t cmd_fn, uint8_t note, uint8_t velocity) {
             selected_voice->note = note;
             selected_voice->used = true;
             break;
+        case 176: // cc
+            if (note == 1) {
+                // modwheel
+                //printf("%d", velocity);
+            }
+            break;
+        case 224: // pitch bend
+            break;
     }
 }
 
@@ -277,7 +402,7 @@ void process_midi(void) {
     }
 
     uint8_t midi_input = uart_getc(uart1);
-    printf("%d\n", midi_input);
+    //printf("%d\n", midi_input);
 
     midi_cmd[midi_counter] = midi_input;
     midi_counter++;
@@ -292,7 +417,7 @@ void process_midi(void) {
     if (midi_counter == 2 && midi_cmd[0] < 128) {
         // this is technicaly unsafe, but come on.
         if (cmd_fn != 0) { // uninitialized
-            printf("short\n");
+            //printf("short\n");
             process_midi_commands(cmd_fn, midi_cmd[0], midi_cmd[1]);
         }
         
@@ -303,7 +428,7 @@ void process_midi(void) {
         midi_counter = 0;
 
     } else if (midi_counter == 3) {
-        printf("new\n");
+        //printf("new\n");
         cmd_fn = midi_cmd[0] & 240;
         cmd_channel = midi_cmd[0] & 15;
         process_midi_commands(cmd_fn, midi_cmd[1], midi_cmd[2]);
@@ -386,6 +511,7 @@ int main(void) {
 
     int midi_counter = 0;
     uint8_t midi_cmd[] = {0, 0, 0};
+
 
     for (int i = 0; i < VOICE_COUNT; i++) {
         initialize_voice(&voices[i]);
