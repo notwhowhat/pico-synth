@@ -13,7 +13,7 @@
 #define MIDI_LED_PIN 15
 #define AUDIO_PIN 2 
 
-#define VOICE_COUNT 1
+#define VOICE_COUNT 4
 
 #include "wavetables.h"
 #include "frequencies.h"
@@ -60,6 +60,7 @@ struct voice {
     bool used;
     int note; // which note in midi_keys it's connected to
     int age;
+    bool new;
 
     float table_index;
     float table_increment;
@@ -86,6 +87,7 @@ void initialize_voice(volatile struct voice *v) {
     v->used = false;
     v->note = 0;
     v->age = 0;
+    v->new = false;
 
     v->table_index = 0.0;
     v->table_increment = 0.0;
@@ -95,19 +97,19 @@ void initialize_voice(volatile struct voice *v) {
     v->time = 0;
 
     v->a_time = 40000;
-    v->d_time = 20000;
-    v->r_time = 20000;
+    v->d_time = 40000;
+    v->r_time = 80000;
     
     v->s_mod = 0.5;
     v->a_mod = 1.0 / v->a_time;
 
     // dy = 1 - s_mod
     // dx = 0 - d_time
-    v->d_mod = (1.0 - v->s_mod) / /*-*/(v->d_time);
+    v->d_mod = (1.0 - v->s_mod) / v->d_time;
 
     // dy = s_mod - 0
     // dx = 0 - r_time
-    v->r_mod = v->s_mod / -(v->r_time);
+    v->r_mod = v->s_mod / v->r_time;
 }
 
 /* program flow for voice handler:
@@ -205,49 +207,111 @@ void on_pwm_interrupt() {
         float vol_mod = 0.0;
         ///*
         // when refactoring into a function, make the do's return
-        // it's off (0 = note off)
-        if (midi_keys[voices[i].note] == 0) {
-            // the time only works if it gets reset for the release
-            // it has to check for a new note-off
-            if (midi_previous_keys[voices[i].note != 0]) {
-                // new command
-                voices[i].time = 0;
+        // resets the time if the note has just started so that the envelope plays in the right time
+
+        if (voices[i].used) {
+            // it's off (0 = note off)
+            if (midi_keys[voices[i].note] == 0) {
+                // the time only works if it gets reset for the release
+                // it has to check for a new note-off
+                if (midi_previous_keys[voices[i].note] != 0) {
+                    // new command
+                    printf("newoff");
+                    voices[i].time = 0;
+                    /// XXX DON"T DO THIS! I REALLY SHOULDN"T MESS WITH MIDI
+                    midi_previous_keys[voices[i].note] = 0;
+                }
+
+                // check if it's releasing or if the note should be off 
+                if (voices[i].time < voices[i].r_time) {
+                    // do release
+                    vol_mod = voices[i].s_mod - voices[i].time * voices[i].r_mod;
+                } else {
+                    // reset voice
+                    initialize_voice(&voices[i]);
+                    //printf("resetting!");
+                }
+            } else {
+                // the note is on!
+                // check first if attack, then decay
+                if (voices[i].time < voices[i].a_time) {
+                    // do attack
+                    vol_mod = voices[i].time * voices[i].a_mod;
+                } else if (voices[i].time < (voices[i].a_time + voices[i].d_time)) {
+                    // do decay
+                    // the decay is starting from where the attack is, but it's still going up
+                    vol_mod = 1.0 - (voices[i].time - voices[i].a_time) * voices[i].d_mod;
+                } else {
+                    // do sustain 
+                    vol_mod = voices[i].s_mod;
+                }
+            }
+            // time starts counting up since the start. the envelope has already gone through the attack and decay. (not the problem because of poor code)
+            // the wave also goes out of phase between the envelope period changes. this is probably because the wave is made negative. (this is what causes the click)
+            // so i need to do it in a way without inverting the phase
+            // this could maybe be done by making the mod negative, and then taking it 1-mod or something similar
+            //if (voices[i].used) {
+            voices[i].time++;
+        }
+        
+        
+        // this is where the notes get stuck playing
+        //if (midi_keys[voices[i].note] != 0) {
+        if (vol_mod != 0.0) {
+            // this could technicaly be used for performance, but it might be causing the vibrato chord bug
+            if (voices[i].table_increment == 0.0) {
+                // this maybe optimizes
+                voices[i].table_increment = (360 / (44100 / FREQUENCIES[voices[i].note]));
             }
 
-            // check if it's releasing or if the note should be off 
-            if (voices[i].time < voices[i].r_time) {
-                // do release
-                vol_mod = voices[i].time * voices[i].r_mod;
-            } else {
-                // reset voice
-                initialize_voice(&voices[i]);
-                //printf("resetting!");
+            voices[i].table_index += voices[i].table_increment;
+            //voices[i].table_index += (360 / (44100 / FREQUENCIES[voices[i].note]));
+            if (voices[i].table_index > 360.0F) {
+                voices[i].table_index = voices[i].table_index - 360.0F;
             }
+
+            // the gain must be set to something sensible, otherwise the it get's too loud, so the int's
+            // sometimes get overloaded and an lfo-like sound occurs.
+            master_out += vol_mod * oscillator(voices[i].selected_waveform, voices[i].table_index);
+
         } else {
-            // the note is on!
-            // check first if attack, then decay
-            if (voices[i].time < voices[i].a_time) {
-                // do attack
-                vol_mod = voices[i].time * voices[i].a_mod;
-            } else if (voices[i].time < (voices[i].a_time + voices[i].d_time)) {
-                // do decay
-                // the decay is starting from where the attack is, but it's still going up
-                vol_mod = 1.0 - (voices[i].time - voices[i].a_time) * voices[i].d_mod;
-            } else {
-                // do sustain 
-                vol_mod = voices[i].s_mod;
-            }
+            // no envelopes now. the voice is terminated when the note off is recieved
+            // this is really inefficient. it resets every voice every cycle that it's off
+            //initialize_voice(&voices[i]);
+            //voices[i].used = false;
+            //voices[i].table_increment = 0.0;
+            //voices[i].table_index = 0.0;
+            //voices[1].age = 0;
         }
-        // time starts counting up since the start. the envelope has already gone through the attack and decay. (not the problem because of poor code)
-        // the wave also goes out of phase between the envelope period changes. this is probably because the wave is made negative. (this is what causes the click)
-        // so i need to do it in a way without inverting the phase
-        // this could maybe be done by making the mod negative, and then taking it 1-mod or something similar
-        voices[i].time++;
+
+
         //*/
 
         //printf("%f\n", vol_mod);
 
+        /*
+        //if (vol_mod != 0.0) {
+            //printf("ssssound");
+            // time to generate sound!
+            if (voices[i].table_increment == 0.0) {
+                // this maybe optimizes
+                voices[i].table_increment = (360 / (44100 / FREQUENCIES[voices[i].note]));
+            }
 
+            voices[i].table_index += voices[i].table_increment;
+            //voices[i].table_index += (360 / (44100 / FREQUENCIES[voices[i].note]));
+            if (voices[i].table_index > 360.0F) {
+                voices[i].table_index = voices[i].table_index - 360.0F;
+            }
+
+            // the gain must be set to something sensible, otherwise the it get's too loud, so the int's
+            // sometimes get overloaded and an lfo-like sound occurs.
+            master_out += oscillator(voices[i].selected_waveform, voices[i].table_index);
+        //}
+        */
+
+
+        /*
         // this is where the notes get stuck playing
         if (midi_keys[voices[i].note] != 0) {
             // this could technicaly be used for performance, but it might be causing the vibrato chord bug
@@ -269,12 +333,13 @@ void on_pwm_interrupt() {
         } else {
             // no envelopes now. the voice is terminated when the note off is recieved
             // this is really inefficient. it resets every voice every cycle that it's off
-            initialize_voice(&voices[i]);
+            //initialize_voice(&voices[i]);
             //voices[i].used = false;
             //voices[i].table_increment = 0.0;
             //voices[i].table_index = 0.0;
             //voices[1].age = 0;
         }
+        */
     }
     
     //waveform selected_waveform = SIN;
@@ -342,7 +407,7 @@ void process_midi_commands(uint8_t cmd_fn, uint8_t note, uint8_t velocity) {
     switch(cmd_fn) {
         case 128:
             gpio_put(MIDI_LED_PIN, 0);
-            //printf("off @ %d\n", midi_cmd[1]);
+            printf("off @ %d\n", note);
             midi_previous_keys[note] = midi_keys[note];
             midi_keys[note] = 0;
             break;
@@ -379,6 +444,7 @@ void process_midi_commands(uint8_t cmd_fn, uint8_t note, uint8_t velocity) {
             
             selected_voice->note = note;
             selected_voice->used = true;
+            selected_voice->new = true;
             break;
         case 176: // cc
             if (note == 1) {
