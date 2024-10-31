@@ -275,6 +275,8 @@ hardware/sync.h
 /mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/src/hardware/sync.h
 hardware/uart.h
 /mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/src/hardware/uart.h
+hardware/timer.h
+/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/src/hardware/timer.h
 math.h
 /mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/src/math.h
 wavetables.h
