@@ -14,15 +14,12 @@
 #define MIDI_LED_PIN 15
 #define AUDIO_PIN 2 
 
-#define VOICE_COUNT 8
+#define VOICE_COUNT 16
 
 #include "wavetables.h"
 #include "frequencies.h"
 
-int available_available = 16;
-
 int audio_counter = 0;
-float sample_index = 0.0;
 
 typedef enum {
     SIN,
@@ -145,7 +142,6 @@ if there are more notes than voices and
 */
 
 float oscillator(waveform selected_waveform, float sample_index) {
-    // sample_index is still passed as a float for other interpolation methods later
     switch (selected_waveform) {
         case SIN:
             return SIN_TABLE[(int)sample_index];
@@ -174,9 +170,101 @@ if new notes have shown up:
         reset voice with lowest note 
 */
 
+float process_voice(struct voice *v) {
+    if (v->used) {
+        // it's off (0 = note off)
+        if (midi_keys[v->note] == 0) {
+            // the time only works if it gets reset for the release
+            // it has to check for a new note-off
+            if (midi_previous_keys[v->note] != 0) {
+                // new command
+                v->time = 0;
+                /// XXX DON"T DO THIS! I REALLY SHOULDN"T MESS WITH MIDI
+                midi_previous_keys[v->note] = 0;
+            }
+
+            // check if it's releasing or if the note should be off 
+            if (v->time < v->r_time) {
+                // do release
+                v->mod -= v->r_mod;
+            } else {
+                // reset voice
+                initialize_voice(v);
+            }
+        } else {
+            // the note is on!
+            // check first if attack, then decay
+            if (v->time < v->a_time) {
+                // do attack
+                v->mod += v->a_mod;
+            } else if (v->time < (v->a_time + v->d_time)) {
+                // do decay
+                // the decay is starting from where the attack is, but it's still going up
+                v->mod -= v->d_mod;
+            } else {
+                // do sustain 
+                v->mod = v->s_mod;
+            }
+        }
+        // time starts counting up since the start. the envelope has already gone through the attack and decay. (not the problem because of poor code)
+        // the wave also goes out of phase between the envelope period changes. this is probably because the wave is made negative. (this is what causes the click)
+        // so i need to do it in a way without inverting the phase
+        // this could maybe be done by making the mod negative, and then taking it 1-mod or something similar
+        //if (voices[i].used) {
+        v->time++;
+    }
+    
+    
+    // this is where the notes get stuck playing
+    //if (midi_keys[voices[i].note] != 0) {
+    if (v->mod != 0.0) {
+        // this could technicaly be used for performance, but it might be causing the vibrato chord bug
+        if (v->table_increment == 0.0) {
+            // this maybe optimizes
+            v->table_increment = (360 / (44100 / FREQUENCIES[v->note]));
+        }
+
+        v->table_index += v->table_increment;
+        //voices[i].table_index += (360 / (44100 / FREQUENCIES[voices[i].note]));
+        if (v->table_index > 360.0) {
+            v->table_index = v->table_index - 360.0;
+        }
+
+        // the gain must be set to something sensible, otherwise the it get's too loud, so the int's
+        // sometimes get overloaded and an lfo-like sound occurs.
+        //master_out += voices[i].mod * oscillator(voices[i].selected_waveform, voices[i].table_index);
+        return v->mod * oscillator(v->selected_waveform, v->table_index);
+    }
+    return 0.0;
+}
+
 // call it with isr (interrupt service routine)
 void on_pwm_interrupt() {
-    uint32_t start = time_us_32();
+    //uint32_t start = time_us_32();
+    pwm_clear_irq(pwm_gpio_to_slice_num(AUDIO_PIN));    
+
+    float master_out = 0.0;
+    // i forgot to add notes to free voices ;)
+
+    //for (struct voice *v = voices; v < voices + VOICE_COUNT; v++) {
+    for (int i = 0; i < VOICE_COUNT; i++) {
+        struct voice *v = &voices[i];
+        master_out += process_voice(v);
+    }
+    
+    master_out = gain * (master_out + gain);
+
+    pwm_set_gpio_level(AUDIO_PIN, (uint16_t)master_out);
+    //uint32_t d_time = time_us_32() - start;
+    //if (d_time > slowest_time) {
+    //    slowest_time = d_time;
+    //    printf("%d\n", slowest_time);
+    //}
+}
+
+void don_pwm_interrupt() {
+    static uint32_t slowest_time = 0;
+    //uint32_t start = time_us_32();
     pwm_clear_irq(pwm_gpio_to_slice_num(AUDIO_PIN));    
 
     float master_out = 0.0;
@@ -186,6 +274,14 @@ void on_pwm_interrupt() {
     // that it shouldn't work, but it doesn. i don't really know why so. if they're static they
     // will only be accessed in here, and they can be initialized at decleration, without being overwritten.
     // i can use static for voices tooo!!!! i might be happy
+
+    // time for the great refactor: removing floats, because no one needs to swim on silicon
+    // i will keep them in the wavetable because i don't feel like changing the python scripts now.
+    // the largest ammount of (decimals) that i can have is technically nine, but i will instead have only three.
+    // this is done for a smoother transistion to uint16's with a max of 65535
+
+    // overclocking could actually be a better option. i think i can more than float the clock frequency safely,
+    // to about 270000kHz
 
 
     /*
@@ -206,7 +302,11 @@ void on_pwm_interrupt() {
 
     */
 
+
+    uint32_t start = time_us_32();
     for (int i = 0; i < VOICE_COUNT; i++) {
+        // takes 16us
+        //master_out += process_voice(&voices[i]);
         ///*
         // when refactoring into a function, make the do's return
         // resets the time if the note has just started so that the envelope plays in the right time
@@ -217,6 +317,7 @@ void on_pwm_interrupt() {
         // if vol_mod is made static the envelope stages can add a modifier instead of multiplying a new value every cycle.
 
         // another problem is that the release is also triggered when the note is turned off before the sustain phase
+        ///*
 
         if (voices[i].used) {
             // it's off (0 = note off)
@@ -283,13 +384,19 @@ void on_pwm_interrupt() {
             master_out += voices[i].mod * oscillator(voices[i].selected_waveform, voices[i].table_index);
 
         }
+        //*/
     }
     
     //master_out = (master_out * gain) + gain;
-    master_out = (float)gain * (master_out + (float)gain);
+    // i think it's getting a bit aliased
+    master_out = gain * (master_out + gain);
 
     pwm_set_gpio_level(AUDIO_PIN, (uint16_t)master_out);
-    //printf("%d\n", time_us_32() - start);
+    //uint32_t d_time = time_us_32() - start;
+    //if (d_time > slowest_time) {
+    //    slowest_time = d_time;
+    //    printf("%d\n", slowest_time);
+    //}
 }
 
 int process_audio(void) {
@@ -442,7 +549,7 @@ void core1_entry() {
     pwm_config config = pwm_get_default_config();
     // these values are set to run at the sample rate of 44.1KHz.
     pwm_config_set_clkdiv(&config, 14.0f); 
-    pwm_config_set_wrap(&config, 200); 
+    pwm_config_set_wrap(&config, 437); 
     pwm_init(audio_pin_slice, &config, true);
 
     pwm_set_gpio_level(AUDIO_PIN, 0);
@@ -463,7 +570,9 @@ int main(void) {
     // TODO: its the clock frequency that's wrong. at just a tiny bit more it works flawelessly, but 
     // if i just lower it a tiny bit it errors, because of no led output. 
     //set_sys_clock_khz(123480, true); 
-    set_sys_clock_khz(124000, true);
+    //set_sys_clock_khz(124000, true);
+    // at the higher clock speed it can handle ten voices flawlessly (this is before filters and complex moduation)
+    set_sys_clock_khz(270000, true);
     
     int midi_baud_rate = uart_init(uart1, 31250);
     gpio_set_function(5, GPIO_FUNC_UART);
