@@ -14,12 +14,11 @@
 #define MIDI_LED_PIN 15
 #define AUDIO_PIN 2 
 
-#define VOICE_COUNT 16
+#define VOICE_COUNT 8
 
 #include "wavetables.h"
 #include "frequencies.h"
 
-int audio_counter = 0;
 
 typedef enum {
     SIN,
@@ -28,7 +27,6 @@ typedef enum {
 } waveform;
 
 int gain = 10;
-volatile int note_on = 0;
 
 // this fills it with zeros!
 // two key arrays are needed to be ablet to distinguish between a new and old note for envel
@@ -53,19 +51,25 @@ then check if time
 
 */
 
-// the voice gets allocated a note, which it reads
-struct voice {
-    bool used;
-    int note; // which note in midi_keys it's connected to
-    int age;
-    bool new;
+/*
+so what has to be done?
+envelopes and lfo(s) for modulation
+modulation for osc1 and osc2 frequency, amplitude, filter
 
-    float table_index;
-    float table_increment;
+implementing frequency modulation might be difficult because of the current oscillator design. 
+currently, the table increment is only calculated once per note and it remains constant.
+this has to be changed for frequency/pitch modulation to work 
 
-    waveform selected_waveform;
+oscilator aliasing is leaving huge artifacts on the sound. this can be fixed with filtering in the
+generation of the wavetables.
+i think i already have an algorithm for the filter. but i'm not sure about how well it will perform
 
-    // this is ugly. i know. the only envelope now is the volume one;
+it could be good to start working on the interface before i get to the modulation for real. then i can
+actually try using the features, and see how they work when i make them so that i don't need to redo everything
+because it doesn't work when the values change.
+*/
+
+struct env {
     int time;
     float mod;
 
@@ -79,10 +83,39 @@ struct voice {
     float r_mod;
 };
 
-// when set to zero EVERYTHING inside of the structs get too
-volatile struct voice voices[VOICE_COUNT] = {0};
+// the voice gets allocated a note, which it reads
+struct voice {
+    bool used;
+    int note; // which note in midi_keys it's connected to
+    int age;
+    bool new;
 
-void initialize_voice(volatile struct voice *v) {
+    float table_index;
+    float table_increment;
+
+    waveform selected_waveform;
+
+    struct env amp_env;
+};
+
+// when set to zero EVERYTHING inside of the structs get too
+struct voice voices[VOICE_COUNT] = {0};
+
+void initialize_env(struct env *e, int a_time, int d_time, int r_time, float s_mod) {
+    e->time = 0;
+    e->mod = 0.0;
+
+    e->a_time = 20000;
+    e->d_time = 20000;
+    e->r_time = 20000;
+
+    e->s_mod = 0.3;
+    e->a_mod = 1.0 / e->a_time;
+    e->d_mod = (1.0 - e->s_mod) / e->d_time;
+    e->r_mod = e->s_mod / e->r_time;
+}
+
+void initialize_voice(struct voice *v) {
     v->used = false;
     v->note = 0;
     v->age = 0;
@@ -93,24 +126,7 @@ void initialize_voice(volatile struct voice *v) {
 
     v->selected_waveform = SAW;
 
-    v->time = 0;
-    v->mod = 0.0;
-
-    // look out for zero division
-    v->a_time = 20000;
-    v->d_time = 20000;
-    v->r_time = 20000;
-    
-    v->s_mod = 0.3;
-    v->a_mod = 1.0 / v->a_time;
-
-    // dy = 1 - s_mod
-    // dx = 0 - d_time
-    v->d_mod = (1.0 - v->s_mod) / v->d_time;
-
-    // dy = s_mod - 0
-    // dx = 0 - r_time
-    v->r_mod = v->s_mod / v->r_time;
+    initialize_env(&v->amp_env, 20000, 20000, 20000, 0.4);
 }
 
 /* program flow for voice handler:
@@ -170,6 +186,7 @@ if new notes have shown up:
         reset voice with lowest note 
 */
 
+
 float process_voice(struct voice *v) {
     if (v->used) {
         // it's off (0 = note off)
@@ -178,15 +195,15 @@ float process_voice(struct voice *v) {
             // it has to check for a new note-off
             if (midi_previous_keys[v->note] != 0) {
                 // new command
-                v->time = 0;
+                v->amp_env.time = 0;
                 /// XXX DON"T DO THIS! I REALLY SHOULDN"T MESS WITH MIDI
                 midi_previous_keys[v->note] = 0;
             }
 
             // check if it's releasing or if the note should be off 
-            if (v->time < v->r_time) {
+            if (v->amp_env.time < v->amp_env.r_time) {
                 // do release
-                v->mod -= v->r_mod;
+                v->amp_env.mod -= v->amp_env.r_mod;
             } else {
                 // reset voice
                 initialize_voice(v);
@@ -194,16 +211,16 @@ float process_voice(struct voice *v) {
         } else {
             // the note is on!
             // check first if attack, then decay
-            if (v->time < v->a_time) {
+            if (v->amp_env.time < v->amp_env.a_time) {
                 // do attack
-                v->mod += v->a_mod;
-            } else if (v->time < (v->a_time + v->d_time)) {
+                v->amp_env.mod += v->amp_env.a_mod;
+            } else if (v->amp_env.time < (v->amp_env.a_time + v->amp_env.d_time)) {
                 // do decay
                 // the decay is starting from where the attack is, but it's still going up
-                v->mod -= v->d_mod;
+                v->amp_env.mod -= v->amp_env.d_mod;
             } else {
                 // do sustain 
-                v->mod = v->s_mod;
+                v->amp_env.mod = v->amp_env.s_mod;
             }
         }
         // time starts counting up since the start. the envelope has already gone through the attack and decay. (not the problem because of poor code)
@@ -211,17 +228,18 @@ float process_voice(struct voice *v) {
         // so i need to do it in a way without inverting the phase
         // this could maybe be done by making the mod negative, and then taking it 1-mod or something similar
         //if (voices[i].used) {
-        v->time++;
+        v->amp_env.time++;
     }
     
     
     // this is where the notes get stuck playing
     //if (midi_keys[voices[i].note] != 0) {
-    if (v->mod != 0.0) {
+    if (v->amp_env.mod != 0.0) {
         // this could technicaly be used for performance, but it might be causing the vibrato chord bug
         if (v->table_increment == 0.0) {
             // this maybe optimizes
-            v->table_increment = (360 / (44100 / FREQUENCIES[v->note]));
+            //v->table_increment = (360 / (44100 / FREQUENCIES[v->note]));
+            v->table_increment = (360 / (44100 / FREQUENCIES[50 + 100 * v->note]));
         }
 
         v->table_index += v->table_increment;
@@ -233,7 +251,7 @@ float process_voice(struct voice *v) {
         // the gain must be set to something sensible, otherwise the it get's too loud, so the int's
         // sometimes get overloaded and an lfo-like sound occurs.
         //master_out += voices[i].mod * oscillator(voices[i].selected_waveform, voices[i].table_index);
-        return v->mod * oscillator(v->selected_waveform, v->table_index);
+        return v->amp_env.mod * oscillator(v->selected_waveform, v->table_index);
     }
     return 0.0;
 }
@@ -244,7 +262,6 @@ void on_pwm_interrupt() {
     pwm_clear_irq(pwm_gpio_to_slice_num(AUDIO_PIN));    
 
     float master_out = 0.0;
-    // i forgot to add notes to free voices ;)
 
     //for (struct voice *v = voices; v < voices + VOICE_COUNT; v++) {
     for (int i = 0; i < VOICE_COUNT; i++) {
@@ -262,150 +279,6 @@ void on_pwm_interrupt() {
     //}
 }
 
-void don_pwm_interrupt() {
-    static uint32_t slowest_time = 0;
-    //uint32_t start = time_us_32();
-    pwm_clear_irq(pwm_gpio_to_slice_num(AUDIO_PIN));    
-
-    float master_out = 0.0;
-    // i forgot to add notes to free voices ;)
-
-    // TODO: i should actually use static for all of the voices and define them here. i know
-    // that it shouldn't work, but it doesn. i don't really know why so. if they're static they
-    // will only be accessed in here, and they can be initialized at decleration, without being overwritten.
-    // i can use static for voices tooo!!!! i might be happy
-
-    // time for the great refactor: removing floats, because no one needs to swim on silicon
-    // i will keep them in the wavetable because i don't feel like changing the python scripts now.
-    // the largest ammount of (decimals) that i can have is technically nine, but i will instead have only three.
-    // this is done for a smoother transistion to uint16's with a max of 65535
-
-    // overclocking could actually be a better option. i think i can more than float the clock frequency safely,
-    // to about 270000kHz
-
-
-    /*
-    envelopes will be y=kx+m
-    k = max amplitude / env part
-    a_mod = 1 / a_time
-    d_mod = - 1 / d_time
-    r_mod = - 1 / r_time
-    if time > a_time then mod * d_mod
-
-    envelope controll flow:
-    if note is off then do release
-    otherwise check if time < a_time then do attack
-    otherwise check if time < d_time then do release
-    otherwise do sustain
-    if it's off then reset time start release
-    then check if time
-
-    */
-
-
-    uint32_t start = time_us_32();
-    for (int i = 0; i < VOICE_COUNT; i++) {
-        // takes 16us
-        //master_out += process_voice(&voices[i]);
-        ///*
-        // when refactoring into a function, make the do's return
-        // resets the time if the note has just started so that the envelope plays in the right time
-        
-        // the weird drifting happens when the decay is being computed. i tried with a constant and it dissapeared.
-        // i think it's the same with the attack. it is. so the problem is that the multiplication is too slow.
-        // to fix this i can use subtraction instead. this might also open up posibilities for non-linear curves.
-        // if vol_mod is made static the envelope stages can add a modifier instead of multiplying a new value every cycle.
-
-        // another problem is that the release is also triggered when the note is turned off before the sustain phase
-        ///*
-
-        if (voices[i].used) {
-            // it's off (0 = note off)
-            if (midi_keys[voices[i].note] == 0) {
-                // the time only works if it gets reset for the release
-                // it has to check for a new note-off
-                if (midi_previous_keys[voices[i].note] != 0) {
-                    // new command
-                    voices[i].time = 0;
-                    /// XXX DON"T DO THIS! I REALLY SHOULDN"T MESS WITH MIDI
-                    midi_previous_keys[voices[i].note] = 0;
-                }
-
-                // check if it's releasing or if the note should be off 
-                if (voices[i].time < voices[i].r_time) {
-                    // do release
-                    voices[i].mod -= voices[i].r_mod;
-                } else {
-                    // reset voice
-                    initialize_voice(&voices[i]);
-                }
-            } else {
-                // the note is on!
-                // check first if attack, then decay
-                if (voices[i].time < voices[i].a_time) {
-                    // do attack
-                    voices[i].mod += voices[i].a_mod;
-                } else if (voices[i].time < (voices[i].a_time + voices[i].d_time)) {
-                    // do decay
-                    // the decay is starting from where the attack is, but it's still going up
-                    voices[i].mod -= voices[i].d_mod;
-                } else {
-                    // do sustain 
-                    voices[i].mod = voices[i].s_mod;
-                }
-            }
-            // time starts counting up since the start. the envelope has already gone through the attack and decay. (not the problem because of poor code)
-            // the wave also goes out of phase between the envelope period changes. this is probably because the wave is made negative. (this is what causes the click)
-            // so i need to do it in a way without inverting the phase
-            // this could maybe be done by making the mod negative, and then taking it 1-mod or something similar
-            //if (voices[i].used) {
-            voices[i].time++;
-        }
-        
-        
-        // this is where the notes get stuck playing
-        //if (midi_keys[voices[i].note] != 0) {
-        if (voices[i].mod != 0.0) {
-            // this could technicaly be used for performance, but it might be causing the vibrato chord bug
-            if (voices[i].table_increment == 0.0) {
-                // this maybe optimizes
-                voices[i].table_increment = (360 / (44100 / FREQUENCIES[voices[i].note]));
-            }
-
-            voices[i].table_index += voices[i].table_increment;
-            //voices[i].table_index += (360 / (44100 / FREQUENCIES[voices[i].note]));
-            if (voices[i].table_index > 360.0) {
-                voices[i].table_index = voices[i].table_index - 360.0;
-            }
-
-            // the gain must be set to something sensible, otherwise the it get's too loud, so the int's
-            // sometimes get overloaded and an lfo-like sound occurs.
-            //master_out += voices[i].mod * oscillator(voices[i].selected_waveform, voices[i].table_index);
-            master_out += voices[i].mod * oscillator(voices[i].selected_waveform, voices[i].table_index);
-
-        }
-        //*/
-    }
-    
-    //master_out = (master_out * gain) + gain;
-    // i think it's getting a bit aliased
-    master_out = gain * (master_out + gain);
-
-    pwm_set_gpio_level(AUDIO_PIN, (uint16_t)master_out);
-    //uint32_t d_time = time_us_32() - start;
-    //if (d_time > slowest_time) {
-    //    slowest_time = d_time;
-    //    printf("%d\n", slowest_time);
-    //}
-}
-
-int process_audio(void) {
-    // all audio and midi processing should be done here, instead of in the interurpt
-    // or not. idk
-
-    return 0;
-}
-
 /*
 priority for main program loop:
 
@@ -418,6 +291,12 @@ read in and set parameters
 
 this seems good because it should let the audio process as much as it needs.
 
+
+i think the next step is to fix modulation. and stop the oscillators from aliasing, but it 
+could be better to do that in combination with the filters. i don't know
+
+the next important step for modulation is to be able to alter the pitch on the fly, hopefuly in semitones.
+this opens up the possibility for both simple modulation with envelopes and lfo's, but also supersaws!
 */
 
 void process_midi_commands(uint8_t cmd_fn, uint8_t note, uint8_t velocity) {
@@ -579,13 +458,6 @@ int main(void) {
     uart_set_fifo_enabled(uart1, true);
 
     //core1_entry();
-
-    // backup sin generator
-    //float increment = 2.0 * M_PI / 360;
-    //for (int i = 0; i < 360; i++) {
-    //    //uint16_t sample = 100 + 100 * sin((audio_counter / div) * (2 * M_PI / 100));
-    //    sin_table[i] = (float)sin(increment * i); 
-    //}
 
     gpio_init(ERR_LED_PIN);
     gpio_set_dir(ERR_LED_PIN, GPIO_OUT);
