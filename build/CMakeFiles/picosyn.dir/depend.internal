@@ -2358,8 +2358,7 @@ CMakeFiles/picosyn.dir/src/picosyn.c.obj
  /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio/include/pico/stdio.h
  /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_uart/include/pico/stdio_uart.h
  /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/include/pico/stdio_usb.h
- /mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/src/frequencies.h
  /mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/src/picosyn.c
- /mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/src/wavetables.h
+ /mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/src/tables.h
  generated/pico_base/pico/config_autogen.h
  generated/pico_base/pico/version.h

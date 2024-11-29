@@ -258,8 +258,6 @@ hardware/uart.h
 pico/stdio.h
 /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/include/pico/pico/stdio.h
 
-/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/src/frequencies.h
-
 /mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/src/picosyn.c
 stdio.h
 -
@@ -279,12 +277,10 @@ hardware/timer.h
 /mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/src/hardware/timer.h
 math.h
 /mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/src/math.h
-wavetables.h
-/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/src/wavetables.h
-frequencies.h
-/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/src/frequencies.h
+tables.h
+/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/src/tables.h
 
-/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/src/wavetables.h
+/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/src/tables.h
 
 generated/pico_base/pico/config_autogen.h
 /home/whowhat/pico/pico-sdk/src/boards/include/boards/pico.h

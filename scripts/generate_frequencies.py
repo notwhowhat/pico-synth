@@ -5,6 +5,8 @@ from textwrap import dedent
 
 # three types of wavetables:
 # square, sin and sawtooth (triangle will come, but i'm too lazy to implement it now)
+# instead of having table indicies, the tables can instead be filled with increments.
+# i actually think that this will improve performence sustantially.
 
 CENTS: bool = True
 TABLE_LENGTH: int = 128
@@ -28,7 +30,7 @@ def generate_table(length: int) -> np.ndarray:
 
 def format_table(table: np.ndarray) -> str:
     top: str = f'float FREQUENCIES[] = {{'
-    bottom: str = '};'
+    bottom: str = '}\n;'
 
     values: str = ''
     for sample in table:

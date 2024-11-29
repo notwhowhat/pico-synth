@@ -16,8 +16,9 @@
 
 #define VOICE_COUNT 8
 
-#include "wavetables.h"
-#include "frequencies.h"
+//#include "wavetables.h"
+//#include "frequencies.h"
+#include "tables.h"
 
 
 typedef enum {
@@ -83,6 +84,12 @@ struct env {
     float r_mod;
 };
 
+struct osc {
+    float table_index;
+    float table_increment;
+    waveform selected_waveform;
+};
+
 // the voice gets allocated a note, which it reads
 struct voice {
     bool used;
@@ -93,6 +100,8 @@ struct voice {
     float table_index;
     float table_increment;
 
+    struct osc osc1;
+
     waveform selected_waveform;
 
     struct env amp_env;
@@ -100,6 +109,29 @@ struct voice {
 
 // when set to zero EVERYTHING inside of the structs get too
 struct voice voices[VOICE_COUNT] = {0};
+
+float oscillator(waveform selected_waveform, float sample_index) {
+    switch (selected_waveform) {
+        case SIN:
+            return SIN_TABLE[(int)sample_index];
+            break;
+       case SAW:
+            return SAW_TABLE[(int)sample_index];
+            break;
+       case SQUARE:
+            return SQUARE_TABLE[(int)sample_index];
+            break;
+        default:
+            return 0.0;
+    }
+}
+
+void initialize_osc(struct osc *osc, waveform selected_waveform) {
+    osc->table_index = 0.0;
+
+    osc->table_increment = 0.0;
+    osc->selected_waveform = selected_waveform;
+}
 
 void initialize_env(struct env *e, int a_time, int d_time, int r_time, float s_mod) {
     e->time = 0;
@@ -127,74 +159,70 @@ void initialize_voice(struct voice *v) {
     v->selected_waveform = SAW;
 
     initialize_env(&v->amp_env, 20000, 20000, 20000, 0.4);
+    initialize_osc(&v->osc1, SAW);
 }
 
-/* program flow for voice handler:
-loop through new notes
-loop through old notes
-if new notes have shown up:
-    loop through voices
-    if any voices are free:
-        set voice to not free
-        set voice note
-    else:
-        loop through voices
-        reset voice with lowest note 
-        
+void start_env_r(struct env *e) {
+    e->time = 0;
+}
 
-loop through notes and save how many that are on
-loop through voices and see how many that are free
-if there are more notes than voices and
-*/
-
-
-/*
-* PWM Interrupt Handler which outputs PWM level and advances the 
-* current sample. 
-* 
-* We repeat the same value for 8 cycles this means sample rate etc
-* adjust by factor of 8   (this is what bitshifting <<3 is doing)
-* 
-*/
-
-float oscillator(waveform selected_waveform, float sample_index) {
-    switch (selected_waveform) {
-        case SIN:
-            return SIN_TABLE[(int)sample_index];
-            break;
-       case SAW:
-            return SAW_TABLE[(int)sample_index];
-            break;
-       case SQUARE:
-            return SQUARE_TABLE[(int)sample_index];
-            break;
-        default:
-            return 0.0;
+void process_env_r(struct env *e, bool amp) {
+    if (e->time < e->r_time) {
+        // do release
+        e->mod -= e->r_mod;
+    } else {
+        // reset voice
+        e->mod = 0.0;
     }
+
+    e->time++;
 }
 
-/* program flow for voice handler:
-loop through new notes
-loop through old notes
-if new notes have shown up:
-    loop through voices
-    if any voices are free:
-        set voice to not free
-        set voice note
-    else:
-        loop through voices
-        reset voice with lowest note 
-*/
+void process_env_ads(struct env *e) {
+    if (e->time < e->a_time) {
+        // do attack
+        e->mod += e->a_mod;
+    } else if (e->time < (e->a_time + e->d_time)) {
+        // do decay
+        // the decay is starting from where the attack is, but it's still going up
+        e->mod -= e->d_mod;
+    } else {
+        // do sustain 
+        e->mod = e->s_mod;
+    }
 
+    e->time++;
+}
 
 float process_voice(struct voice *v) {
+    if (v->used) {
+        if (midi_keys[v->note] == 0) {
+            if (midi_previous_keys[v->note] != 0) {
+                // do this with all envelopes
+                start_env_r(&v->amp_env);
+
+                midi_previous_keys[v->note] = 0;
+            }
+
+            process_env_r(&v->amp_env, true);
+            if (v->amp_env.mod == 0.0) {
+                initialize_voice(v);
+            }
+        } else {
+            // do this with all enveloeps
+            process_env_ads(&v->amp_env);
+        }
+
+        //v->amp_env.time++;
+    }
+    /*
     if (v->used) {
         // it's off (0 = note off)
         if (midi_keys[v->note] == 0) {
             // the time only works if it gets reset for the release
             // it has to check for a new note-off
             if (midi_previous_keys[v->note] != 0) {
-                // new command
+                // new command (start release)
                 v->amp_env.time = 0;
                 /// XXX DON"T DO THIS! I REALLY SHOULDN"T MESS WITH MIDI
                 midi_previous_keys[v->note] = 0;
@@ -223,33 +251,30 @@ float process_voice(struct voice *v) {
                 v->amp_env.mod = v->amp_env.s_mod;
             }
         }
-        // time starts counting up since the start. the envelope has already gone through the attack and decay. (not the problem because of poor code)
-        // the wave also goes out of phase between the envelope period changes. this is probably because the wave is made negative. (this is what causes the click)
-        // so i need to do it in a way without inverting the phase
-        // this could maybe be done by making the mod negative, and then taking it 1-mod or something similar
-        //if (voices[i].used) {
         v->amp_env.time++;
     }
+    */
     
     
     // this is where the notes get stuck playing
     //if (midi_keys[voices[i].note] != 0) {
     if (v->amp_env.mod != 0.0) {
-        // this could technicaly be used for performance, but it might be causing the vibrato chord bug
-        if (v->table_increment == 0.0) {
-            // this maybe optimizes
-            //v->table_increment = (360 / (44100 / FREQUENCIES[v->note]));
-            v->table_increment = (360 / (44100 / FREQUENCIES[50 + 100 * v->note]));
-        }
+        //return v->amp_env.mod * process_osc(&v->osc1, v->note);
+        //if (v->table_increment == 0.0) {
+        //    // this maybe optimizes
+        //    //v->table_increment = (360 / (44100 / FREQUENCIES[v->note]));
+        //    v->table_increment = (360 / (44100 / FREQUENCIES[50 + 100 * v->note]));
+        //}
 
-        v->table_index += v->table_increment;
-        //voices[i].table_index += (360 / (44100 / FREQUENCIES[voices[i].note]));
+        //v->table_index += v->table_increment;
+        ////voices[i].table_index += (360 / (44100 / FREQUENCIES[voices[i].note]));
+
+        v->table_index += INCREMENTS[50 + 100 * v->note];
         if (v->table_index > 360.0) {
             v->table_index = v->table_index - 360.0;
         }
 
         // the gain must be set to something sensible, otherwise the it get's too loud, so the int's
-        // sometimes get overloaded and an lfo-like sound occurs.
         //master_out += voices[i].mod * oscillator(voices[i].selected_waveform, voices[i].table_index);
         return v->amp_env.mod * oscillator(v->selected_waveform, v->table_index);
     }

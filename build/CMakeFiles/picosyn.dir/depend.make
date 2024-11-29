@@ -2357,9 +2357,8 @@ CMakeFiles/picosyn.dir/src/picosyn.c.obj: /home/whowhat/pico/pico-sdk/src/rp2_co
 CMakeFiles/picosyn.dir/src/picosyn.c.obj: /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio/include/pico/stdio.h
 CMakeFiles/picosyn.dir/src/picosyn.c.obj: /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_uart/include/pico/stdio_uart.h
 CMakeFiles/picosyn.dir/src/picosyn.c.obj: /home/whowhat/pico/pico-sdk/src/rp2_common/pico_stdio_usb/include/pico/stdio_usb.h
-CMakeFiles/picosyn.dir/src/picosyn.c.obj: ../src/frequencies.h
 CMakeFiles/picosyn.dir/src/picosyn.c.obj: ../src/picosyn.c
-CMakeFiles/picosyn.dir/src/picosyn.c.obj: ../src/wavetables.h
+CMakeFiles/picosyn.dir/src/picosyn.c.obj: ../src/tables.h
 CMakeFiles/picosyn.dir/src/picosyn.c.obj: generated/pico_base/pico/config_autogen.h
 CMakeFiles/picosyn.dir/src/picosyn.c.obj: generated/pico_base/pico/version.h
 
