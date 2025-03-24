@@ -930,6 +930,33 @@ home/whowhat/pico/pico-sdk/src/common/pico_util/queue.c.s:
 	$(MAKE) -f CMakeFiles/picosyn.dir/build.make CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/common/pico_util/queue.c.s
 .PHONY : home/whowhat/pico/pico-sdk/src/common/pico_util/queue.c.s
 
+home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.obj: home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.obj
+
+.PHONY : home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.obj
+
+# target to build an object file
+home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.obj:
+	$(MAKE) -f CMakeFiles/picosyn.dir/build.make CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.obj
+.PHONY : home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.obj
+
+home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.i: home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.i
+
+.PHONY : home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.i
+
+# target to preprocess a source file
+home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.i:
+	$(MAKE) -f CMakeFiles/picosyn.dir/build.make CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.i
+.PHONY : home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.i
+
+home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.s: home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.s
+
+.PHONY : home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.s
+
+# target to generate assembly for a file
+home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.s:
+	$(MAKE) -f CMakeFiles/picosyn.dir/build.make CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.s
+.PHONY : home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.s
+
 home/whowhat/pico/pico-sdk/src/rp2_common/hardware_claim/claim.obj: home/whowhat/pico/pico-sdk/src/rp2_common/hardware_claim/claim.c.obj
 
 .PHONY : home/whowhat/pico/pico-sdk/src/rp2_common/hardware_claim/claim.obj
@@ -2043,6 +2070,9 @@ help:
 	@echo "... home/whowhat/pico/pico-sdk/src/common/pico_util/queue.obj"
 	@echo "... home/whowhat/pico/pico-sdk/src/common/pico_util/queue.i"
 	@echo "... home/whowhat/pico/pico-sdk/src/common/pico_util/queue.s"
+	@echo "... home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.obj"
+	@echo "... home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.i"
+	@echo "... home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.s"
 	@echo "... home/whowhat/pico/pico-sdk/src/rp2_common/hardware_claim/claim.obj"
 	@echo "... home/whowhat/pico/pico-sdk/src/rp2_common/hardware_claim/claim.i"
 	@echo "... home/whowhat/pico/pico-sdk/src/rp2_common/hardware_claim/claim.s"

@@ -26,6 +26,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/common/pico_util/datetime.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/common/pico_util/pheap.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/common/pico_util/queue.c.obj"
+  "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_claim/claim.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.obj"
   "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_divider/divider.S.obj"

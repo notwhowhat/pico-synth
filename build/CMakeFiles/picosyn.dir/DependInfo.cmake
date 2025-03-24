@@ -119,6 +119,7 @@ set(CMAKE_ASM_TARGET_INCLUDE_PATH
   "/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/include"
   "/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/include"
   "/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pwm/include"
+  "/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/include"
   "/home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/include"
   )
 set(CMAKE_DEPENDS_CHECK_C
@@ -149,6 +150,7 @@ set(CMAKE_DEPENDS_CHECK_C
   "/home/whowhat/pico/pico-sdk/src/common/pico_util/datetime.c" "/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/common/pico_util/datetime.c.obj"
   "/home/whowhat/pico/pico-sdk/src/common/pico_util/pheap.c" "/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/common/pico_util/pheap.c.obj"
   "/home/whowhat/pico/pico-sdk/src/common/pico_util/queue.c" "/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/common/pico_util/queue.c.obj"
+  "/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c" "/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.obj"
   "/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_claim/claim.c" "/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_claim/claim.c.obj"
   "/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c" "/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.obj"
   "/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/dma.c" "/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/dma.c.obj"
@@ -287,6 +289,7 @@ set(CMAKE_C_TARGET_INCLUDE_PATH
   "/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/include"
   "/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/include"
   "/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pwm/include"
+  "/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/include"
   "/home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/include"
   )
 

@@ -892,9 +892,22 @@ CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/pi
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/pio.c.s"
 	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/pio.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/pio.c.s
 
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.obj: CMakeFiles/picosyn.dir/flags.make
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.obj: /home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_72) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.obj   -c /home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.i"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c > CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.i
+
+CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.s"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.s
+
 CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj: CMakeFiles/picosyn.dir/flags.make
 CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj: /home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_72) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_73) "Building C object CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj"
 	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj   -c /home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c
 
 CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.i: cmake_force
@@ -978,6 +991,7 @@ picosyn_OBJECTS = \
 "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c.obj" \
 "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/dma.c.obj" \
 "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/pio.c.obj" \
+"CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.obj" \
 "CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj"
 
 # External object files for target picosyn
@@ -1054,11 +1068,12 @@ picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/lib/tinyusb/src/c
 picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c.obj
 picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_dma/dma.c.obj
 picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_pio/pio.c.obj
+picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/hardware_adc/adc.c.obj
 picosyn.elf: CMakeFiles/picosyn.dir/home/whowhat/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
 picosyn.elf: CMakeFiles/picosyn.dir/build.make
 picosyn.elf: pico-sdk/src/rp2_common/boot_stage2/bs2_default_padded_checksummed.S
 picosyn.elf: CMakeFiles/picosyn.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_73) "Linking C executable picosyn.elf"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_74) "Linking C executable picosyn.elf"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/picosyn.dir/link.txt --verbose=$(VERBOSE)
 	/usr/bin/arm-none-eabi-objcopy -Oihex /mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/picosyn.elf picosyn.hex
 	/usr/bin/arm-none-eabi-objcopy -Obinary /mnt/c/Users/jakob/coding-related/micontroller-projects/picosyn/build/picosyn.elf picosyn.bin

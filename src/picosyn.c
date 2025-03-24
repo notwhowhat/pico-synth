@@ -6,6 +6,7 @@
 #include "hardware/sync.h" // wait for interrupt 
 #include "hardware/uart.h"
 #include "hardware/timer.h"
+#include "hardware/adc.h"
 
 #include "math.h"
 
@@ -14,12 +15,18 @@
 #define MIDI_LED_PIN 15
 #define AUDIO_PIN 2 
 
+#define MUX_1_PIN 18
+#define MUX_2_PIN 19
+#define MUX_3_PIN 20 
+
 #define VOICE_COUNT 8
 
-//#include "wavetables.h"
-//#include "frequencies.h"
 #include "tables.h"
 
+#define LOWPASS 0
+#define HIGHPASS 1
+
+float controls[8];
 
 typedef enum {
     SIN,
@@ -33,6 +40,24 @@ int gain = 10;
 // two key arrays are needed to be ablet to distinguish between a new and old note for envel
 uint8_t midi_keys[128] = {0};
 uint8_t midi_previous_keys[128] = {0};
+
+/*
+paramaters will be done so that they are stored in a struct or array. there will also be a second
+one holding the old values. every struct element will be updated and moved simultaniously.
+*/
+const float pot_divider = 1.0 / 4095.0;
+float pot_mod = 0.0;
+
+const int max_detune[7] = {
+    -191, -109, -37,
+    0,
+    31, 107, 181,
+};
+
+//float cutoff = 0.1;
+//float resonance = 0.2;
+//
+//float filter1 = 0.0, filter2 = 0.0, filter3 = 0.0, filter4 = 0.0;
 
 /*
 envelopes will be y=kx+m
@@ -90,6 +115,18 @@ struct osc {
     waveform selected_waveform;
 };
 
+struct filter {
+    float cutoff;
+    float resonance;
+    bool type;
+
+    // buffers for orders of filter
+    float first;
+    float second;
+    float third;
+    float fourth;
+};
+
 // the voice gets allocated a note, which it reads
 struct voice {
     bool used;
@@ -102,46 +139,94 @@ struct voice {
 
     struct osc osc1;
 
+    //struct osc oscillators[7];
+
     waveform selected_waveform;
 
     struct env amp_env;
+    struct env filter_env;
+
+    struct filter lowpass;
 };
 
 // when set to zero EVERYTHING inside of the structs get too
 struct voice voices[VOICE_COUNT] = {0};
 
-float oscillator(waveform selected_waveform, float sample_index) {
-    switch (selected_waveform) {
+void initialize_osc(struct osc *osc, waveform selected_waveform) {
+    //osc->table_index = 0.0;
+
+    osc->table_increment = 0.0;
+    osc->selected_waveform = selected_waveform;
+}
+
+float process_osc(struct osc *osc, int note_increment) {
+    osc->table_index += INCREMENT_TABLE[50 + note_increment];
+    if (osc->table_index > 360.0) {
+        osc->table_index = osc->table_index - 360.0;
+    }
+    
+    switch (osc->selected_waveform) {
         case SIN:
-            return SIN_TABLE[(int)sample_index];
+            return SIN_TABLE[(int)osc->table_index];
             break;
        case SAW:
-            return SAW_TABLE[(int)sample_index];
+            return SAW_TABLE[(int)osc->table_index];
             break;
        case SQUARE:
-            return SQUARE_TABLE[(int)sample_index];
+            return SQUARE_TABLE[(int)osc->table_index];
             break;
         default:
             return 0.0;
     }
 }
 
-void initialize_osc(struct osc *osc, waveform selected_waveform) {
-    osc->table_index = 0.0;
+void initialize_filter(struct filter *f, float cutoff, float resonance, bool type) {
+    f->cutoff = cutoff;
+    f->resonance = resonance;
+    f->type = type;
 
-    osc->table_increment = 0.0;
-    osc->selected_waveform = selected_waveform;
+    f->first = 0.0;
+    f->second = 0.0;
+    f->third = 0.0;
+    f->fourth = 0.0;
 }
 
+float process_lowpass(struct filter *f, float input) {
+    f->first += ((input - (f->fourth * f->resonance)) - f->first) * f->cutoff;
+    f->second += (f->first - f->second) * f->cutoff;
+    f->third += (f->second - f->third) * f->cutoff;
+    f->fourth += (f->third - f->fourth) * f->cutoff;
+    
+    return f->fourth;
+}
+
+float process_filter(struct filter *f, float input, float mod) {
+    // to acieve a highpass filter, remove the lowpass from the input.
+    // highpass = input - lowpass
+
+
+    // it becomes infinite
+
+    if (f->type != LOWPASS) {
+        f->cutoff = (1.0 - pot_mod);// * mod;
+        return input - process_lowpass(f, input);
+    } else {
+        f->cutoff = pot_mod * mod;
+        return process_lowpass(f, input);
+    }
+    
+}
+
+// the minimum time: one sample
 void initialize_env(struct env *e, int a_time, int d_time, int r_time, float s_mod) {
     e->time = 0;
     e->mod = 0.0;
 
-    e->a_time = 20000;
-    e->d_time = 20000;
-    e->r_time = 20000;
+    e->a_time = a_time;
+    e->d_time = d_time;
+    e->r_time = r_time;
 
-    e->s_mod = 0.3;
+    e->s_mod = s_mod;
     e->a_mod = 1.0 / e->a_time;
     e->d_mod = (1.0 - e->s_mod) / e->d_time;
     e->r_mod = e->s_mod / e->r_time;
@@ -158,8 +243,18 @@ void initialize_voice(struct voice *v) {
 
     v->selected_waveform = SAW;
 
-    initialize_env(&v->amp_env, 20000, 20000, 20000, 0.4);
+    initialize_env(&v->amp_env, 1, 20000, 1, 0.5);
+    initialize_env(&v->filter_env, 1, 5000, 1, 0.0);
+
     initialize_osc(&v->osc1, SAW);
+    // the supersaw sound like a lazer because the phases are the same in the beginning, 
+    // which makes them sound louder and out of tune.
+    // for the not-very-super saw
+    //for (int i = 1; i < 7; i++) {
+    //    initialize_osc(&v->oscillators[i], SAW);
+    //}
+
+    initialize_filter(&v->lowpass, 0.5, 1.0, LOWPASS);
 }
 
 void start_env_r(struct env *e) {
@@ -200,83 +295,51 @@ float process_voice(struct voice *v) {
             if (midi_previous_keys[v->note] != 0) {
                 // do this with all envelopes
                 start_env_r(&v->amp_env);
+                start_env_r(&v->filter_env);
 
                 midi_previous_keys[v->note] = 0;
             }
 
             process_env_r(&v->amp_env, true);
+            process_env_r(&v->filter_env, true);
+
             if (v->amp_env.mod == 0.0) {
                 initialize_voice(v);
             }
         } else {
             // do this with all enveloeps
             process_env_ads(&v->amp_env);
+            process_env_ads(&v->filter_env);
         }
 
         //v->amp_env.time++;
     }
-    /*
-    if (v->used) {
-        // it's off (0 = note off)
-        if (midi_keys[v->note] == 0) {
-            // the time only works if it gets reset for the release
-            // it has to check for a new note-off
-            if (midi_previous_keys[v->note] != 0) {
-                // new command (start release)
-                v->amp_env.time = 0;
-                /// XXX DON"T DO THIS! I REALLY SHOULDN"T MESS WITH MIDI
-                midi_previous_keys[v->note] = 0;
-            }
-
-            // check if it's releasing or if the note should be off 
-            if (v->amp_env.time < v->amp_env.r_time) {
-                // do release
-                v->amp_env.mod -= v->amp_env.r_mod;
-            } else {
-                // reset voice
-                initialize_voice(v);
-            }
-        } else {
-            // the note is on!
-            // check first if attack, then decay
-            if (v->amp_env.time < v->amp_env.a_time) {
-                // do attack
-                v->amp_env.mod += v->amp_env.a_mod;
-            } else if (v->amp_env.time < (v->amp_env.a_time + v->amp_env.d_time)) {
-                // do decay
-                // the decay is starting from where the attack is, but it's still going up
-                v->amp_env.mod -= v->amp_env.d_mod;
-            } else {
-                // do sustain 
-                v->amp_env.mod = v->amp_env.s_mod;
-            }
-        }
-        v->amp_env.time++;
-    }
-    */
-    
     
     // this is where the notes get stuck playing
     //if (midi_keys[voices[i].note] != 0) {
     if (v->amp_env.mod != 0.0) {
-        //return v->amp_env.mod * process_osc(&v->osc1, v->note);
-        //if (v->table_increment == 0.0) {
-        //    // this maybe optimizes
-        //    //v->table_increment = (360 / (44100 / FREQUENCIES[v->note]));
-        //    v->table_increment = (360 / (44100 / FREQUENCIES[50 + 100 * v->note]));
+
+        //v->table_index += INCREMENTS[50 + 100 * v->note];
+        //if (v->table_index > 360.0) {
+        //    v->table_index = v->table_index - 360.0;
         //}
 
-        //v->table_index += v->table_increment;
-        ////voices[i].table_index += (360 / (44100 / FREQUENCIES[voices[i].note]));
+        //// the gain must be set to something sensible, otherwise the it get's too loud, so the int's
+        ////master_out += voices[i].mod * oscillator(voices[i].selected_waveform, voices[i].table_index);
+        //return v->amp_env.mod * oscillator(v->selected_waveform, v->table_index);
+        float out = process_osc(&v->osc1, v->note * 100);
 
-        v->table_index += INCREMENTS[50 + 100 * v->note];
-        if (v->table_index > 360.0) {
-            v->table_index = v->table_index - 360.0;
-        }
+        // bad supersaw. it's really simple. no pitch tracking allpass filters, just a bit of detuning.
+        // sounds nothing like the original
+        //float out = 0.0;
+        //for (int i = 0; i < 7; i++) {
+        //    out += process_osc(&v->oscillators[i], v->note * 100 + max_detune[i] * pot_mod);//0.25);
+        //}
 
-        // the gain must be set to something sensible, otherwise the it get's too loud, so the int's
-        //master_out += voices[i].mod * oscillator(voices[i].selected_waveform, voices[i].table_index);
-        return v->amp_env.mod * oscillator(v->selected_waveform, v->table_index);
+        out = process_filter(&v->lowpass, out, v->filter_env.mod);
+        out *= v->amp_env.mod;
+
+        return out;
     }
     return 0.0;
 }
@@ -289,11 +352,31 @@ void on_pwm_interrupt() {
     float master_out = 0.0;
 
     //for (struct voice *v = voices; v < voices + VOICE_COUNT; v++) {
+
     for (int i = 0; i < VOICE_COUNT; i++) {
         struct voice *v = &voices[i];
         master_out += process_voice(v);
     }
+
+    // THE FILTER ACTUALLY WOOORRRKKKSSS!!!
+    // (i haven't tried resonance, but the cutoff works for sure. (kindof))
+
+    // to acieve a highpass filter, remove the lowpass from the input.
+    // highpass = input - lowpass
+
+    //resonance = pot_mod;
+    //float input = master_out - (filter4 * resonance);
+
+    ////cutoff = pot_mod;
     
+    //filter1 += (input - filter1) * cutoff;
+    //filter2 += (filter1 - filter2) * cutoff;
+    //filter3 += (filter2 - filter3) * cutoff;
+    //filter4 += (filter3 - filter4) * cutoff;
+
+    //master_out = filter4;
+    
+    //master_out = gain * pot_mod * (master_out + gain * pot_mod);
     master_out = gain * (master_out + gain);
 
     pwm_set_gpio_level(AUDIO_PIN, (uint16_t)master_out);
@@ -385,45 +468,46 @@ void process_midi(void) {
     static uint8_t cmd_channel = 0;
 
     // it's actually waiting here quite a bit
-    while (!uart_is_readable(uart1)) {
-    }
+    //while (!uart_is_readable(uart1)) {
+    //}
+    if (uart_is_readable(uart1)) {
+        uint8_t midi_input = uart_getc(uart1);
+        //printf("%d\n", midi_input);
 
-    uint8_t midi_input = uart_getc(uart1);
-    //printf("%d\n", midi_input);
+        midi_cmd[midi_counter] = midi_input;
+        midi_counter++;
 
-    midi_cmd[midi_counter] = midi_input;
-    midi_counter++;
+        // this can probably optimized a bit!
+        // there will only be one new note. so i can remove everything with that.
 
-    // this can probably optimized a bit!
-    // there will only be one new note. so i can remove everything with that.
+        // it doesn't send the status byte if it was the same as the last
+        // that's the problem! I FOUUUUNNND IT!
+        // the status byte always starts with a zero, so it's always bigger than 127!!
 
-    // it doesn't send the status byte if it was the same as the last
-    // that's the problem! I FOUUUUNNND IT!
-    // the status byte always starts with a zero, so it's always bigger than 127!!
+        if (midi_counter == 2 && midi_cmd[0] < 128) {
+            // this is technicaly unsafe, but come on.
+            if (cmd_fn != 0) { // uninitialized
+                //printf("short\n");
+                process_midi_commands(cmd_fn, midi_cmd[0], midi_cmd[1]);
+            }
+            
+            // process midi with last status byte
+            midi_cmd[0] = 0;
+            midi_cmd[1] = 0;
+            midi_cmd[2] = 0;
+            midi_counter = 0;
 
-    if (midi_counter == 2 && midi_cmd[0] < 128) {
-        // this is technicaly unsafe, but come on.
-        if (cmd_fn != 0) { // uninitialized
-            //printf("short\n");
-            process_midi_commands(cmd_fn, midi_cmd[0], midi_cmd[1]);
+        } else if (midi_counter == 3) {
+            //printf("new\n");
+            cmd_fn = midi_cmd[0] & 240;
+            cmd_channel = midi_cmd[0] & 15;
+            process_midi_commands(cmd_fn, midi_cmd[1], midi_cmd[2]);
+
+            midi_cmd[0] = 0;
+            midi_cmd[1] = 0;
+            midi_cmd[2] = 0;
+            midi_counter = 0;
         }
-        
-        // process midi with last status byte
-        midi_cmd[0] = 0;
-        midi_cmd[1] = 0;
-        midi_cmd[2] = 0;
-        midi_counter = 0;
-
-    } else if (midi_counter == 3) {
-        //printf("new\n");
-        cmd_fn = midi_cmd[0] & 240;
-        cmd_channel = midi_cmd[0] & 15;
-        process_midi_commands(cmd_fn, midi_cmd[1], midi_cmd[2]);
-
-        midi_cmd[0] = 0;
-        midi_cmd[1] = 0;
-        midi_cmd[2] = 0;
-        midi_counter = 0;
     }
 }
 
@@ -491,6 +575,27 @@ int main(void) {
     gpio_init(MIDI_LED_PIN);
     gpio_set_dir(MIDI_LED_PIN, GPIO_OUT);
 
+    adc_init();
+
+    //adc_gpio_init(28);
+    //adc_select_input(2);
+
+    adc_gpio_init(27);
+    adc_select_input(1);
+
+    // to mux input
+    gpio_init(MUX_1_PIN);
+    gpio_set_dir(MUX_1_PIN, GPIO_OUT);
+    gpio_put(MUX_1_PIN, 1);
+    
+    gpio_init(MUX_2_PIN);
+    gpio_set_dir(MUX_2_PIN, GPIO_OUT);
+    gpio_put(MUX_2_PIN, 1);
+
+    gpio_init(MUX_3_PIN);
+    gpio_set_dir(MUX_3_PIN, GPIO_OUT);
+    gpio_put(MUX_3_PIN, 1);
+
     int midi_counter = 0;
     uint8_t midi_cmd[] = {0, 0, 0};
 
@@ -502,6 +607,27 @@ int main(void) {
     multicore_launch_core1(core1_entry);
 
     while (1) {
+        // unfortunately the midi is blocking, which does so that it doesn't read it constantly.
         process_midi();
+
+        // with this configuration of the cores, it might be better to compute and set the controls in core 0.
+        // even though this idea could be good, it will create huge problems related to concurrency.
+        for (int i = 0; i <= 8; i++) { // from 0 to 8
+            gpio_put(MUX_1_PIN, i);
+            gpio_put(MUX_2_PIN, i>>1);
+            gpio_put(MUX_3_PIN, i>>2);
+            if (i == 0) {
+                int adc_input = adc_read();
+                printf("%d: %d\n", i, adc_input);
+                pot_mod = adc_input * pot_divider;
+            }
+            //printf("%d: %d\n", i, adc_read());
+        }
+
+        // the max val is 2^12 - 1= 4095
+        //int adc_input = adc_read();
+        //printf("%d\n", adc_input);
+        ////pot_mod = (adc_input >> 1) * pot_divider;
+        //pot_mod = adc_input * pot_divider;
     }
 }
