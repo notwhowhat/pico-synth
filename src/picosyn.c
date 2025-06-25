@@ -46,13 +46,18 @@ paramaters will be done so that they are stored in a struct or array. there will
 one holding the old values. every struct element will be updated and moved simultaniously.
 */
 const float pot_divider = 1.0 / 4095.0;
-float pot_mod = 0.0;
+float pot_mod = 1.0;
 
 const int max_detune[7] = {
     -191, -109, -37,
     0,
     31, 107, 181,
 };
+
+// paramaters only to be used by core 1 (inputs)
+
+float filter_cutoff = 1.0;
+float filter_res = 0.0
 
 //float cutoff = 0.1;
 //float resonance = 0.2;
@@ -93,6 +98,12 @@ i think i already have an algorithm for the filter. but i'm not sure about how w
 it could be good to start working on the interface before i get to the modulation for real. then i can
 actually try using the features, and see how they work when i make them so that i don't need to redo everything
 because it doesn't work when the values change.
+*/
+
+/* 
+new idea for enveloes:
+enum containing state.
+if mod > state cap then enter next state (could be done with enum)
 */
 
 struct env {
@@ -243,8 +254,8 @@ void initialize_voice(struct voice *v) {
 
     v->selected_waveform = SAW;
 
-    initialize_env(&v->amp_env, 1, 20000, 1, 0.5);
-    initialize_env(&v->filter_env, 1, 5000, 1, 0.0);
+    initialize_env(&v->amp_env, 1, 1, 1, 1.0);
+    initialize_env(&v->filter_env, 1, 5000, 1, 1.0);
 
     initialize_osc(&v->osc1, SAW);
     // the supersaw sound like a lazer because the phases are the same in the beginning, 
@@ -254,7 +265,7 @@ void initialize_voice(struct voice *v) {
     //    initialize_osc(&v->oscillators[i], SAW);
     //}
 
-    initialize_filter(&v->lowpass, 0.5, 1.0, LOWPASS);
+    initialize_filter(&v->lowpass, 1.0, 0.0, LOWPASS);
 }
 
 void start_env_r(struct env *e) {
@@ -288,6 +299,8 @@ void process_env_ads(struct env *e) {
 
     e->time++;
 }
+
+// what can happen when the envelopes get reset is that the time wrong.
 
 float process_voice(struct voice *v) {
     if (v->used) {
@@ -408,24 +421,25 @@ this opens up the possibility for both simple modulation with envelopes and lfo'
 */
 
 void process_midi_commands(uint8_t cmd_fn, uint8_t note, uint8_t velocity) {
+    // XXX: different devices output midi note off's in different ways. ableton and my midi keyboard send a ntoe off 
+    // command, whilst the mininova just sends a note on with a velocity of zero. both work, but the outputs are set up
+    // for the first alternative for performence reasons.
+    // TODO: voice stealing doesn't really work. it frees the voice to be stolen, but it doesn't give it a note
     switch(cmd_fn) {
         case 128:
             gpio_put(MIDI_LED_PIN, 0);
-            printf("off @ %d\n", note);
+            //printf("off @ %d\n", note);
             midi_previous_keys[note] = midi_keys[note];
             midi_keys[note] = 0;
             break;
         case 144:
             gpio_put(MIDI_LED_PIN, 1);
-            //printf("on @ %d\n", midi_cmd[1]);
+            //printf("on @ %d\n", note);
 
             // this should work, but it's risky. check if it's a correct value
             midi_previous_keys[note] = midi_keys[note];
             midi_keys[note] = velocity;
             
-            // so that the synth doesn't have do redo the whole operation if someone plays way to many keys
-
-            // the voice stealing is now done so that the lowest note is stolen.
             struct voice *selected_voice = voices; // &voices[0], because array's are mad
 
             for (int i = 0; i < VOICE_COUNT; i++) {
@@ -433,9 +447,6 @@ void process_midi_commands(uint8_t cmd_fn, uint8_t note, uint8_t velocity) {
                     selected_voice = &voices[i];
                     break;
                 } else {
-                    // the voice with the lowest note gets stolen i don't know if this is good. 
-                    // i could probably change it if i have timers, but what would happen is that
-                    // the variables would get too long if they would be timed in ms.
                     if (voices[i].age < selected_voice->age) {
                         selected_voice = &voices[i];
                     }
@@ -461,7 +472,7 @@ void process_midi_commands(uint8_t cmd_fn, uint8_t note, uint8_t velocity) {
     }
 }
 
-void process_midi(void) {
+void on_uart_interrupt(void) {
     static int midi_counter = 0;
     static uint8_t midi_cmd[] = {0, 0, 0};
     static uint8_t cmd_fn = 0;
@@ -476,9 +487,6 @@ void process_midi(void) {
 
         midi_cmd[midi_counter] = midi_input;
         midi_counter++;
-
-        // this can probably optimized a bit!
-        // there will only be one new note. so i can remove everything with that.
 
         // it doesn't send the status byte if it was the same as the last
         // that's the problem! I FOUUUUNNND IT!
@@ -511,6 +519,10 @@ void process_midi(void) {
     }
 }
 
+//void on_uart_interrupt(void) {
+//    process_midi();
+//}
+
 /* 
 time to implement multithreading! it will be split up in two threads. the load
 won't be balanced in any way, instead, the midi will be on one core, and the audio processing will be on the
@@ -520,11 +532,20 @@ i will share the voices in global memory. it's suboptimal, but i will at least b
 where should i the audio get processed? probably in the second core? idk.
 */
 
+/*
+envelopes 2.0
+when the envelopes are reset they will:
+change the period/part (attack, for example), but not skip periods. they will only continue.
+decay is a bit weird, because the sustain can be changed, which results in sometimes going up. this is a result of
+the desired operation
+*/
+
 void core1_entry() {
     gpio_set_function(AUDIO_PIN, GPIO_FUNC_PWM);
 
     int audio_pin_slice = pwm_gpio_to_slice_num(AUDIO_PIN);
 
+    // XXX: this should probably be after the next chunk of code so the interrupt doesn't get run too early!
     pwm_clear_irq(audio_pin_slice);
     pwm_set_irq_enabled(audio_pin_slice, true);
     // set the handle function above
@@ -547,6 +568,16 @@ void core1_entry() {
     }
 }
 
+void debug_message(void) {
+    int used_voices = 0;
+    for (int i = 0; i < VOICE_COUNT; i++) {
+        if (voices[i].used == true) {
+            used_voices++;
+        }
+    }
+    printf("used: %d\n", used_voices);
+}
+
 
 // I SHOULD RUN THE MIDIIII ON A UART INTERRUPT WHY CAN'T I THINKGKKKGKGKGK
 int main(void) {
@@ -563,10 +594,17 @@ int main(void) {
     set_sys_clock_khz(270000, true);
     
     int midi_baud_rate = uart_init(uart1, 31250);
-    gpio_set_function(5, GPIO_FUNC_UART);
+    gpio_set_function(5, GPIO_FUNC_UART); // 5 = midi pin
     uart_set_fifo_enabled(uart1, true);
 
-    //core1_entry();
+    ///* maybe midi interrupt code? the uart MUST be initialized and set to the correct baud rate before
+    //uart_set_irqs_enabled(uart1, true, false);
+    uart_set_irq_enables(uart1, true, false);
+
+    irq_set_exclusive_handler(UART1_IRQ, on_uart_interrupt); // function doesn't exist 
+    irq_set_enabled(UART1_IRQ, true);
+
+    //*/
 
     gpio_init(ERR_LED_PIN);
     gpio_set_dir(ERR_LED_PIN, GPIO_OUT);
@@ -585,7 +623,7 @@ int main(void) {
 
     // to mux input
     gpio_init(MUX_1_PIN);
-    gpio_set_dir(MUX_1_PIN, GPIO_OUT);
+    
     gpio_put(MUX_1_PIN, 1);
     
     gpio_init(MUX_2_PIN);
@@ -608,14 +646,19 @@ int main(void) {
 
     while (1) {
         // unfortunately the midi is blocking, which does so that it doesn't read it constantly.
-        process_midi();
+        // a much safer and more reliable way would be to set up an interrupt for the midi so that it becomes prioritized.
+        // i'm not sure if the midi code is quick enough, but it has to work. another way of making the midi code more reliable
+        // is to buffer it, but i don't think it's very needed. it probably slows the code down more than it helps.
+        //process_midi();
 
         // with this configuration of the cores, it might be better to compute and set the controls in core 0.
         // even though this idea could be good, it will create huge problems related to concurrency.
-        for (int i = 0; i <= 8; i++) { // from 0 to 8
+
+        for (int i = 0; i <= 7; i++) { // from 0 to 8
             gpio_put(MUX_1_PIN, i);
             gpio_put(MUX_2_PIN, i>>1);
             gpio_put(MUX_3_PIN, i>>2);
+
             if (i == 0) {
                 int adc_input = adc_read();
                 printf("%d: %d\n", i, adc_input);
@@ -623,6 +666,8 @@ int main(void) {
             }
             //printf("%d: %d\n", i, adc_read());
         }
+
+        //debug_message();
 
         // the max val is 2^12 - 1= 4095
         //int adc_input = adc_read();
