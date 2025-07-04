@@ -34,6 +34,10 @@ typedef enum {
     SQUARE,
 } waveform;
 
+typedef enum {
+    A, D, S, R,
+} env_state;
+
 int gain = 10;
 
 // this fills it with zeros!
@@ -56,8 +60,8 @@ const int max_detune[7] = {
 
 // paramaters only to be used by core 1 (inputs)
 
-float filter_cutoff = 1.0;
-float filter_res = 0.0
+//float filter_cutoff = 1.0;
+//float filter_res = 0.0;
 
 //float cutoff = 0.1;
 //float resonance = 0.2;
@@ -109,6 +113,7 @@ if mod > state cap then enter next state (could be done with enum)
 struct env {
     int time;
     float mod;
+    env_state state;
 
     int a_time;
     int d_time;
@@ -232,6 +237,7 @@ float process_filter(struct filter *f, float input, float mod) {
 void initialize_env(struct env *e, int a_time, int d_time, int r_time, float s_mod) {
     e->time = 0;
     e->mod = 0.0;
+    e->state = A;
 
     e->a_time = a_time;
     e->d_time = d_time;
@@ -241,6 +247,22 @@ void initialize_env(struct env *e, int a_time, int d_time, int r_time, float s_m
     e->a_mod = 1.0 / e->a_time;
     e->d_mod = (1.0 - e->s_mod) / e->d_time;
     e->r_mod = e->s_mod / e->r_time;
+}
+
+void update_env(struct env *e, int a_time, int d_time, int r_time, float s_mod) {
+    switch (e->state) {
+        case A:
+            e->a_time = a_time;
+            e->a_mod = 1.0 / e->a_time;
+        case D:
+            e->d_time = d_time;
+            e->d_mod = (1.0 - e->s_mod) / e->d_time;
+        //case S:
+        //    e->s_mod = s_mod;
+        case R:
+            e->r_time = r_time;
+            e->r_mod = e->s_mod / e->r_time;
+    }
 }
 
 void initialize_voice(struct voice *v) {
@@ -255,7 +277,7 @@ void initialize_voice(struct voice *v) {
     v->selected_waveform = SAW;
 
     initialize_env(&v->amp_env, 1, 1, 1, 1.0);
-    initialize_env(&v->filter_env, 1, 5000, 1, 1.0);
+    //initialize_env(&v->filter_env, 1, 5000, 1, 1.0);
 
     initialize_osc(&v->osc1, SAW);
     // the supersaw sound like a lazer because the phases are the same in the beginning, 
@@ -265,11 +287,12 @@ void initialize_voice(struct voice *v) {
     //    initialize_osc(&v->oscillators[i], SAW);
     //}
 
-    initialize_filter(&v->lowpass, 1.0, 0.0, LOWPASS);
+    //initialize_filter(&v->lowpass, 1.0, 0.0, LOWPASS);
 }
 
 void start_env_r(struct env *e) {
     e->time = 0;
+    e->state = R;
 }
 
 void process_env_r(struct env *e, bool amp) {
@@ -288,13 +311,16 @@ void process_env_ads(struct env *e) {
     if (e->time < e->a_time) {
         // do attack
         e->mod += e->a_mod;
+        e->state = A;
     } else if (e->time < (e->a_time + e->d_time)) {
         // do decay
         // the decay is starting from where the attack is, but it's still going up
         e->mod -= e->d_mod;
+        e->state = D;
     } else {
         // do sustain 
         e->mod = e->s_mod;
+        e->state = S;
     }
 
     e->time++;
@@ -302,19 +328,20 @@ void process_env_ads(struct env *e) {
 
 // what can happen when the envelopes get reset is that the time wrong.
 
+// remove and make into two functions
 float process_voice(struct voice *v) {
     if (v->used) {
         if (midi_keys[v->note] == 0) {
             if (midi_previous_keys[v->note] != 0) {
                 // do this with all envelopes
                 start_env_r(&v->amp_env);
-                start_env_r(&v->filter_env);
+                //start_env_r(&v->filter_env);
 
                 midi_previous_keys[v->note] = 0;
             }
 
             process_env_r(&v->amp_env, true);
-            process_env_r(&v->filter_env, true);
+            //process_env_r(&v->filter_env, true);
 
             if (v->amp_env.mod == 0.0) {
                 initialize_voice(v);
@@ -322,7 +349,7 @@ float process_voice(struct voice *v) {
         } else {
             // do this with all enveloeps
             process_env_ads(&v->amp_env);
-            process_env_ads(&v->filter_env);
+            //process_env_ads(&v->filter_env);
         }
 
         //v->amp_env.time++;
@@ -349,7 +376,7 @@ float process_voice(struct voice *v) {
         //    out += process_osc(&v->oscillators[i], v->note * 100 + max_detune[i] * pot_mod);//0.25);
         //}
 
-        out = process_filter(&v->lowpass, out, v->filter_env.mod);
+        //out = process_filter(&v->lowpass, out, v->filter_env.mod);
         out *= v->amp_env.mod;
 
         return out;
@@ -549,7 +576,7 @@ void core1_entry() {
     pwm_clear_irq(audio_pin_slice);
     pwm_set_irq_enabled(audio_pin_slice, true);
     // set the handle function above
-    irq_set_exclusive_handler(PWM_IRQ_WRAP, on_pwm_interrupt); 
+    irq_set_exclusive_handler(PWM_IRQ_WRAP, on_pwm_interrupt); // TODO: make it use process_midi
     irq_set_enabled(PWM_IRQ_WRAP, true);
 
     // https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#ga8478ee26cc144e947ccd75b0169059a6
@@ -654,18 +681,26 @@ int main(void) {
         // with this configuration of the cores, it might be better to compute and set the controls in core 0.
         // even though this idea could be good, it will create huge problems related to concurrency.
 
+        float inputs[8] = {-1.0};
+
         for (int i = 0; i <= 7; i++) { // from 0 to 8
             gpio_put(MUX_1_PIN, i);
             gpio_put(MUX_2_PIN, i>>1);
             gpio_put(MUX_3_PIN, i>>2);
 
+            int adc_input = adc_read();
+            inputs[i] = adc_input * pot_divider;
             if (i == 0) {
-                int adc_input = adc_read();
-                printf("%d: %d\n", i, adc_input);
+                //printf("%d: %d\n", i, adc_input);
                 pot_mod = adc_input * pot_divider;
             }
-            //printf("%d: %d\n", i, adc_read());
+            printf("%d: %d\n", 2, inputs[2]);
         }
+
+        for (int i = 0; i < VOICE_COUNT; i++) {
+            update_env(&voices[i].amp_env, 80000 * inputs[0], 80000 * inputs[1], 80000 * inputs[2], inputs[3]);
+        }
+
 
         //debug_message();
 
