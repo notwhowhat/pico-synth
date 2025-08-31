@@ -1,4 +1,14 @@
-#
+#include "interface.h"
+#include "midi.h"
+#include "voice.h"
+#include "picosyn.h"
+
+//#include "hardware/uart.h"
+
+#include <stdio.h>
+
+uint8_t midi_keys[128] = {0};
+uint8_t midi_previous_keys[128] = {0};
 
 void process_midi_commands(uint8_t cmd_fn, uint8_t note, uint8_t velocity) {
     // XXX: different devices output midi note off's in different ways. ableton and my midi keyboard send a ntoe off 
@@ -7,13 +17,15 @@ void process_midi_commands(uint8_t cmd_fn, uint8_t note, uint8_t velocity) {
     // TODO: voice stealing doesn't really work. it frees the voice to be stolen, but it doesn't give it a note
     switch(cmd_fn) {
         case 128:
-            gpio_put(MIDI_LED_PIN, 0);
+            //gpio_put(MIDI_LED_PIN, 0);
+            write_gpio(MIDI_LED_PIN, 0);
             //printf("off @ %d\n", note);
             midi_previous_keys[note] = midi_keys[note];
             midi_keys[note] = 0;
             break;
         case 144:
-            gpio_put(MIDI_LED_PIN, 1);
+            //gpio_put(MIDI_LED_PIN, 1);
+            write_gpio(MIDI_LED_PIN, 1);
             //printf("on @ %d\n", note);
 
             // this should work, but it's risky. check if it's a correct value
@@ -52,7 +64,7 @@ void process_midi_commands(uint8_t cmd_fn, uint8_t note, uint8_t velocity) {
     }
 }
 
-void process_midi(void) {
+void on_uart_interrupt(void) {
     static int midi_counter = 0;
     static uint8_t midi_cmd[] = {0, 0, 0};
     static uint8_t cmd_fn = 0;
@@ -61,8 +73,9 @@ void process_midi(void) {
     // it's actually waiting here quite a bit
     //while (!uart_is_readable(uart1)) {
     //}
-    if (uart_is_readable(uart1)) {
-        uint8_t midi_input = uart_getc(uart1);
+    //if (uart_is_readable(uart1)) {
+    if (check_uart()) {
+        uint8_t midi_input = read_uart();
         //printf("%d\n", midi_input);
 
         midi_cmd[midi_counter] = midi_input;
