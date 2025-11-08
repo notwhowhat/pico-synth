@@ -26,10 +26,10 @@ struct env {
     float mod;
     env_state state;
 
-    int a_time;
-    int d_time;
-    int r_time;
-    
+    float a_time;
+    float d_time;
+    float r_time;
+   
     float s_mod;
     float a_mod;
     float d_mod;
@@ -77,7 +77,7 @@ struct voice {
     struct filter lowpass;
 };
 
-struct voice voices[VOICE_COUNT];
+extern struct voice voices[VOICE_COUNT];
 
 
 void initialize_osc(struct osc *osc, waveform selected_waveform);
@@ -85,12 +85,23 @@ float process_osc(struct osc *osc, int note_increment);
 
 void initialize_filter(struct filter *f, float cutoff, float resonance, filter_type mode);
 float process_lowpass(struct filter *f, float input);
+void update_filter_cutoff(struct filter *f, float cutoff);
+void update_filter_resonance(struct filter *f, float resonance);
 
-void initialize_env(struct env *e, int a_time, int d_time, int r_time, float s_mod);
+void initialize_env(struct env *e, float a_time_mod, float d_time_mod, float r_time_mod, float s_mod);
+void set_env_attack_mod(struct env *e, float a_time_mod);
+void set_env_decay_mod(struct env *e, float d_time_mod);
+void set_env_release_mod(struct env *e, float r_time_mod);
 void start_env_r(struct env *e);
 void process_env_r(struct env *e, bool amp);
 void process_env_ads(struct env *e);
-void update_env(struct env *e, int a_time, int d_time, int r_time, float s_mod);
+
+void update_env(struct env *e, float a_time_mod, float d_time_mod, float r_time_mod, float s_mod);
+
+void update_env_a(struct env *e, float time_mod);
+void update_env_d(struct env *e, float time_mod);
+void update_env_r(struct env *e, float time_mod);
+void update_env_s(struct env *e, float time_mod);
 
 void initialize_voice(struct voice *v);
 float process_voice(struct voice *v);

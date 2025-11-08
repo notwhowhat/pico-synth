@@ -641,7 +641,6 @@ int main(void) {
 
     gpio_init(ERR_LED_PIN);
     gpio_set_dir(ERR_LED_PIN, GPIO_OUT);
-    gpio_put(ERR_LED_PIN, 1);
     
     gpio_init(MIDI_LED_PIN);
     gpio_set_dir(MIDI_LED_PIN, GPIO_OUT);
@@ -670,12 +669,19 @@ int main(void) {
     int midi_counter = 0;
     uint8_t midi_cmd[] = {0, 0, 0};
 
+    // problem fixed. caused by passing a factor instead of the time
+    // XXX: the program is stopping at initialize_voice(). find out why
+    // there is something in initialize_env() that causes the crash
 
     for (int i = 0; i < VOICE_COUNT; i++) {
         initialize_voice(&voices[i]);
     }
+    gpio_put(ERR_LED_PIN, 1); // doesn't turn on, program doesn't get to here.
 
     multicore_launch_core1(core1_entry);
+
+    pot_divider = 1.0 / 4095.0;
+
 
     while (1) {
         // unfortunately the midi is blocking, which does so that it doesn't read it constantly.
@@ -697,15 +703,19 @@ int main(void) {
             int adc_input = adc_read();
             inputs[i] = adc_input * pot_divider;
             if (i == 0) {
+                //pot_mod = adc_input * pot_divider;
+                //printf("%d: %f\n", i, inputs[i]);
                 //printf("%d: %d\n", i, adc_input);
-                pot_mod = adc_input * pot_divider;
             }
-            printf("%d: %d\n", 2, inputs[2]);
+            //printf("%d: %d\n", 2, inputs[2]);
         }
 
-        for (int i = 0; i < VOICE_COUNT; i++) {
-            update_env(&voices[i].amp_env, 80000 * inputs[0], 80000 * inputs[1], 80000 * inputs[2], inputs[3]);
-        }
+        //for (int i = 0; i < VOICE_COUNT; i++) {
+        //    //printf("%f\n", 1.0 / (15.0 * 44100.0));
+        //    //update_env(&voices[i].amp_env, 0.0001, 0.0001, 0.0001, 1.0);
+        //    update_env(&voices[i].amp_env, 0.0001, 0.0001, inputs[0], 1.0);
+        //    //update_env(&voices[i].amp_env, inputs[0], inputs[1], inputs[2], inputs[3]);
+        //}
 
 
         //debug_message();

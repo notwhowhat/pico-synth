@@ -3,6 +3,7 @@ add_executable(tests
     mocks.c
     ../src/midi.c
     ../src/voice.c
+    ../src/controls.c
 )
 
 

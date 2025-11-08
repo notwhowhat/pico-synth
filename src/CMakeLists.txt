@@ -1,7 +1,7 @@
 # Initialise the Pico SDK
 pico_sdk_init()
 
-add_executable(firmware picosyn.c interface.c midi.c voice.c)
+add_executable(firmware picosyn.c interface.c midi.c voice.c controls.c)
 
 pico_set_program_name(firmware "picosyn")
 pico_set_program_version(firmware "0.1")
