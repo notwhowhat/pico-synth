@@ -3,7 +3,7 @@
 
 void process_controls(void) {
     // get the new controls
-    // then make set them to all voices
+    // then push them to all voices
     float changed_controls[INPUT_COUNT] = {0};
     int changed_controls_number[INPUT_COUNT] = {0};
     int changed_controls_counter = 0;

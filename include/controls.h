@@ -3,6 +3,12 @@
 #ifndef CONTROLS_H
 #define CONTROLS_H
 
+/*
+there are a few things needed for the controls to work:
+inputs from the pins
+
+*/
+
 typedef enum {
     AMP_A,
     AMP_D,

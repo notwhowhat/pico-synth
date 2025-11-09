@@ -7,10 +7,12 @@
 #ifndef VOICE_H
 #define VOICE_H
 
+// TODO: add triangle wave
 typedef enum {
     SIN,
     SAW,
     SQUARE,
+    COUNT
 } waveform;
 
 typedef enum {
@@ -40,6 +42,7 @@ struct osc {
     float table_index;
     float table_increment;
     waveform selected_waveform;
+    int tune;
 };
 
 struct filter {
@@ -49,10 +52,10 @@ struct filter {
     //bool type;
 
     // buffers for orders of filter
-    float first;
-    float second;
-    float third;
-    float fourth;
+    float a;
+    float b;
+    float c;
+    float d;
 };
 
 // the voice gets allocated a note, which it reads
@@ -83,25 +86,28 @@ extern struct voice voices[VOICE_COUNT];
 void initialize_osc(struct osc *osc, waveform selected_waveform);
 float process_osc(struct osc *osc, int note_increment);
 
+void update_osc_waveform(struct osc *osc);
+void update_osc_tune(struct osc *osc, int tune);
+
 void initialize_filter(struct filter *f, float cutoff, float resonance, filter_type mode);
 float process_lowpass(struct filter *f, float input);
 void update_filter_cutoff(struct filter *f, float cutoff);
 void update_filter_resonance(struct filter *f, float resonance);
 
 void initialize_env(struct env *e, float a_time_mod, float d_time_mod, float r_time_mod, float s_mod);
-void set_env_attack_mod(struct env *e, float a_time_mod);
-void set_env_decay_mod(struct env *e, float d_time_mod);
-void set_env_release_mod(struct env *e, float r_time_mod);
-void start_env_r(struct env *e);
 void process_env_r(struct env *e, bool amp);
 void process_env_ads(struct env *e);
 
-void update_env(struct env *e, float a_time_mod, float d_time_mod, float r_time_mod, float s_mod);
+// these set_env_mod functions are technically not needed if it's updated every cycle
+void set_env_attack_mod(struct env *e, float a_time_mod);
+void set_env_decay_mod(struct env *e, float d_time_mod);
+void set_env_release_mod(struct env *e, float r_time_mod);
 
 void update_env_a(struct env *e, float time_mod);
 void update_env_d(struct env *e, float time_mod);
 void update_env_r(struct env *e, float time_mod);
 void update_env_s(struct env *e, float time_mod);
+void update_env(struct env *e, float a_time_mod, float d_time_mod, float r_time_mod, float s_mod); // should not be used.
 
 void initialize_voice(struct voice *v);
 float process_voice(struct voice *v);

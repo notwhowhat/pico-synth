@@ -16,11 +16,14 @@
 
 // TODO: add lfos. give them a seperate increment table (make a new one)
 
+
 // TODO: logarithmic envelopes. probably won't work.
+
+const float LFO_MOD = 360.0 / 44100.0;
 
 // XXX TODO SOUND THE GENERAL ALARM: ENV_MAX_TIME_MOD has run out of presision (it doesn't actually matter)
 const float ENV_MAX_TIME = 661500.0; // 15s * SAMPLE_RATE
-const float ENV_MAX_TIME_MOD = 1.0 / ENV_MAX_TIME; // inverse of 15s in sample rate
+const float ENV_MAX_TIME_MOD = 1.0 / ENV_MAX_TIME;
 
 struct voice voices[VOICE_COUNT] = {0};
 
@@ -29,10 +32,11 @@ void initialize_osc(struct osc *osc, waveform selected_waveform) {
 
     osc->table_increment = 0.0;
     osc->selected_waveform = selected_waveform;
+    osc->tune = 0;
 }
 
 float process_osc(struct osc *osc, int note_increment) {
-    osc->table_index += INCREMENT_TABLE[50 + note_increment];
+    osc->table_index += INCREMENT_TABLE[50 + note_increment + osc->tune];
     if (osc->table_index > 360.0) {
         osc->table_index = osc->table_index - 360.0;
     }
@@ -52,24 +56,32 @@ float process_osc(struct osc *osc, int note_increment) {
     }
 }
 
+void update_osc_waveform(struct osc *osc) {
+    osc->selected_waveform++;
+    if (osc->selected_waveform == COUNT) {
+        osc->selected_waveform = SIN;
+    }
+}
+
+void update_osc_tune(struct osc *osc, int tune) {
+    osc->tune = tune;
+}
+
 void initialize_filter(struct filter *f, float cutoff, float resonance, filter_type mode) {
     f->cutoff = cutoff;
     f->resonance = resonance;
     f->mode = mode;
 
-    f->first = 0.0;
-    f->second = 0.0;
-    f->third = 0.0;
-    f->fourth = 0.0;
+    f->a = f->b = f->c = f->b = 0.0;
 }
 
 float process_lowpass(struct filter *f, float input) {
-    f->first += ((input - (f->fourth * f->resonance)) - f->first) * f->cutoff;
-    f->second += (f->first - f->second) * f->cutoff;
-    f->third += (f->second - f->third) * f->cutoff;
-    f->fourth += (f->third - f->fourth) * f->cutoff;
+    f->a += ((input - (f->b * f->resonance)) - f->a) * f->cutoff;
+    f->b += (f->a - f->b) * f->cutoff;
+    f->c += (f->b - f->c) * f->cutoff;
+    f->d += (f->c - f->d) * f->cutoff;
     
-    return f->fourth;
+    return f->d;
 }
 
 float process_filter(struct filter *f, float input, float mod) {
@@ -203,9 +215,6 @@ void initialize_voice(struct voice *v) {
     //initialize_filter(&v->lowpass, 1.0, 0.0, LOWPASS);
 }
 
-void start_env_r(struct env *e) {
-    e->state = RELEASE;
-}
 
 void process_env_r(struct env *e, bool amp) {
     e->mod -= e->r_mod;
@@ -252,8 +261,9 @@ float process_voice(struct voice *v) {
         if (midi_keys[v->note] == 0) {
             if (midi_previous_keys[v->note] != 0) {
                 // do this with all envelopes
-                start_env_r(&v->amp_env);
-                //start_env_r(&v->filter_env);
+
+                v->amp_env.state = RELEASE;
+                //v->filter_env.state = RELEASE;
 
                 midi_previous_keys[v->note] = 0;
             }
@@ -312,48 +322,18 @@ float process_voice(struct voice *v) {
 
 // call it with isr (interrupt service routine)
 void on_pwm_interrupt() {
-    //uint32_t start = time_us_32();
-    //pwm_clear_irq(pwm_gpio_to_slice_num(AUDIO_PIN));    
     reset_interrupt();
 
     float master_out = 0.0;
-
-    //for (struct voice *v = voices; v < voices + VOICE_COUNT; v++) {
 
     for (int i = 0; i < VOICE_COUNT; i++) {
         struct voice *v = &voices[i];
         master_out += process_voice(v);
     }
-
-    // THE FILTER ACTUALLY WOOORRRKKKSSS!!!
-    // (i haven't tried resonance, but the cutoff works for sure. (kindof))
-
-    // to acieve a highpass filter, remove the lowpass from the input.
-    // highpass = input - lowpass
-
-    //resonance = pot_mod;
-    //float input = master_out - (filter4 * resonance);
-
-    ////cutoff = pot_mod;
-    
-    //filter1 += (input - filter1) * cutoff;
-    //filter2 += (filter1 - filter2) * cutoff;
-    //filter3 += (filter2 - filter3) * cutoff;
-    //filter4 += (filter3 - filter4) * cutoff;
-
-    //master_out = filter4;
-    
+   
     //master_out = gain * pot_mod * (master_out + gain * pot_mod);
     master_out = GAIN * (master_out + GAIN);
 
-    //pwm_set_gpio_level(AUDIO_PIN, (uint16_t)master_out);
     write_pwm(master_out);
-
-    //printf("%f\n", ENV_MAX_TIME_MOD);
-    //uint32_t d_time = time_us_32() - start;
-    //if (d_time > slowest_time) {
-    //    slowest_time = d_time;
-    //    printf("%d\n", slowest_time);
-    //}
 }
 

@@ -22,6 +22,11 @@
 #define MUX_2_PIN 19
 #define MUX_3_PIN 20 
 
+/*
+notes:
+the table for increments might not be necessary.
+it would make lfos more easy to implement.
+*/
 
 //#define VOICE_COUNT 8
 //
