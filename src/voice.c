@@ -15,7 +15,7 @@
 // correctly. then, the next feature to add is pitch modulation.
 
 // TODO: add lfos. give them a seperate increment table (make a new one)
-
+// almost done. just has to be tested
 
 // TODO: logarithmic envelopes. probably won't work.
 
@@ -27,16 +27,17 @@ const float ENV_MAX_TIME_MOD = 1.0 / ENV_MAX_TIME;
 
 struct voice voices[VOICE_COUNT] = {0};
 
-void initialize_osc(struct osc *osc, waveform selected_waveform) {
-    //osc->table_index = 0.0;
-
+void initialize_osc(struct osc *osc, int note, waveform selected_waveform) {
+    // table_index is not fixed to emulate free running oscillators
+    osc->table_start = 50 + note * 100;
     osc->table_increment = 0.0;
     osc->selected_waveform = selected_waveform;
     osc->tune = 0;
 }
 
 float process_osc(struct osc *osc, int note_increment) {
-    osc->table_index += INCREMENT_TABLE[50 + note_increment + osc->tune];
+    osc->table_index += INCREMENT_TABLE[50 + note_increment * 100 + osc->tune];
+    //osc->table_index += INCREMENT_TABLE[osc->table_start + osc->tune];
     if (osc->table_index > 360.0) {
         osc->table_index = osc->table_index - 360.0;
     }
@@ -65,6 +66,45 @@ void update_osc_waveform(struct osc *osc) {
 
 void update_osc_tune(struct osc *osc, int tune) {
     osc->tune = tune;
+}
+
+void initialize_lfo(struct lfo *lfo, float rate, waveform selected_waveform) {
+    // table_index is not fixed to emulate free running oscillators
+    lfo->table_increment = 0.0;
+    lfo->selected_waveform = selected_waveform;
+    lfo->rate = rate;
+}
+
+float process_lfo(struct lfo *lfo) {
+    lfo->table_index += LFO_MOD * lfo->rate;
+    if (lfo->table_index > 360.0) {
+        lfo->table_index = lfo->table_index - 360.0;
+    }
+    
+    switch (lfo->selected_waveform) {
+        case SIN:
+            return SIN_TABLE[(int)lfo->table_index];
+            break;
+       case SAW:
+            return SAW_TABLE[(int)lfo->table_index];
+            break;
+       case SQUARE:
+            return SQUARE_TABLE[(int)lfo->table_index];
+            break;
+        default:
+            return 0.0;
+    }
+}
+
+void update_lfo_waveform(struct lfo *lfo) {
+    lfo->selected_waveform++;
+    if (lfo->selected_waveform == COUNT) {
+        lfo->selected_waveform = SIN;
+    }
+}
+
+void update_lfo_tune(struct lfo *lfo, float rate) {
+    lfo->rate = rate;
 }
 
 void initialize_filter(struct filter *f, float cutoff, float resonance, filter_type mode) {
@@ -204,7 +244,7 @@ void initialize_voice(struct voice *v) {
     //initialize_env(&v->amp_env, ENV_MAX_TIME_MOD, ENV_MAX_TIME_MOD, ENV_MAX_TIME_MOD, 1.0);
     //initialize_env(&v->filter_env, 0.0001, 0.001, 0.0001, 0.0);
 
-    initialize_osc(&v->osc1, SIN);
+    initialize_osc(&v->osc1, v->note, SIN);
     // the supersaw sound like a lazer because the phases are the same in the beginning, 
     // which makes them sound louder and out of tune.
     // for the not-very-super saw

@@ -39,10 +39,18 @@ struct env {
 };
 
 struct osc {
+    int table_start;
     float table_index;
     float table_increment;
     waveform selected_waveform;
     int tune;
+};
+
+struct lfo {
+    float table_index;
+    float table_increment;
+    waveform selected_waveform;
+    float rate;
 };
 
 struct filter {
@@ -82,12 +90,15 @@ struct voice {
 
 extern struct voice voices[VOICE_COUNT];
 
-
-void initialize_osc(struct osc *osc, waveform selected_waveform);
+void initialize_osc(struct osc *osc, int note, waveform selected_waveform);
 float process_osc(struct osc *osc, int note_increment);
-
 void update_osc_waveform(struct osc *osc);
 void update_osc_tune(struct osc *osc, int tune);
+
+void initialize_lfo(struct lfo *lfo, float rate, waveform selected_waveform);
+float process_lfo(struct lfo *lfo);
+void update_lfo_waveform(struct lfo *lfo);
+void update_lfo_rate(struct lfo *lfo, float rate);
 
 void initialize_filter(struct filter *f, float cutoff, float resonance, filter_type mode);
 float process_lowpass(struct filter *f, float input);

@@ -689,15 +689,6 @@ int main(void) {
 
 
     while (1) {
-        // unfortunately the midi is blocking, which does so that it doesn't read it constantly.
-        // a much safer and more reliable way would be to set up an interrupt for the midi so that it becomes prioritized.
-        // i'm not sure if the midi code is quick enough, but it has to work. another way of making the midi code more reliable
-        // is to buffer it, but i don't think it's very needed. it probably slows the code down more than it helps.
-        //process_midi();
-
-        // with this configuration of the cores, it might be better to compute and set the controls in core 0.
-        // even though this idea could be good, it will create huge problems related to concurrency.
-
         float inputs[8] = {-1.0};
 
         for (int i = 0; i <= 7; i++) { // from 0 to 8
@@ -707,6 +698,7 @@ int main(void) {
 
             int adc_input = adc_read();
             inputs[i] = adc_input * pot_divider;
+            //printf("%d:%f, ", i, inputs[i]);
             if (i == 0) {
                 //pot_mod = adc_input * pot_divider;
                 //printf("%d: %f\n", i, inputs[i]);
@@ -714,6 +706,7 @@ int main(void) {
             }
             //printf("%d: %d\n", 2, inputs[2]);
         }
+        //printf("\n");
 
         //for (int i = 0; i < VOICE_COUNT; i++) {
         //    //printf("%f\n", 1.0 / (15.0 * 44100.0));
