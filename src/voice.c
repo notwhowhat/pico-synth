@@ -27,9 +27,8 @@ const float ENV_MAX_TIME_MOD = 1.0 / ENV_MAX_TIME;
 
 struct voice voices[VOICE_COUNT] = {0};
 
-void initialize_osc(struct osc *osc, int note, waveform selected_waveform) {
+void initialize_osc(struct osc *osc, waveform selected_waveform) {
     // table_index is not fixed to emulate free running oscillators
-    osc->table_start = 50 + note * 100;
     osc->table_increment = 0.0;
     osc->selected_waveform = selected_waveform;
     osc->tune = 0;
@@ -37,7 +36,6 @@ void initialize_osc(struct osc *osc, int note, waveform selected_waveform) {
 
 float process_osc(struct osc *osc, int note_increment) {
     osc->table_index += INCREMENT_TABLE[50 + note_increment * 100 + osc->tune];
-    //osc->table_index += INCREMENT_TABLE[osc->table_start + osc->tune];
     if (osc->table_index > 360.0) {
         osc->table_index = osc->table_index - 360.0;
     }
@@ -244,7 +242,7 @@ void initialize_voice(struct voice *v) {
     //initialize_env(&v->amp_env, ENV_MAX_TIME_MOD, ENV_MAX_TIME_MOD, ENV_MAX_TIME_MOD, 1.0);
     //initialize_env(&v->filter_env, 0.0001, 0.001, 0.0001, 0.0);
 
-    initialize_osc(&v->osc1, v->note, SIN);
+    initialize_osc(&v->osc1, SIN);
     // the supersaw sound like a lazer because the phases are the same in the beginning, 
     // which makes them sound louder and out of tune.
     // for the not-very-super saw
@@ -342,7 +340,7 @@ float process_voice(struct voice *v) {
         //return v->amp_env.mod * oscillator(v->selected_waveform, v->table_index);
 
         //printf("state: %d, a: %f, d: %f, r: %f, s: %f\n", v->amp_env.state,  v->amp_env.a_mod,  v->amp_env.d_mod,  v->amp_env.r_mod,  v->amp_env.s_mod);
-        float out = process_osc(&v->osc1, v->note * 100);
+        float out = process_osc(&v->osc1, v->note);
 
         // bad supersaw. it's really simple. no pitch tracking allpass filters, just a bit of detuning.
         // sounds nothing like the original

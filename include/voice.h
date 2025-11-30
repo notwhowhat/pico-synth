@@ -39,7 +39,6 @@ struct env {
 };
 
 struct osc {
-    int table_start;
     float table_index;
     float table_increment;
     waveform selected_waveform;
@@ -90,7 +89,7 @@ struct voice {
 
 extern struct voice voices[VOICE_COUNT];
 
-void initialize_osc(struct osc *osc, int note, waveform selected_waveform);
+void initialize_osc(struct osc *osc, waveform selected_waveform);
 float process_osc(struct osc *osc, int note_increment);
 void update_osc_waveform(struct osc *osc);
 void update_osc_tune(struct osc *osc, int tune);
