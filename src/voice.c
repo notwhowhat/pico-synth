@@ -14,10 +14,27 @@
 // the real next thing to do is to figure out if everything implemented is working
 // correctly. then, the next feature to add is pitch modulation.
 
-// TODO: add lfos. give them a seperate increment table (make a new one)
-// almost done. just has to be tested
-
 // TODO: logarithmic envelopes. probably won't work.
+
+// TODO: change tuning system to always use and have a tune in cents. do when home, otherwise it'll break.
+// in the script for generating the table i mixed deg and rad. this must be changed. the keytrack is also wrong.
+
+/*
+keytracking:
+filter frequency can be calculated by taking nyquist * cutoff
+the distance to move is freq - note freq 
+key cutoff = key frequency / nyquist and is found in table
+the note in to be inputted to the table should be in cents, so 100 * midi note
+
+final cutoff = start cutoff + mod * (start cutoff - key cutoff)
+
+ring mod:
+out = osc1 * osc2
+
+sync:
+when the leader.table_index < leader.table_increment, the 
+follower.table_index is set to 0.
+*/
 
 const float LFO_MOD = 360.0 / 44100.0;
 
@@ -26,6 +43,12 @@ const float ENV_MAX_TIME = 661500.0; // 15s * SAMPLE_RATE
 const float ENV_MAX_TIME_MOD = 1.0 / ENV_MAX_TIME;
 
 struct voice voices[VOICE_COUNT] = {0};
+
+float get_amp_mod(float mod) {
+    // the real function is 1000^(x-1) but x^4 is used as an aproximation.
+    // i should use the real one if i happen to include a math library
+    return mod * mod * mod * mod;
+}
 
 void initialize_osc(struct osc *osc, waveform selected_waveform) {
     // table_index is not fixed to emulate free running oscillators
@@ -101,7 +124,7 @@ void update_lfo_waveform(struct lfo *lfo) {
     }
 }
 
-void update_lfo_tune(struct lfo *lfo, float rate) {
+void update_lfo_rate(struct lfo *lfo, float rate) {
     lfo->rate = rate;
 }
 
@@ -251,6 +274,7 @@ void initialize_voice(struct voice *v) {
     //}
 
     //initialize_filter(&v->lowpass, 1.0, 0.0, LOWPASS);
+    initialize_lfo(&v->lfo, 2, SIN);
 }
 
 
@@ -341,6 +365,7 @@ float process_voice(struct voice *v) {
 
         //printf("state: %d, a: %f, d: %f, r: %f, s: %f\n", v->amp_env.state,  v->amp_env.a_mod,  v->amp_env.d_mod,  v->amp_env.r_mod,  v->amp_env.s_mod);
         float out = process_osc(&v->osc1, v->note);
+        // ring mod: osc1 * osc2
 
         // bad supersaw. it's really simple. no pitch tracking allpass filters, just a bit of detuning.
         // sounds nothing like the original
@@ -350,7 +375,7 @@ float process_voice(struct voice *v) {
         //}
 
         //out = process_filter(&v->lowpass, out, v->filter_env.mod);
-        out *= v->amp_env.mod;
+        out *= get_amp_mod(v->amp_env.mod); //process_lfo(&v->lfo)
 
         return out;
     }

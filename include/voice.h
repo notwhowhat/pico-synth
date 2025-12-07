@@ -85,6 +85,8 @@ struct voice {
     struct env filter_env;
 
     struct filter lowpass;
+
+    struct lfo lfo;
 };
 
 extern struct voice voices[VOICE_COUNT];
@@ -119,6 +121,7 @@ void update_env_r(struct env *e, float time_mod);
 void update_env_s(struct env *e, float time_mod);
 void update_env(struct env *e, float a_time_mod, float d_time_mod, float r_time_mod, float s_mod); // should not be used.
 
+float get_amp_mod(float mod);
 void initialize_voice(struct voice *v);
 float process_voice(struct voice *v);
 
