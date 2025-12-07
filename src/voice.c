@@ -5,6 +5,8 @@
 #include "midi.h"
 #include "picosyn.h"
 
+#include <math.h>
+
 //#include "hardware/pwm.h"  // pwm 
 
 // the next thing to do is to add full modulation. in the beginning, the parameters
@@ -17,7 +19,6 @@
 // TODO: logarithmic envelopes. probably won't work.
 
 // TODO: change tuning system to always use and have a tune in cents. do when home, otherwise it'll break.
-// in the script for generating the table i mixed deg and rad. this must be changed. the keytrack is also wrong.
 
 /*
 keytracking:
@@ -26,7 +27,7 @@ the distance to move is freq - note freq
 key cutoff = key frequency / nyquist and is found in table
 the note in to be inputted to the table should be in cents, so 100 * midi note
 
-final cutoff = start cutoff + mod * (start cutoff - key cutoff)
+final cutoff = start cutoff + mod * (key cutoff - start cutoff)
 
 ring mod:
 out = osc1 * osc2
@@ -55,10 +56,13 @@ void initialize_osc(struct osc *osc, waveform selected_waveform) {
     osc->table_increment = 0.0;
     osc->selected_waveform = selected_waveform;
     osc->tune = 0;
+    osc->detune = 0;
 }
 
 float process_osc(struct osc *osc, int note_increment) {
-    osc->table_index += INCREMENT_TABLE[50 + note_increment * 100 + osc->tune];
+    osc->tune = note_increment * 100 + osc->detune;
+    osc->table_increment = INCREMENT_TABLE[50 + osc->tune];
+    osc->table_index += osc->table_increment;
     if (osc->table_index > 360.0) {
         osc->table_index = osc->table_index - 360.0;
     }
@@ -85,8 +89,8 @@ void update_osc_waveform(struct osc *osc) {
     }
 }
 
-void update_osc_tune(struct osc *osc, int tune) {
-    osc->tune = tune;
+void update_osc_detune(struct osc *osc, int detune) {
+    osc->detune = detune;
 }
 
 void initialize_lfo(struct lfo *lfo, float rate, waveform selected_waveform) {
@@ -255,17 +259,16 @@ void initialize_voice(struct voice *v) {
     v->age = 0;
     v->new = false;
 
-    v->table_index = 0.0;
-    v->table_increment = 0.0;
-
-    v->selected_waveform = SIN;
-
     // TODO: uncomment
-    initialize_env(&v->amp_env, 0.1, 0.1, 0.1, 1.0);
+    //initialize_env(&v->amp_env, 0.1, 0.1, 0.1, 1.0);
+    initialize_env(&v->amp_env, 0.0001, 0.0001, 0.0001, 1.0);
     //initialize_env(&v->amp_env, ENV_MAX_TIME_MOD, ENV_MAX_TIME_MOD, ENV_MAX_TIME_MOD, 1.0);
     //initialize_env(&v->filter_env, 0.0001, 0.001, 0.0001, 0.0);
 
+    v->sync = true;
+    v->ring_mod = false;
     initialize_osc(&v->osc1, SIN);
+    initialize_osc(&v->osc2, SIN);
     // the supersaw sound like a lazer because the phases are the same in the beginning, 
     // which makes them sound louder and out of tune.
     // for the not-very-super saw
@@ -352,6 +355,7 @@ float process_voice(struct voice *v) {
     // this is where the notes get stuck playing
     //if (midi_keys[voices[i].note] != 0) {
     if (v->amp_env.mod != 0.0) {
+        float out = 0;
         //printf("mod: %f\n", v->amp_env.mod);
 
         //v->table_index += INCREMENTS[50 + 100 * v->note];
@@ -364,7 +368,19 @@ float process_voice(struct voice *v) {
         //return v->amp_env.mod * oscillator(v->selected_waveform, v->table_index);
 
         //printf("state: %d, a: %f, d: %f, r: %f, s: %f\n", v->amp_env.state,  v->amp_env.a_mod,  v->amp_env.d_mod,  v->amp_env.r_mod,  v->amp_env.s_mod);
-        float out = process_osc(&v->osc1, v->note);
+
+        // osc1 is leader for sync.
+        if (v->sync) {
+            if (v->osc1.table_index < v->osc1.table_increment) {
+                v->osc2.table_index = 0.0;
+            } 
+        }
+
+        if (v-ring_mod) {
+            out = process_osc(&v->osc1, v->note) * process_osc(&v->osc2, v->note + 7);
+        } else {
+            out = 0 * process_osc(&v->osc1, v->note + 7) + process_osc(&v->osc2, v->note);
+        }
         // ring mod: osc1 * osc2
 
         // bad supersaw. it's really simple. no pitch tracking allpass filters, just a bit of detuning.

@@ -43,6 +43,7 @@ struct osc {
     float table_increment;
     waveform selected_waveform;
     int tune;
+    int detune;
 };
 
 struct lfo {
@@ -72,14 +73,12 @@ struct voice {
     int age;
     bool new;
 
-    float table_index;
-    float table_increment;
-
+    bool sync;
+    bool ring_mod;
     struct osc osc1;
+    struct osc osc2;
 
     //struct osc oscillators[7];
-
-    waveform selected_waveform;
 
     struct env amp_env;
     struct env filter_env;
@@ -94,7 +93,7 @@ extern struct voice voices[VOICE_COUNT];
 void initialize_osc(struct osc *osc, waveform selected_waveform);
 float process_osc(struct osc *osc, int note_increment);
 void update_osc_waveform(struct osc *osc);
-void update_osc_tune(struct osc *osc, int tune);
+void update_osc_detune(struct osc *osc, int detune);
 
 void initialize_lfo(struct lfo *lfo, float rate, waveform selected_waveform);
 float process_lfo(struct lfo *lfo);

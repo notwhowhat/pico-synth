@@ -28,7 +28,6 @@ def gen_inctable(length: int) -> np.ndarray:
 
     for i in range(length):
         freq: float = 440.0 * 2.0 ** ((i - 6950.0) / 1200.0)
-        # TODO: use radians, this might throw everything off like crazy
         table[i] = 360.0 / (SAMPLE_RATE / freq)
         
     return table
