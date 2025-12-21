@@ -40,10 +40,10 @@ void update_control(struct voice *v, inputs control, float value) {
             update_env_s(&v->amp_env, value);
             break;
         case FILTER_CUTOFF:
-            update_filter_cutoff(&v->lowpass, value);
+            //update_filter_cutoff(&v->lowpass, value);
             break;
         case FILTER_RESONANCE:
-            update_filter_resonance(&v->lowpass, value);
+            //update_filter_resonance(&v->lowpass, value);
             break;
     }
 }

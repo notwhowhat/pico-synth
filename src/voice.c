@@ -37,6 +37,9 @@ when the leader.table_index < leader.table_increment, the
 follower.table_index is set to 0.
 */
 
+const float PI = 3.14159265;
+const float filter_mod = PI * 180.0;
+
 const float LFO_MOD = 360.0 / 44100.0;
 
 // XXX TODO SOUND THE GENERAL ALARM: ENV_MAX_TIME_MOD has run out of presision (it doesn't actually matter)
@@ -132,6 +135,57 @@ void update_lfo_rate(struct lfo *lfo, float rate) {
     lfo->rate = rate;
 }
 
+void initialize_filter(struct filter *f, float cutoff, float resonance, int note) {
+    // 0 < cutoff, resonance < 1
+    f->cutoff = cutoff;
+    f->resonance = resonance;
+
+    f->keytrack = KEYTRACK_TABLE[note];
+    f->keytrack_mod = 0.0;
+
+    f->g = compute_filter_g(f->cutoff, f->keytrack, f->keytrack_mod);//2.0 * sinf(PI * f->cutoff / 2.0);
+    f->r = 0.5 / f->resonance;
+    f->low = f->band = f->high = 0.0;
+
+    f->mode = LOW;
+}
+
+float compute_filter_g(float cutoff, float keytrack, float keytrack_mod) {
+    float total_cutoff = cutoff + keytrack_mod * (keytrack - cutoff);
+    return 2.0 * SIN_TABLE[(int) (filter_mod * total_cutoff)];
+}
+
+void update_filter_cutoff(struct filter *f, float cutoff) {
+    f->cutoff = cutoff;
+    f->g = compute_filter_g(cutoff, f->keytrack, f->keytrack_mod);
+}
+
+void update_filter_resonance(struct filter *f, float resonance) {
+    f->resonance = resonance;
+    f->r = 0.5 / resonance;
+}
+
+float process_filter(struct filter *f, float input) {
+    f->high = f->r * input - f->low - f->r * f->band;
+    f->band += f->g * f->high;
+    f->low += f->g * f->band;
+    f->notch = f->high + f->low;
+
+    switch (f->mode) {
+        case LOW:
+            return f->low;
+        case BAND:
+            return f->band;
+        case HIGH:
+            return f->high;
+        case NOTCH:
+            return f->notch;
+    }
+}
+
+
+
+/*
 void initialize_filter(struct filter *f, float cutoff, float resonance, filter_type mode) {
     f->cutoff = cutoff;
     f->resonance = resonance;
@@ -160,7 +214,7 @@ float process_filter(struct filter *f, float input, float mod) {
         f->cutoff = (1.0 - pot_mod);// * mod;
         return input - process_lowpass(f, input);
     } else {
-        f->cutoff = pot_mod * mod;
+        //f->cutoff = pot_mod * mod;
         return process_lowpass(f, input);
     }
     
@@ -173,6 +227,7 @@ void update_filter_cutoff(struct filter *f, float cutoff) {
 void update_filter_resonance(struct filter *f, float resonance) {
     f->resonance = resonance;
 }
+*/
 
 
 // the minimum time: one sample
@@ -265,10 +320,10 @@ void initialize_voice(struct voice *v) {
     //initialize_env(&v->amp_env, ENV_MAX_TIME_MOD, ENV_MAX_TIME_MOD, ENV_MAX_TIME_MOD, 1.0);
     //initialize_env(&v->filter_env, 0.0001, 0.001, 0.0001, 0.0);
 
-    v->sync = true;
+    v->sync = false;
     v->ring_mod = false;
-    initialize_osc(&v->osc1, SIN);
-    initialize_osc(&v->osc2, SIN);
+    initialize_osc(&v->osc1, SAW);
+    initialize_osc(&v->osc2, SAW);
     // the supersaw sound like a lazer because the phases are the same in the beginning, 
     // which makes them sound louder and out of tune.
     // for the not-very-super saw
@@ -276,7 +331,8 @@ void initialize_voice(struct voice *v) {
     //    initialize_osc(&v->oscillators[i], SAW);
     //}
 
-    //initialize_filter(&v->lowpass, 1.0, 0.0, LOWPASS);
+    //initialize_filter(&v->lowpass, 0.5, 0.0, LOWPASS);
+    initialize_filter(&v->filter, 0.01, 1.0, v->note);
     initialize_lfo(&v->lfo, 2, SIN);
 }
 
@@ -376,7 +432,7 @@ float process_voice(struct voice *v) {
             } 
         }
 
-        if (v-ring_mod) {
+        if (v->ring_mod) {
             out = process_osc(&v->osc1, v->note) * process_osc(&v->osc2, v->note + 7);
         } else {
             out = 0 * process_osc(&v->osc1, v->note + 7) + process_osc(&v->osc2, v->note);
@@ -392,6 +448,8 @@ float process_voice(struct voice *v) {
 
         //out = process_filter(&v->lowpass, out, v->filter_env.mod);
         out *= get_amp_mod(v->amp_env.mod); //process_lfo(&v->lfo)
+        out = process_filter(&v->filter, out);
+        //out = process_filter(&v->lowpass, out, 1.0);
 
         return out;
     }
