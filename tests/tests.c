@@ -6,7 +6,12 @@
 #include <stdio.h>
 #include <assert.h>
 
-int t_midi(void) {
+int main(void) {
+    //struct env tenv;
+    //initialize_env(&tenv, 1, 1, 1, 0.5);
+
+    //printf("a: %f, d: %f, r: %f, s: %f\n", tenv.a_mod, tenv.d_mod, tenv.r_mod, tenv.s_mod);
+
     struct voice v;
     initialize_voice(&v);
     v.used = true;
@@ -29,28 +34,8 @@ int t_midi(void) {
         printf("mod: %f\n", v.amp_env.mod);
     }
     
-}
-
-int t_filter(void) {
-    struct filter f;
-    initialize_filter(&f, 0.2, 0.0);
-
-    for (int i = 0; i < 1000; i++) {
-        process_filter(&f, i / 1000.0);
-    }
-}
-
-int main(void) {
-    //struct env tenv;
-    //initialize_env(&tenv, 1, 1, 1, 0.5);
-
-    //printf("a: %f, d: %f, r: %f, s: %f\n", tenv.a_mod, tenv.d_mod, tenv.r_mod, tenv.s_mod);
-    t_filter();
-
-
-
-
     printf("success\n");
+
     return 0;
 
 }

@@ -21,7 +21,6 @@ target_link_libraries(firmware
     hardware_adc
     pico_multicore
     hardware_timer
-    m
 )
 
 pico_add_extra_outputs(firmware)
