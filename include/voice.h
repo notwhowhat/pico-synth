@@ -19,9 +19,10 @@ typedef enum {
     ATTACK, DECAY, SUSTAIN, RELEASE,
 } env_state;
 
+// TODO: add max count
 typedef enum {
-    LOWPASS, HIGHPASS
-} filter_type;
+    LOW, BAND, HIGH, NOTCH
+} filter_mode;
 
 struct env {
     int time;
@@ -56,15 +57,34 @@ struct lfo {
 struct filter {
     float cutoff;
     float resonance;
-    filter_type mode;
-    //bool type;
 
-    // buffers for orders of filter
-    float a;
-    float b;
-    float c;
-    float d;
+    float keytrack;
+    float keytrack_mod;
+
+    float g;
+    float r;
+
+    float low;
+    float band;
+    float high;
+    float notch;
+
+    filter_mode mode;
 };
+
+
+//struct filter {
+    //float cutoff;
+    //float resonance;
+    //filter_type mode;
+    ////bool type;
+
+    //// buffers for orders of filter
+    //float a;
+    //float b;
+    //float c;
+    //float d;
+//};
 
 // the voice gets allocated a note, which it reads
 struct voice {
@@ -82,8 +102,10 @@ struct voice {
 
     struct env amp_env;
     struct env filter_env;
+    float filter_env_mod;
 
-    struct filter lowpass;
+    //struct filter lowpass;
+    struct filter filter;
 
     struct lfo lfo;
 };
@@ -100,10 +122,13 @@ float process_lfo(struct lfo *lfo);
 void update_lfo_waveform(struct lfo *lfo);
 void update_lfo_rate(struct lfo *lfo, float rate);
 
-void initialize_filter(struct filter *f, float cutoff, float resonance, filter_type mode);
-float process_lowpass(struct filter *f, float input);
-void update_filter_cutoff(struct filter *f, float cutoff);
-void update_filter_resonance(struct filter *f, float resonance);
+void initialize_filter(struct filter *f, float cutoff, float resonance, int note);
+float process_filter(struct filter *f, float input);
+float compute_filter_g(float cutoff, float keytrack, float keytrack_mod);
+//void initialize_filter(struct filter *f, float cutoff, float resonance, filter_type mode);
+//float process_lowpass(struct filter *f, float input);
+//void update_filter_cutoff(struct filter *f, float cutoff);
+//void update_filter_resonance(struct filter *f, float resonance);
 
 void initialize_env(struct env *e, float a_time_mod, float d_time_mod, float r_time_mod, float s_mod);
 void process_env_r(struct env *e, bool amp);
