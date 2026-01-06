@@ -19,7 +19,7 @@ features when all finished:
 together (modutlation)
 - sync
 - ring mod
-- (fm?)
+- fm (osc 1 will modulate osc 2. knob will change modifier)
 
 2x lfo. for each:
 - rate
@@ -42,13 +42,16 @@ filter.
 - cutoff 
 - resonance
 - (drive)
-- (key tracking)
+- (key tracking) !
 
 arpeggiator.
 - midi sync bpm or button
 - hold
 - up, down, random (converge and diverge)
 - (gate)
+
+legato 
+portamento 
 
 presets.
 

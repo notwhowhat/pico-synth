@@ -677,6 +677,7 @@ int main(void) {
     // problem fixed. caused by passing a factor instead of the time
     // XXX: the program is stopping at initialize_voice(). find out why
     // there is something in initialize_env() that causes the crash
+    initialize_parameters(&global_paramaters);
 
     for (int i = 0; i < VOICE_COUNT; i++) {
         initialize_voice(&voices[i]);

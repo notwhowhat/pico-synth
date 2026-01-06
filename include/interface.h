@@ -10,5 +10,6 @@ void write_gpio(int pin, int value);
 bool check_uart(void);
 int read_uart(void);
 int read_adc(void);
+int read_gpio(int pin);
 
 #endif

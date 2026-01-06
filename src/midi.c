@@ -10,48 +10,71 @@
 uint8_t midi_keys[128] = {0};
 uint8_t midi_previous_keys[128] = {0};
 
+void note_off(int note) {
+    write_gpio(MIDI_LED_PIN, 0);
+    //printf("off @ %d\n", note);
+    midi_previous_keys[note] = midi_keys[note];
+    midi_keys[note] = 0;
+}
+
+void note_on(int note, int velocity) {
+    //gpio_put(MIDI_LED_PIN, 1);
+    write_gpio(MIDI_LED_PIN, 1);
+    //printf("on @ %d\n", note);
+
+    // this should work, but it's risky. check if it's a correct value
+    midi_previous_keys[note] = midi_keys[note];
+    midi_keys[note] = velocity;
+            
+    if (global_paramaters.mode == POLY) {
+        struct voice *selected_voice = voices; // &voices[0], because array's are mad
+        struct voice *last_voice = voices;
+        bool theft = false;
+        for (int i = 0; i < VOICE_COUNT; i++) {
+            if (!voices[i].used) {
+                selected_voice = &voices[i];
+            } else if (voices[i].age > selected_voice->age) {
+                // this voice is being stolen. it's info should be passed for legato
+                // portamento should be done elsewhere
+                // this should not be else if. 
+                selected_voice = &voices[i];
+                theft = true;
+            }
+
+            if (voices[i].age > 0 && voices[i].age < last_voice->age) {
+                last_voice = &voices[i];
+            }
+
+            voices[i].age++;
+        }
+        if (theft) {
+            reset_voice(selected_voice);
+            //initialize_voice(selected_voice);
+        }
+        // somehow selected voice and last voice become the same.
+        start_voice_poly(selected_voice, last_voice, note);
+    } else {
+        start_voice_mono_legato(voices, note);
+    }
+}
+
 void process_midi_commands(uint8_t cmd_fn, uint8_t note, uint8_t velocity) {
     // XXX: different devices output midi note off's in different ways. ableton and my midi keyboard send a ntoe off 
     // command, whilst the mininova just sends a note on with a velocity of zero. both work, but the outputs are set up
     // for the first alternative for performence reasons.
     // TODO: voice stealing doesn't really work. it frees the voice to be stolen, but it doesn't give it a note
+    //printf("cmd: %d, note: %d, velocity: %d\n", cmd_fn, note, velocity);
     switch(cmd_fn) {
         case 128:
             //gpio_put(MIDI_LED_PIN, 0);
-            write_gpio(MIDI_LED_PIN, 0);
-            //printf("off @ %d\n", note);
-            midi_previous_keys[note] = midi_keys[note];
-            midi_keys[note] = 0;
+            note_off(note);
             break;
         case 144:
-            //gpio_put(MIDI_LED_PIN, 1);
-            write_gpio(MIDI_LED_PIN, 1);
-            //printf("on @ %d\n", note);
-
-            // this should work, but it's risky. check if it's a correct value
-            midi_previous_keys[note] = midi_keys[note];
-            midi_keys[note] = velocity;
-            
-            struct voice *selected_voice = voices; // &voices[0], because array's are mad
-
-            for (int i = 0; i < VOICE_COUNT; i++) {
-                if (!voices[i].used) {
-                    selected_voice = &voices[i];
-                    break;
-                } else {
-                    if (voices[i].age < selected_voice->age) {
-                        selected_voice = &voices[i];
-                    }
-                    //if (voices[i].note < selected_voice->note) {
-                    //    selected_voice = &voices[i];
-                    //}
-                }
-                voices[i].age++;
+            if (velocity > 0) {
+                note_on(note, velocity);
+            } else {
+                note_off(note);
             }
-            
-            selected_voice->note = note;
-            selected_voice->used = true;
-            selected_voice->new = true;
             break;
         case 176: // cc
             if (note == 1) {

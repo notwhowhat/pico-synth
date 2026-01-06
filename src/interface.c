@@ -25,4 +25,6 @@ int read_uart(void) {
 int read_adc(void) {
     return adc_read();
 }
-
+int read_gpio(int pin) {
+    return gpio_get(pin);
+}
