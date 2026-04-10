@@ -1,8 +1,20 @@
+#include "interface.h"
+
 #include "voice.h"
 
 #ifndef CONTROLS_H
 #define CONTROLS_H
 
+extern const float POT_MODIFIER;
+
+// in this case, they are ADSR for the amp envelope
+float controls[4];
+extern const int CONTROL_NUM;
+extern const int NOISE_THRESHOLD;
+
+void initialize_controls(void);
+void read_pots(void);
+void process_pot_inputs(int input);
 /*
 buttons that toggle features should be updated and checked immediately.
 buttons that change which layer to be used will only get updated when a pot updates.

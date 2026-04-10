@@ -49,7 +49,6 @@ void note_on(int note, int velocity) {
         }
         if (theft) {
             reset_voice(selected_voice);
-            //initialize_voice(selected_voice);
         }
         // somehow selected voice and last voice become the same.
         start_voice_poly(selected_voice, last_voice, note);

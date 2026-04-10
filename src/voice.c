@@ -53,20 +53,11 @@ when the leader.table_index < leader.table_increment, the
 follower.table_index is set to 0.
 */
 
-const float DEFAULT_ENV_MOD = 0.0;
-
-const float PI = 3.14159265;
-const float filter_mod = PI * 180.0;
 
 const float INV_SAMPLE_RATE = 1.0 / 44100.0;
 
 const float PORTAMENTO_MOD = 0.00009070294;
 
-const float LFO_MOD = 360.0 / 44100.0;
-
-// XXX TODO SOUND THE GENERAL ALARM: ENV_MAX_TIME_MOD has run out of presision (it doesn't actually matter)
-const float ENV_MAX_TIME = 661500.0; // 15s * SAMPLE_RATE
-const float ENV_MAX_TIME_MOD = 1.0 / ENV_MAX_TIME;
 
 struct voice voices[VOICE_COUNT] = {0};
 
@@ -82,139 +73,6 @@ float get_amp_mod(float mod) {
     // i should use the real one if i happen to include a math library
     return mod * mod * mod * mod;
 }
-
-void initialize_osc(struct osc *osc, waveform selected_waveform) {
-    // table_index is not fixed to emulate free running oscillators
-    osc->table_increment = 0.0;
-    osc->selected_waveform = selected_waveform;
-    osc->tune = 0;
-    osc->detune = 0;
-    osc->gain = 1.0;
-}
-
-float process_osc(struct osc *osc, int note_increment, float portamento) {
-    // the portamento approaches zero
-    osc->tune = note_increment * 100 + osc->detune + portamento;
-    osc->table_increment = INCREMENT_TABLE[50 + osc->tune];
-    osc->table_index += osc->table_increment;
-    if (osc->table_index > 360.0) {
-        osc->table_index = osc->table_index - 360.0;
-    }
-    
-    switch (osc->selected_waveform) {
-        case SIN:
-            return SIN_TABLE[(int)osc->table_index];
-            break;
-       case SAW:
-            return SAW_TABLE[(int)osc->table_index];
-            break;
-       case SQUARE:
-            return SQUARE_TABLE[(int)osc->table_index];
-            break;
-        default:
-            return 0.0;
-    }
-}
-
-void update_osc_waveform(struct osc *osc) {
-    osc->selected_waveform++;
-    if (osc->selected_waveform == COUNT) {
-        osc->selected_waveform = SIN;
-    }
-}
-
-void update_osc_detune(struct osc *osc, int detune) {
-    osc->detune = detune;
-}
-
-void initialize_lfo(struct lfo *lfo, float rate, waveform selected_waveform) {
-    // table_index is not fixed to emulate free running oscillators
-    lfo->table_increment = 0.0;
-    lfo->selected_waveform = selected_waveform;
-    lfo->rate = rate;
-}
-
-float process_lfo(struct lfo *lfo) {
-    lfo->table_index += LFO_MOD * lfo->rate;
-    if (lfo->table_index > 360.0) {
-        lfo->table_index = lfo->table_index - 360.0;
-    }
-    
-    switch (lfo->selected_waveform) {
-        case SIN:
-            return SIN_TABLE[(int)lfo->table_index];
-            break;
-       case SAW:
-            return SAW_TABLE[(int)lfo->table_index];
-            break;
-       case SQUARE:
-            return SQUARE_TABLE[(int)lfo->table_index];
-            break;
-        default:
-            return 0.0;
-    }
-}
-
-void update_lfo_waveform(struct lfo *lfo) {
-    lfo->selected_waveform++;
-    if (lfo->selected_waveform == COUNT) {
-        lfo->selected_waveform = SIN;
-    }
-}
-
-void update_lfo_rate(struct lfo *lfo, float rate) {
-    lfo->rate = rate;
-}
-
-void initialize_filter(struct filter *f, float cutoff, float resonance, int note) {
-    // 0 < cutoff, resonance < 1
-    f->cutoff = cutoff;
-    f->resonance = resonance;
-
-    f->keytrack = KEYTRACK_TABLE[note];
-    f->keytrack_mod = 0.0;
-
-    f->g = compute_filter_g(f->cutoff, f->keytrack, f->keytrack_mod);//2.0 * sinf(PI * f->cutoff / 2.0);
-    f->r = 0.5 / f->resonance;
-    f->low = f->band = f->high = 0.0;
-
-    f->mode = LOW;
-}
-
-float compute_filter_g(float cutoff, float keytrack, float keytrack_mod) {
-    float total_cutoff = cutoff + keytrack_mod * (keytrack - cutoff);
-    return 2.0 * SIN_TABLE[(int) (filter_mod * total_cutoff)];
-}
-
-void update_filter_cutoff(struct filter *f, float cutoff) {
-    f->cutoff = cutoff;
-    f->g = compute_filter_g(cutoff, f->keytrack, f->keytrack_mod);
-}
-
-void update_filter_resonance(struct filter *f, float resonance) {
-    f->resonance = resonance;
-    f->r = 0.5 / resonance;
-}
-
-float process_filter(struct filter *f, float input) {
-    f->high = f->r * input - f->low - f->r * f->band;
-    f->band += f->g * f->high;
-    f->low += f->g * f->band;
-    f->notch = f->high + f->low;
-
-    switch (f->mode) {
-        case LOW:
-            return f->low;
-        case BAND:
-            return f->band;
-        case HIGH:
-            return f->high;
-        case NOTCH:
-            return f->notch;
-    }
-}
-
-
 
 /*
 void initialize_filter(struct filter *f, float cutoff, float resonance, filter_type mode) {
@@ -263,81 +121,6 @@ void update_filter_resonance(struct filter *f, float resonance) {
 
 // the minimum time: one sample
 
-void initialize_env(struct env *e, float a_time_mod, float d_time_mod, float r_time_mod, float s_mod, float mod) {
-    e->mod = mod;
-    e->state = ATTACK;
-
-    // times are used for state calculations
-    e->s_mod = s_mod;
-
-    // i am running out of precision on a and d
-    set_env_attack_mod(e, a_time_mod);
-    set_env_decay_mod(e, d_time_mod);
-    set_env_release_mod(e, r_time_mod);
-}
-
-// i know that i might do some horrible premature optimization, but it should be quicker.
-// you can multiply with the inverse of the max length instead of dividing. might be better.
-void set_env_attack_mod(struct env *e, float a_time_mod) {
-    //e->a_time = a_time_mod * ENV_MAX_TIME;
-    //e->a_mod = a_time_mod * ENV_MAX_TIME_MOD;
-    e->a_time = a_time_mod * ENV_MAX_TIME;
-    e->a_mod = 1.0 / e->a_time;
-}
-
-void set_env_decay_mod(struct env *e, float d_time_mod) {
-    //e->d_time = d_time_mod * ENV_MAX_TIME;
-    //e->d_mod = (1.0 - e->s_mod) * d_time_mod * ENV_MAX_TIME_MOD;
-    e->d_time = d_time_mod * ENV_MAX_TIME;
-    e->d_mod = (1.0 - e->s_mod) / e->d_time;
-}    
-
-void set_env_release_mod(struct env *e, float r_time_mod) {
-    //e->r_time = r_time_mod * ENV_MAX_TIME;
-    //e->r_mod = e->s_mod * r_time_mod * ENV_MAX_TIME_MOD;
-    e->r_time = r_time_mod * ENV_MAX_TIME;
-    e->r_mod = e->s_mod / e->r_time;
-
-    //printf("time:%d, mod:%f, time_mod:%f\n", e->r_time, e->r_mod, r_time_mod);
-}
-
-void update_env_a(struct env *e, float time_mod) {
-    if (e->state == ATTACK) {
-        set_env_attack_mod(e, time_mod);
-    }
-}
-
-void update_env_d(struct env *e, float time_mod) {
-    if (e->state == ATTACK && e->state == DECAY) {
-        set_env_decay_mod(e, time_mod);
-    }
-}
-
-void update_env_r(struct env *e, float time_mod) {
-        set_env_release_mod(e, time_mod);
-}
-
-void update_env_s(struct env *e, float time_mod) {
-    if (e->state == ATTACK && e->state == DECAY) {
-        e->s_mod = time_mod;
-    }
-}
-
-void update_env(struct env *e, float a_time_mod, float d_time_mod, float r_time_mod, float s_mod) {
-    // it should check for if it's new or not in here, or at least not in the set_env funcitons
-    switch (e->state) {
-        case ATTACK:
-            set_env_attack_mod(e, a_time_mod);
-            e->s_mod = s_mod;
-        case DECAY:
-            set_env_decay_mod(e, d_time_mod);
-            e->s_mod = s_mod;
-        case SUSTAIN:
-        case RELEASE:
-            set_env_release_mod(e, r_time_mod);
-    }
-}
-
 void initialize_portamento(struct voice *v, int last_note) {
     if (last_note != -1) {
         // a negative increment and 0.001 of space prevents it from becoming zero
@@ -378,8 +161,8 @@ void start_voice_mono_legato(struct voice *v, int note) {
 
 
     if (global_paramaters.mode == LEGATO) {
-        initialize_env(&v->amp_env, 0.1, 0.01, 0.1, 0.5, v->amp_env.mod);
-        initialize_env(&v->filter_env, 0.1, 0.01, 0.1, 0.5, v->filter_env.mod);
+        initialize_env(&v->amp_env, 0.1, 0.01, 0.1, 0.5, v->amp_env.level);
+        initialize_env(&v->filter_env, 0.1, 0.01, 0.1, 0.5, v->filter_env.level);
     } else {
         initialize_env(&v->amp_env, 0.0001, 0.0001, 0.0001, 1.0, 0.0);
         initialize_env(&v->filter_env, 0.0001, 0.0001, 0.0001, 1.0, 0.0);
@@ -422,75 +205,6 @@ void reset_voice(struct voice *v) {
     initialize_lfo(&v->lfo, 2, SIN);
 }
 
-
-
-void process_env_r(struct env *e, bool amp) {
-    e->mod -= e->r_mod;
-
-    if (e->mod < 0.0) {
-        e->mod = 0.0;
-    }
-    
-    //e->time++;
-}
-
-void process_env_ads(struct env *e) {
-    // TODO: find out why in the world i did not just make mod change until it gets the right value 
-    // could it be because i was having problems with mod jumping and becoming negative?
-    /*
-    this is a hopefully more logical implementation
-
-    if attack: increase mod. if mod > 1: decay.
-    if decay: increase mod. if mod > sustain. sustain.
-    if sustain: sustain
-
-    implementing legato will be much easier
-    
-    */
-    switch (e->state) {
-        case ATTACK:
-            e->mod += e->a_mod;
-            if (e->mod > 1.0) {
-                e->mod = 1.0;
-                e->state = DECAY;
-            }
-            break;
-        case DECAY:
-            e->mod += e->a_mod;
-            if (e->mod > 1.0) {
-                e->mod = 1.0;
-                e->state = DECAY;
-            }
-            break;
-        case SUSTAIN:
-            // shouldn't actually be needed
-            e->mod = e->s_mod;
-            break;
-    }
-
-    /*
-    if (e->time < e->a_time) {
-        e->mod += e->a_mod;
-        e->state = ATTACK;
-    } else if (e->time < (e->a_time + e->d_time)) {
-        // the decay is starting from where the attack is, but it's still going up
-        e->mod -= e->d_mod;
-        e->state = DECAY;
-    } else {
-        // sustain should be at correct level after decay
-        // do sustain 
-        //e->mod = e->s_mod;
-        e->state = SUSTAIN;
-    }
-
-    if (e->mod > 1.0) {
-        e->mod = 1.0;
-    }
-
-    e->time++;
-    */
-}
-
 // remove and make into two functions
 float process_voice(struct voice *v) {
     // mod is getting -1'd in the 2nd cycle of release
@@ -512,7 +226,7 @@ float process_voice(struct voice *v) {
             //printf("r:%f\n", v->amp_env.mod);
             //process_env_r(&v->filter_env, true);
 
-            if (v->amp_env.mod <= 0.0) {
+            if (v->amp_env.level <= 0.0) {
                 //printf("sound off\n");
 
                 //initialize_voice(v);
@@ -530,7 +244,7 @@ float process_voice(struct voice *v) {
     
     // this is where the notes get stuck playing
     //if (midi_keys[voices[i].note] != 0) {
-    if (v->amp_env.mod != 0.0) {
+    if (v->amp_env.level != 0.0) {
         float out = 0;
         //printf("mod: %f\n", v->amp_env.mod);
 
@@ -577,7 +291,7 @@ float process_voice(struct voice *v) {
         //}
 
         //out = process_filter(&v->lowpass, out, v->filter_env.mod);
-        out *= get_amp_mod(v->amp_env.mod); //process_lfo(&v->lfo)
+        out *= get_amp_mod(v->amp_env.level); //process_lfo(&v->lfo)
         out = process_filter(&v->filter, out);
         //out = process_filter(&v->lowpass, out, 1.0);
 
@@ -599,6 +313,7 @@ void on_pwm_interrupt() {
     }
    
     //master_out = gain * pot_mod * (master_out + gain * pot_mod);
+    // shifts it to the middle
     master_out = GAIN * (master_out + GAIN);
 
     write_pwm(master_out);

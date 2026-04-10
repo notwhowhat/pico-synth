@@ -1,5 +1,53 @@
 #include "controls.h"
 #include "picosyn.h"
+#include <math.h>
+
+const float POT_MODIFIER = 1.0 / 4096.0;
+const int CONTROL_NUM = 4;
+const int NOISE_THRESHOLD = 10;
+
+void initialize_controls(void) {
+    for (int i; i < CONTROL_NUM -1; i++) {
+        controls[i] = -1.0;
+    }
+}
+
+void read_pots(void) {
+    // does all sorts of muxing and sends updated pots to be processed
+    for (int i = 0; i < CONTROL_NUM - 1; i++) {
+        // the inputs should be read from the muxes but now only one is connected.
+        float input = POT_MODIFIER * read_adc();
+        if (fabs(controls[i] - input) > NOISE_THRESHOLD) {
+            controls[i] = input;
+            process_pot_inputs(i);
+        }
+    }
+}
+
+void process_pot_inputs(int input) {
+    // no function pointers, because the function paramaters must be of the same type
+    for (int i = 0; i < VOICE_COUNT; i++) {
+
+        // TODO: stop the hardcoding of values. just use an enum
+        switch(input) {
+            case 0:
+                update_env_a(&voices[i].amp_env, controls[input]);
+                break;
+            case 1:
+                update_env_d(&voices[i].amp_env, controls[input]);
+                break;
+            case 2:
+                update_env_s(&voices[i].amp_env, controls[input]);
+                break;
+            case 3:
+                update_env_r(&voices[i].amp_env, controls[input]);
+                break;
+
+        }
+    }
+
+}
+
 /*
 const int INPUT_COUNT = POT_COUNT + BUTTON_COUNT;
 

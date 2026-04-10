@@ -1,0 +1,46 @@
+#include "picosyn.h"
+
+#include <stdint.h>
+#include <stdbool.h>
+
+#ifndef ENVELOPE_H
+#define ENVELOPE_H
+
+extern const float ENV_MAX_TIME;
+extern const float ENV_MAX_TIME_MOD;
+
+typedef enum {
+    ATTACK, DECAY, SUSTAIN, RELEASE,
+} env_state;
+
+struct env {
+    float level;
+    env_state state;
+
+    float a_time;
+    float d_time;
+    float r_time;
+   
+    float s_mod;
+    float a_mod;
+    float d_mod;
+    float r_mod;
+};
+
+void initialize_env(struct env *e, float a_time_mod, float d_time_mod, float r_time_mod, float s_mod, float level);
+void process_env_r(struct env *e, bool amp);
+void process_env_ads(struct env *e);
+
+// these set_env_mod functions are technically not needed if it's updated every cycle
+void set_env_attack_mod(struct env *e, float a_time_mod);
+void set_env_decay_mod(struct env *e, float d_time_mod);
+void set_env_release_mod(struct env *e, float r_time_mod);
+
+void update_env_a(struct env *e, float time_mod);
+void update_env_d(struct env *e, float time_mod);
+void update_env_r(struct env *e, float time_mod);
+void update_env_s(struct env *e, float time_mod);
+void update_env(struct env *e, float a_time_mod, float d_time_mod, float r_time_mod, float s_mod); // should not be used.
+
+#endif
+
