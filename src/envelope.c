@@ -24,6 +24,9 @@ void initialize_env(struct env *e, float a_time_mod, float d_time_mod, float r_t
 
 // i know that i might do some horrible premature optimization, but it should be quicker.
 // you can multiply with the inverse of the max length instead of dividing. might be better.
+
+// TODO: make the envelopes nonlinear
+// depth += (target - value) * k;
 void set_env_attack_mod(struct env *e, float a_time_mod) {
     //e->a_time = a_time_mod * ENV_MAX_TIME;
     //e->a_mod = a_time_mod * ENV_MAX_TIME_MOD;

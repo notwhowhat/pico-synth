@@ -3,54 +3,33 @@
 #include "midi.h"
 #include "voice.h"
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
 
-int t_midi(void) {
-    struct voice v;
-    initialize_voice(&v);
-    v.used = true;
-    v.new = true;
-
-    midi_keys[v.note] = 1;
-    midi_previous_keys[v.note] = 1;
-    
-    for (int i = 0; i < 20; i++) {
-        process_voice(&v);
-        printf("mod: %f\n", v.amp_env.mod);
+void write_data(fixed arr[], uint32_t len) {
+    FILE *f = fopen("plot.csv", "w");
+    if (f != NULL) {
+        for (int i = 0; i < len; i++) {
+            fprintf(f, "%d,", i);
+        }
+        fprintf(f, "\n");
+        for (int i = 0; i < len; i++) {
+            fprintf(f, "%d,", arr[i]);
+        }
     }
-    printf("note off\n");
-
-    midi_keys[v.note] = 0;
-    midi_previous_keys[v.note] = 1;
-
-    for (int i = 0; i < 30; i++) {
-        process_voice(&v);
-        printf("mod: %f\n", v.amp_env.mod);
-    }
-    
+    fclose(f);
 }
 
-int t_filter(void) {
-    struct filter f;
-    initialize_filter(&f, 0.2, 0.0);
-
-    for (int i = 0; i < 1000; i++) {
-        process_filter(&f, i / 1000.0);
-    }
+void plot_data(void) {
+    system("/bin/python3 /mnt/c/Users/jakob/coding-related/micontroller-projects/npicosyn/scripts/plot.py");
 }
 
 int main(void) {
-    //struct env tenv;
-    //initialize_env(&tenv, 1, 1, 1, 0.5);
+    fixed arr[5] = {1, -2, 55, -37, 21};
+    write_data(arr, 5);
+    plot_data();
 
-    //printf("a: %f, d: %f, r: %f, s: %f\n", tenv.a_mod, tenv.d_mod, tenv.r_mod, tenv.s_mod);
-    t_filter();
-
-
-
-
-    printf("success\n");
     return 0;
 
 }

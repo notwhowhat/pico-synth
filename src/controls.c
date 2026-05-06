@@ -19,7 +19,8 @@ void read_pots(void) {
         float input = POT_MODIFIER * read_adc();
         if (fabs(controls[i] - input) > NOISE_THRESHOLD) {
             controls[i] = input;
-            process_pot_inputs(i);
+            //process_pot_inputs(i);
+            process_pot_inputs(4);
         }
     }
 }
@@ -42,7 +43,9 @@ void process_pot_inputs(int input) {
             case 3:
                 update_env_r(&voices[i].amp_env, controls[input]);
                 break;
-
+            case 4:
+                update_filter_cutoff(&voices[i].filter, controls[input]);
+                break;
         }
     }
 

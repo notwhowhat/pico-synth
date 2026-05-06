@@ -267,11 +267,11 @@ float process_voice(struct voice *v) {
         }
 
         if (v->ring_mod) {
-            out = process_osc(&v->osc1, v->note, v->portamento) * process_osc(&v->osc2, v->note + 7, v->portamento);
-            //out = v->osc1.gain * process_osc(&v->osc1, v->note) * v->osc2.gain * process_osc(&v->osc2, v->note + 7);
+            out = process_osc(&v->osc1, v->note, v->portamento) * 
+                  process_osc(&v->osc2, v->note + 7, v->portamento);
         } else {
-            out = 0 * process_osc(&v->osc1, v->note + 7, v->portamento) + process_osc(&v->osc2, v->note, v->portamento);
-            //out = 0 * v->osc1.gain * process_osc(&v->osc1, v->note + 7) + v->osc2.gain * process_osc(&v->osc2, v->note);
+            out = 0 * process_osc(&v->osc1, v->note + 7, v->portamento) + 
+                      process_osc(&v->osc2, v->note, v->portamento);
         }
 
         if (v->portamento_increment < 0 && v->portamento >= v->portamento_increment ||
@@ -291,8 +291,7 @@ float process_voice(struct voice *v) {
         //}
 
         //out = process_filter(&v->lowpass, out, v->filter_env.mod);
-        out *= get_amp_mod(v->amp_env.level); //process_lfo(&v->lfo)
-        out = process_filter(&v->filter, out);
+        //out = process_filter(&v->filter, out);
         //out = process_filter(&v->lowpass, out, 1.0);
 
         return out;
@@ -311,9 +310,16 @@ void on_pwm_interrupt() {
         struct voice *v = &voices[i];
         master_out += process_voice(v);
     }
+
+    if (master_out > 1.0) {
+        master_out = 1.0;
+    } else if (master_out < -1.0) {
+        master_out = -1.0;
+    }
    
     //master_out = gain * pot_mod * (master_out + gain * pot_mod);
     // shifts it to the middle
+    //master_out = GAIN * (master_out + VOICE_COUNT);
     master_out = GAIN * (master_out + GAIN);
 
     write_pwm(master_out);

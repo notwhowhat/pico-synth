@@ -23,10 +23,26 @@
 #define MUX_2_PIN 19
 #define MUX_3_PIN 20 
 
+
+const fixed FIXED_MAX = INT32_MAX;
+const fixed FIXED_MIN = INT32_MIN;
+
+extern inline fixed mul_fixed(fixed a, fixed b);
+extern inline fixed div_fixed(fixed a, fixed b);
+
 /*
 notes:
 the table for increments might not be necessary.
 it would make lfos more easy to implement.
+
+I HAVE AN IDEA WOOO!
+different music modules can be named after birds. (i could just make it animals in general)
+this: hummingbird maybe
+sampler: parrot(cause it repeats things)
+sequencer: woodpecker maybe cause' they like to bang their beaks rythmically.
+otherwies it could be bats. they have like sonar.
+any effect units could be the birds' environments, like a cave for echo.
+
 */
 
 /* 
@@ -129,7 +145,7 @@ int main(void) {
     adc_gpio_init(26);
     adc_gpio_init(27);
     adc_gpio_init(28);
-    adc_select_input(1);
+    adc_select_input(1); // gpio 27
 
     // to mux input
     gpio_init(MUX_1_PIN);
@@ -158,12 +174,17 @@ int main(void) {
 
     initialize_controls();
 
-    gpio_put(ERR_LED_PIN, 1); // doesn't turn on, program doesn't get to here.
+    initialize_wavetable(sin_table, sin_wave);
+    initialize_wavetable(square_table, square_wave);
+    initialize_wavetable(sawtooth_table, sawtooth_wave);
+    initialize_wavetable(sawtooth_table, triangle_wave);
 
     multicore_launch_core1(core1_entry);
 
+    gpio_put(ERR_LED_PIN, 1); // doesn't turn on, program doesn't get to here.
+
     while (1) {
-        //read_pots();
+
         
         // mux circuit is incorrect, which results in random behavior.
         /*

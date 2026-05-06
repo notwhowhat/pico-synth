@@ -23,6 +23,7 @@ void initialize_filter(struct filter *f, float cutoff, float resonance, int note
 
 float compute_filter_g(float cutoff, float keytrack, float keytrack_mod) {
     float total_cutoff = cutoff + keytrack_mod * (keytrack - cutoff);
+    //return 2.0 * SIN_TABLE[(int) (M_PI * 180.0 * total_cutoff)];
     return 2.0 * SIN_TABLE[(int) (M_PI * 180.0 * total_cutoff)];
 }
 

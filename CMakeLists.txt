@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 set(PICO_SDK_PATH "~/pico/pico-sdk")
-option(build_tests OFF)
+option(build_tests ON)
 
 if(build_tests STREQUAL "OFF")
     include(${PICO_SDK_PATH}/pico_sdk_init.cmake)

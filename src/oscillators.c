@@ -1,7 +1,35 @@
 #include "oscillators.h"
 #include "tables.h"
 
-const float LFO_MOD = 360.0 / 44100.0;
+#include <math.h>
+
+
+const float LFO_MOD = 360.0 / SAMPLE_RATE;
+
+void initialize_wavetable(fixed *wavetable, float (*f)(float)) {
+    for (int i = 1; i < WAVETABLE_LENGTH; i++) {
+        wavetable[i] = (fixed) FIXED_MAX * (*f)(i);
+    }
+}
+
+// the functions are used to generate wave tables. wave periods are all 1.0
+static float sin_wave(float x) {
+    return sin(2.0 * M_PI * x);
+}
+
+static float square_wave(float x) {
+    return 2.0 * floor(sin(2.0 * M_PI * x)) + 1;
+}
+
+static float sawtooth_wave(float x) {
+    return 2.0 * fmod(x, 1.0) - 1;
+}
+
+static float triangle_wave(float x) {
+    return asin(sin(2.0 * M_PI * x)) * 2.0 / M_PI;
+}
+
+
 
 void initialize_osc(struct osc *osc, waveform selected_waveform) {
     // table_index is not fixed to emulate free running oscillators
