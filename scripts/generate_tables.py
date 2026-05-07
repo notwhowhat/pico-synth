@@ -36,8 +36,7 @@ def gen_keytrack(length: int) -> np.ndarray:
     table: np.ndarray = np.zeros(length)
 
     for i in range(length):
-        freq: float = 440.0 * 2.0 ** ((i - 6950.0) / 1200.0)
-        table[i] = 2.0 * freq / SAMPLE_RATE
+        table[i] = (440 * 2 ** ((i - 57) / 12)) / SAMPLE_RATE
         
     return table
 
@@ -58,7 +57,7 @@ def main():
     square: str = format_table('SQUARE_TABLE', gen_wavetable(WAVETABLE_LENGTH, scipy.signal.square))
 
     increments: str = format_table('INCREMENT_TABLE', gen_inctable(12900))
-    keytrack: str = format_table('KEYTRACK_TABLE', gen_keytrack(12900))
+    keytrack: str = format_table('KEYTRACK_TABLE', gen_keytrack(128))
 
     with open('tables.h', 'w') as f:
         f.write(sin)

@@ -5,6 +5,7 @@
 #include "pico/stdlib.h"   // stdlib 
 #include "hardware/pwm.h"  // pwm 
 #include "hardware/uart.h"
+#include "hardware/adc.h"
 
 void write_pwm(int value) {
     pwm_set_gpio_level(AUDIO_PIN, (uint16_t)value);
@@ -25,4 +26,6 @@ int read_uart(void) {
 int read_adc(void) {
     return adc_read();
 }
-
+int read_gpio(int pin) {
+    return gpio_get(pin);
+}
