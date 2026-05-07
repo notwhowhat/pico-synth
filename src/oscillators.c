@@ -3,7 +3,6 @@
 
 #include <math.h>
 
-
 const float LFO_MOD = 360.0 / SAMPLE_RATE;
 
 void initialize_wavetable(fixed *wavetable, float (*f)(float)) {
@@ -13,19 +12,19 @@ void initialize_wavetable(fixed *wavetable, float (*f)(float)) {
 }
 
 // the functions are used to generate wave tables. wave periods are all 1.0
-static float sin_wave(float x) {
+float sin_wave(float x) {
     return sin(2.0 * M_PI * x);
 }
 
-static float square_wave(float x) {
+float square_wave(float x) {
     return 2.0 * floor(sin(2.0 * M_PI * x)) + 1;
 }
 
-static float sawtooth_wave(float x) {
+float sawtooth_wave(float x) {
     return 2.0 * fmod(x, 1.0) - 1;
 }
 
-static float triangle_wave(float x) {
+float triangle_wave(float x) {
     return asin(sin(2.0 * M_PI * x)) * 2.0 / M_PI;
 }
 

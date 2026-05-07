@@ -19,8 +19,8 @@
 
 // rpi pico is little endian
 typedef int32_t fixed;
-extern const fixed FIXED_MAX;
-extern const fixed FIXED_MIN;
+#define FIXED_MAX INT32_MAX
+#define FIXED_MIN INT32_MIN
 
 inline fixed mul_fixed(fixed a, fixed b) {
     int64_t temp = (int64_t)(a * b);

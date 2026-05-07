@@ -23,10 +23,6 @@
 #define MUX_2_PIN 19
 #define MUX_3_PIN 20 
 
-
-const fixed FIXED_MAX = INT32_MAX;
-const fixed FIXED_MIN = INT32_MIN;
-
 extern inline fixed mul_fixed(fixed a, fixed b);
 extern inline fixed div_fixed(fixed a, fixed b);
 

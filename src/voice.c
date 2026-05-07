@@ -140,14 +140,14 @@ void initialize_voice(struct voice *v) {
 
     // TODO: uncomment
     //initialize_env(&v->amp_env, 0.1, 0.1, 0.1, 1.0);
-    initialize_env(&v->amp_env, 0.0001, 0.0001, 0.0001, 1.0, 0.0);
+    initialize_env(&v->amp_env, 0.01, 0.01, 0.01, 0.5, 0.0);
     //initialize_env(&v->amp_env, ENV_MAX_TIME_MOD, ENV_MAX_TIME_MOD, ENV_MAX_TIME_MOD, 1.0);
     //initialize_env(&v->filter_env, 0.0001, 0.001, 0.0001, 0.0);
 
     v->sync = false;
     v->ring_mod = false;
-    initialize_osc(&v->osc1, SAW);
-    initialize_osc(&v->osc2, SAW);
+    initialize_osc(&v->osc1, SIN);
+    initialize_osc(&v->osc2, SIN);
 
     initialize_filter(&v->filter, 0.01, 1.0, v->note);
     initialize_lfo(&v->lfo, 2, SIN);
@@ -161,10 +161,10 @@ void start_voice_mono_legato(struct voice *v, int note) {
 
 
     if (global_paramaters.mode == LEGATO) {
-        initialize_env(&v->amp_env, 0.1, 0.01, 0.1, 0.5, v->amp_env.level);
+        initialize_env(&v->amp_env, 0.01, 0.01, 0.1, 0.5, v->amp_env.level);
         initialize_env(&v->filter_env, 0.1, 0.01, 0.1, 0.5, v->filter_env.level);
     } else {
-        initialize_env(&v->amp_env, 0.0001, 0.0001, 0.0001, 1.0, 0.0);
+        initialize_env(&v->amp_env, 0.01, 0.01, 0.01, 0.5, 0.0);
         initialize_env(&v->filter_env, 0.0001, 0.0001, 0.0001, 1.0, 0.0);
     }
 
@@ -198,8 +198,8 @@ void reset_voice(struct voice *v) {
     v->ring_mod = false;
 
     // envelopes are not reset here to make a future legato toggle possible
-    initialize_osc(&v->osc1, SAW);
-    initialize_osc(&v->osc2, SAW);
+    initialize_osc(&v->osc1, SIN);
+    initialize_osc(&v->osc2, SIN);
 
     initialize_filter(&v->filter, 0.01, 1.0, v->note);
     initialize_lfo(&v->lfo, 2, SIN);
@@ -289,6 +289,7 @@ float process_voice(struct voice *v) {
         //for (int i = 0; i < 7; i++) {
         //    out += process_osc(&v->oscillators[i], v->note * 100 + max_detune[i] * pot_mod);//0.25);
         //}
+        out *= v->amp_env.level;
 
         //out = process_filter(&v->lowpass, out, v->filter_env.mod);
         //out = process_filter(&v->filter, out);

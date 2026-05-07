@@ -119,9 +119,9 @@ void process_env_ads(struct env *e) {
             }
             break;
         case DECAY:
-            e->level += e->a_mod;
-            if (e->level > 1.0) {
-                e->level = 1.0;
+            e->level -= e->d_mod;
+            if (e->level < e->s_mod) {
+                e->level = e->s_mod;
                 e->state = DECAY;
             }
             break;
