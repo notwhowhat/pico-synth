@@ -32,11 +32,18 @@ struct osc {
 };
 
 struct lfo {
-    float table_index;
-    float table_increment;
+    uint32_t table_index;
     waveform selected_waveform;
-    float rate;
+    uint32_t rate;
 };
+
+
+//struct lfo {
+//    float table_index;
+//    float table_increment;
+//    waveform selected_waveform;
+//    float rate;
+//};
 
 extern const float LFO_MOD;
 float sin_table[WAVETABLE_LENGTH];
@@ -58,9 +65,14 @@ fixed process_osc(struct osc *osc, int note, float portamento);
 void update_osc_waveform(struct osc *osc);
 void update_osc_detune(struct osc *osc, int detune);
 
-void initialize_lfo(struct lfo *lfo, float rate, waveform selected_waveform);
-float process_lfo(struct lfo *lfo);
+void initialize_lfo(struct lfo *lfo, uint32_t rate, waveform selected_waveform);
+fixed process_lfo(struct lfo *lfo);
 void update_lfo_waveform(struct lfo *lfo);
-void update_lfo_rate(struct lfo *lfo, float rate);
+void update_lfo_rate(struct lfo *lfo, uint32_t rate);
+
+//void initialize_lfo(struct lfo *lfo, float rate, waveform selected_waveform);
+//float process_lfo(struct lfo *lfo);
+//void update_lfo_waveform(struct lfo *lfo);
+//void update_lfo_rate(struct lfo *lfo, float rate);
 
 #endif

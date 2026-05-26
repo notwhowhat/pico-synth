@@ -87,31 +87,31 @@ void update_osc_detune(struct osc *osc, int detune) {
     osc->detune_cents = detune;
 }
 
-void initialize_lfo(struct lfo *lfo, float rate, waveform selected_waveform) {
+void initialize_lfo(struct lfo *lfo, uint32_t rate, waveform selected_waveform) {
     // table_index is not fixed to emulate free running oscillators
-    lfo->table_increment = 0.0;
     lfo->selected_waveform = selected_waveform;
     lfo->rate = rate;
 }
 
-float process_lfo(struct lfo *lfo) {
-    lfo->table_index += LFO_MOD * lfo->rate;
-    if (lfo->table_index > 360.0) {
-        lfo->table_index = lfo->table_index - 360.0;
-    }
+fixed process_lfo(struct lfo *lfo) {
+    lfo->table_index += (UINT32_MAX - lfo->rate);
+    uint32_t index = lfo->table_index >> INCREMENT_SCALE;
     
     switch (lfo->selected_waveform) {
         case SIN:
-            return SIN_TABLE[(int)lfo->table_index];
+            return sin_table[(int)index];
             break;
-       case SAW:
-            return SAW_TABLE[(int)lfo->table_index];
+        case TRI:
+            return triangle_table[(int)index];
             break;
-       case SQUARE:
-            return SQUARE_TABLE[(int)lfo->table_index];
+        case SAW:
+            return sawtooth_table[(int)index];
+            break;
+        case SQUARE:
+            return square_table[(int)index];
             break;
         default:
-            return 0.0;
+            return 0;
     }
 }
 
@@ -122,8 +122,6 @@ void update_lfo_waveform(struct lfo *lfo) {
     }
 }
 
-void update_lfo_rate(struct lfo *lfo, float rate) {
+void update_lfo_rate(struct lfo *lfo, uint32_t rate) {
     lfo->rate = rate;
 }
-
-
