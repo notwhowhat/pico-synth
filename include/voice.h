@@ -111,7 +111,7 @@ void initialize_voice(struct voice *v);
 void start_voice_mono_legato(struct voice *v, int note);
 void start_voice_poly(struct voice *v, struct voice *lv, int note);
 void reset_voice(struct voice *v);
-float process_voice(struct voice *v);
+fixed process_voice(struct voice *v);
 
 void on_pwm_interrupt(void);
 

@@ -174,6 +174,7 @@ int main(void) {
     initialize_wavetable(square_table, square_wave);
     initialize_wavetable(sawtooth_table, sawtooth_wave);
     initialize_wavetable(sawtooth_table, triangle_wave);
+    initialize_increment_table();
 
     multicore_launch_core1(core1_entry);
 

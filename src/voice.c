@@ -206,7 +206,7 @@ void reset_voice(struct voice *v) {
 }
 
 // remove and make into two functions
-float process_voice(struct voice *v) {
+fixed process_voice(struct voice *v) {
     // mod is getting -1'd in the 2nd cycle of release
     if (v->used) {
 
@@ -245,7 +245,7 @@ float process_voice(struct voice *v) {
     // this is where the notes get stuck playing
     //if (midi_keys[voices[i].note] != 0) {
     if (v->amp_env.level != 0.0) {
-        float out = 0;
+        fixed out = 0;
         //printf("mod: %f\n", v->amp_env.mod);
 
         //v->table_index += INCREMENTS[50 + 100 * v->note];
@@ -266,20 +266,19 @@ float process_voice(struct voice *v) {
             } 
         }
 
-        if (v->ring_mod) {
-            out = process_osc(&v->osc1, v->note, v->portamento) * 
-                  process_osc(&v->osc2, v->note + 7, v->portamento);
-        } else {
-            out = 0 * process_osc(&v->osc1, v->note + 7, v->portamento) + 
-                      process_osc(&v->osc2, v->note, v->portamento);
-        }
-
         if (v->portamento_increment < 0 && v->portamento >= v->portamento_increment ||
             v->portamento_increment > 0 && v->portamento <= v->portamento_increment) {
             v->portamento = 0.0;
         } else {
             v->portamento -= v->portamento_increment;
 
+        }
+        
+        if (v->ring_mod) {
+            out = process_osc(&v->osc1, v->note, v->portamento) * 
+                  process_osc(&v->osc2, v->note + 7, v->portamento);
+        } else {
+            out = process_osc(&v->osc2, v->note, v->portamento);
         }
         // ring mod: osc1 * osc2
 

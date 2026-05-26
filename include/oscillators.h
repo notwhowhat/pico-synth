@@ -6,22 +6,29 @@
 #ifndef OSCILLATORS_H
 #define OSCILLATORS_H
 
+// it's actually good if the table length is 256
 #define WAVETABLE_LENGTH 256
+
+// 128 midi notes + 1 for detune, and 100 cents/semitone
+#define INCREMENT_TABLE_LENGTH 12900 
+#define INCREMENT_SCALE 24 // 32 - log2(wavetable length)
 
 typedef enum {
     SIN,
+    TRI,
     SAW,
     SQUARE,
     COUNT
 } waveform;
 
 struct osc {
-    float table_index;
-    float table_increment;
+    // even though they are fixed, the table values are treated as q8.24
+    uint32_t table_index;
+    uint32_t table_increment;
     waveform selected_waveform;
     int tune_cents;
     int detune_cents;
-    float gain;
+    fixed gain;
 };
 
 struct lfo {
@@ -32,20 +39,22 @@ struct lfo {
 };
 
 extern const float LFO_MOD;
+float sin_table[WAVETABLE_LENGTH];
+float square_table[WAVETABLE_LENGTH];
+float triangle_table[WAVETABLE_LENGTH];
+float sawtooth_table[WAVETABLE_LENGTH];
+uint32_t increment_table[INCREMENT_TABLE_LENGTH];
 
-fixed sin_table[WAVETABLE_LENGTH];
-fixed square_table[WAVETABLE_LENGTH];
-fixed triangle_table[WAVETABLE_LENGTH];
-fixed sawtooth_table[WAVETABLE_LENGTH];
+void initialize_wavetable(float *table, float (*f)(float));
+void initialize_increment_table(void);
 
-void initialize_wavetable(fixed *wavetable, float (*f)(float));
 float sin_wave(float x);
 float square_wave(float x);
 float triangle_wave(float x);
 float sawtooth_wave(float x);
 
 void initialize_osc(struct osc *osc, waveform selected_waveform);
-float process_osc(struct osc *osc, int note_increment, float portamento);
+fixed process_osc(struct osc *osc, int note, float portamento);
 void update_osc_waveform(struct osc *osc);
 void update_osc_detune(struct osc *osc, int detune);
 
