@@ -138,16 +138,14 @@ void initialize_voice(struct voice *v) {
     v->new = false;
     v->portamento = 0.0;
 
-    // TODO: uncomment
-    //initialize_env(&v->amp_env, 0.1, 0.1, 0.1, 1.0);
-    initialize_env(&v->amp_env, LIN, 0.01, 0.01, 0.01, 0.5, 0.0);
+    initialize_env(&v->amp_env, LIN, 0.0);
     // TODO: remove. shouldn't be needed if updated regularly in loop
     set_env_sustain_mod(&v->amp_env, 0.5);
     set_env_attack_mod(&v->amp_env, 0.01);
     set_env_decay_mod(&v->amp_env, 0.01);
     set_env_release_mod(&v->amp_env, 0.01);
-    //initialize_env(&v->amp_env, ENV_MAX_TIME_MOD, ENV_MAX_TIME_MOD, ENV_MAX_TIME_MOD, 1.0);
-    //initialize_env(&v->filter_env, 0.0001, 0.001, 0.0001, 0.0);
+
+    //initialize_env(&v->filter_env, 0.0);
 
     v->sync = false;
     v->ring_mod = false;
@@ -166,17 +164,12 @@ void start_voice_mono_legato(struct voice *v, int note) {
 
 
     if (global_paramaters.mode == LEGATO) {
-        initialize_env(&v->amp_env, LIN, 0.01, 0.01, 0.1, 0.5, v->amp_env.level);
-        initialize_env(&v->filter_env, LIN, 0.1, 0.01, 0.1, 0.5, v->filter_env.level);
+        initialize_env(&v->amp_env, LIN, get_env_level(&v->amp_env));
+        initialize_env(&v->filter_env, LIN, get_env_level(&v->filter_env));
     } else {
-        initialize_env(&v->amp_env, EXP, 0.01, 0.01, 0.01, 0.5, 0.0);
-        initialize_env(&v->filter_env, EXP, 0.0001, 0.0001, 0.0001, 1.0, 0.0);
+        initialize_env(&v->amp_env, EXP, 0.0);
+        initialize_env(&v->filter_env, EXP, 0.0);
     }
-
-    //initialize_env(&v->amp_env, 0.1, 0.1, 0.1, 1.0);
-    //initialize_env(&v->filter_env, 0.0001, 0.001, 0.0001, 0.0);
-
-    
 
     // max 11025 cycles per semitone as portamento speed
     // portamento speed = 1 / number of cycles per semitone
@@ -189,8 +182,8 @@ void start_voice_poly(struct voice *v, struct voice *lv, int note) {
     v->used = true;
     v->age = 0;
 
-    initialize_env(&v->amp_env, LIN, 0.0001, 0.0001, 0.0001, 1.0, 0.0);
-    initialize_env(&v->filter_env, LIN, 0.0001, 0.001, 0.0001, 0.0, 0.0);
+    initialize_env(&v->amp_env, LIN, 0.0);
+    initialize_env(&v->filter_env, LIN,  0.0);
     printf("n: %d, l: %d\n", v->note, lv->note);
     initialize_portamento(v, lv->note);
 }
@@ -227,9 +220,9 @@ fixed process_voice(struct voice *v) {
                 midi_previous_keys[v->note] = 0;
             }
 
-            process_env_r(&v->amp_env, true);
+            process_env_r(&v->amp_env);
             //printf("r:%f\n", v->amp_env.mod);
-            //process_env_r(&v->filter_env, true);
+            //process_env_r(&v->filter_env);
 
             if (v->amp_env.level <= 0) {
                 //printf("sound off\n");
