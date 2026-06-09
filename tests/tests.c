@@ -52,6 +52,12 @@ int main(void) {
     struct voice v;
     initialize_voice(&v);
 
+    // sustain must be set before release and decay.
+    set_env_sustain_mod(&v.amp_env, 0.5);
+    set_env_attack_mod(&v.amp_env, 0.01);
+    set_env_decay_mod(&v.amp_env, 0.01);
+    set_env_release_mod(&v.amp_env, 0.01);
+
     uint32_t note_duration = 22050;
     uint32_t sampling_duration = 44100;
     fixed data[sampling_duration];

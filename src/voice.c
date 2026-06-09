@@ -140,7 +140,12 @@ void initialize_voice(struct voice *v) {
 
     // TODO: uncomment
     //initialize_env(&v->amp_env, 0.1, 0.1, 0.1, 1.0);
-    initialize_env(&v->amp_env, 0.01, 0.01, 0.01, 0.5, 0.0);
+    initialize_env(&v->amp_env, LIN, 0.01, 0.01, 0.01, 0.5, 0.0);
+    // TODO: remove. shouldn't be needed if updated regularly in loop
+    set_env_sustain_mod(&v->amp_env, 0.5);
+    set_env_attack_mod(&v->amp_env, 0.01);
+    set_env_decay_mod(&v->amp_env, 0.01);
+    set_env_release_mod(&v->amp_env, 0.01);
     //initialize_env(&v->amp_env, ENV_MAX_TIME_MOD, ENV_MAX_TIME_MOD, ENV_MAX_TIME_MOD, 1.0);
     //initialize_env(&v->filter_env, 0.0001, 0.001, 0.0001, 0.0);
 
@@ -161,11 +166,11 @@ void start_voice_mono_legato(struct voice *v, int note) {
 
 
     if (global_paramaters.mode == LEGATO) {
-        initialize_env(&v->amp_env, 0.01, 0.01, 0.1, 0.5, v->amp_env.level);
-        initialize_env(&v->filter_env, 0.1, 0.01, 0.1, 0.5, v->filter_env.level);
+        initialize_env(&v->amp_env, LIN, 0.01, 0.01, 0.1, 0.5, v->amp_env.level);
+        initialize_env(&v->filter_env, LIN, 0.1, 0.01, 0.1, 0.5, v->filter_env.level);
     } else {
-        initialize_env(&v->amp_env, 0.01, 0.01, 0.01, 0.5, 0.0);
-        initialize_env(&v->filter_env, 0.0001, 0.0001, 0.0001, 1.0, 0.0);
+        initialize_env(&v->amp_env, EXP, 0.01, 0.01, 0.01, 0.5, 0.0);
+        initialize_env(&v->filter_env, EXP, 0.0001, 0.0001, 0.0001, 1.0, 0.0);
     }
 
     //initialize_env(&v->amp_env, 0.1, 0.1, 0.1, 1.0);
@@ -184,8 +189,8 @@ void start_voice_poly(struct voice *v, struct voice *lv, int note) {
     v->used = true;
     v->age = 0;
 
-    initialize_env(&v->amp_env, 0.0001, 0.0001, 0.0001, 1.0, 0.0);
-    initialize_env(&v->filter_env, 0.0001, 0.001, 0.0001, 0.0, 0.0);
+    initialize_env(&v->amp_env, LIN, 0.0001, 0.0001, 0.0001, 1.0, 0.0);
+    initialize_env(&v->filter_env, LIN, 0.0001, 0.001, 0.0001, 0.0, 0.0);
     printf("n: %d, l: %d\n", v->note, lv->note);
     initialize_portamento(v, lv->note);
 }
@@ -226,7 +231,7 @@ fixed process_voice(struct voice *v) {
             //printf("r:%f\n", v->amp_env.mod);
             //process_env_r(&v->filter_env, true);
 
-            if (v->amp_env.level <= 0.0) {
+            if (v->amp_env.level <= 0) {
                 //printf("sound off\n");
 
                 //initialize_voice(v);
@@ -271,7 +276,6 @@ fixed process_voice(struct voice *v) {
             v->portamento = 0.0;
         } else {
             v->portamento -= v->portamento_increment;
-
         }
         
         if (v->ring_mod) {

@@ -10,11 +10,6 @@ void initialize_wavetable(float *table, float (*f)(float)) {
         table[i] =  (fixed)(f(2.0 * M_PI * i) * FIXED_MAX);
     }
 }
-//void initialize_wavetable(fixed *table, float (*f)(float)) {
-//    for (int i = 0; i < WAVETABLE_LENGTH; i++) {
-//        table[i] = (fixed) FIXED_MAX * sin(2.0 * M_PI * i);
-//    }
-//}
 
 // the functions are used to generate wave tables. wave periods are all 1.0
 float sin_wave(float x) {

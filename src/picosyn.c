@@ -166,6 +166,7 @@ int main(void) {
 
     for (int i = 0; i < VOICE_COUNT; i++) {
         initialize_voice(&voices[i]);
+        
     }
 
     initialize_controls();

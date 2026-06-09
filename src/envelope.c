@@ -2,6 +2,7 @@
 
 #include "envelope.h"
 #include "picosyn.h"
+#include "controls.h"
 
 #include <math.h>
 
@@ -9,24 +10,56 @@
 const float ENV_MAX_TIME = 661500.0; // 15s * SAMPLE_RATE
 const float ENV_MAX_TIME_MOD = 1.0 / ENV_MAX_TIME;
 
-void initialize_env(struct env *e, float a_time_mod, float d_time_mod, float r_time_mod, float s_mod, float level) {
+const float ENV_TARGET_CLAMP = 0.0001;
+const fixed ENV_FACTOR = (fixed) 0.007 * FIXED_MAX;
+
+// between virus and nord
+const float ENV_MAX_K = 0.03; 
+const float ENV_MIN_K = 1e-6; 
+
+/*
+linear envelopes don't sound that great. 
+a better way to do it is to use a linear acumulator:
+
+    level += (target - env) * k
+
+when k is a coefficient loosely based on time.
+because the level results in an asymptote at the target, it
+has to be clamped before to make enevelopes run well
+
+k ~ 1 - e ^ -1 / (r * t)
+
+when r is sample rate and t is time.
+
+*/
+
+void initialize_env(struct env *e, env_mode mode, float a_time_mod, float d_time_mod, float r_time_mod, float s_mod, float level) {
+    e->mode = mode;
     e->level = level;
     e->state = ATTACK;
+    // it is technically better if the parameters aren't set 
+    // in the init funciton, because they'll already be up to date 
+    // before from the parameter update functions in core 0.
+
 
     // times are used for state calculations
-    e->s_mod = s_mod;
+    //e->s_mod = s_mod;
 
     // i am running out of precision on a and d
-    set_env_attack_mod(e, a_time_mod);
-    set_env_decay_mod(e, d_time_mod);
-    set_env_release_mod(e, r_time_mod);
+    //set_env_attack_mod(e, a_time_mod);
+    //set_env_decay_mod(e, d_time_mod);
+    //set_env_release_mod(e, r_time_mod);
 }
 
 // i know that i might do some horrible premature optimization, but it should be quicker.
 // you can multiply with the inverse of the max length instead of dividing. might be better.
 
-// TODO: make the envelopes nonlinear
 // depth += (target - value) * k;
+
+void set_env_sustain_mod(struct env *e, float s_mod) {
+    e->s_mod = s_mod;
+}
+
 void set_env_attack_mod(struct env *e, float a_time_mod) {
     //e->a_time = a_time_mod * ENV_MAX_TIME;
     //e->a_mod = a_time_mod * ENV_MAX_TIME_MOD;
@@ -88,13 +121,15 @@ void update_env(struct env *e, float a_time_mod, float d_time_mod, float r_time_
 }
 
 void process_env_r(struct env *e, bool amp) {
-    e->level -= e->r_mod;
+    if (e->mode == EXP) {
+        e->level -= e->level * 0.0007;
+    } else {
+        e-> level -= e->r_mod;
+    }
 
-    if (e->level < 0.0) {
+    if (e->level < ENV_TARGET_CLAMP) {
         e->level = 0.0;
     }
-    
-    //e->time++;
 }
 
 void process_env_ads(struct env *e) {
@@ -112,17 +147,27 @@ void process_env_ads(struct env *e) {
     */
     switch (e->state) {
         case ATTACK:
-            e->level += e->a_mod;
-            if (e->level > 1.0) {
+            if (e->mode == EXP) {
+                e->level += (1.0 - e->level) * 0.0007;
+            } else {
+                e->level += e->a_mod;
+            }
+
+            if (e->level > 1.0 - ENV_TARGET_CLAMP) {
                 e->level = 1.0;
                 e->state = DECAY;
             }
             break;
         case DECAY:
-            e->level -= e->d_mod;
-            if (e->level < e->s_mod) {
+            if (e->mode == EXP) {
+                e->level += (e->s_mod - e->level) * 0.0007;
+            } else {
+                e->level -= e->d_mod;
+            }
+
+            if (e->level < e->s_mod + ENV_TARGET_CLAMP) {
                 e->level = e->s_mod;
-                e->state = DECAY;
+                e->state = SUSTAIN;
             }
             break;
         case SUSTAIN:
@@ -130,26 +175,51 @@ void process_env_ads(struct env *e) {
             e->level = e->s_mod;
             break;
     }
-
-    /*
-    if (e->time < e->a_time) {
-        e->mod += e->a_mod;
-        e->state = ATTACK;
-    } else if (e->time < (e->a_time + e->d_time)) {
-        // the decay is starting from where the attack is, but it's still going up
-        e->mod -= e->d_mod;
-        e->state = DECAY;
-    } else {
-        // sustain should be at correct level after decay
-        // do sustain 
-        //e->mod = e->s_mod;
-        e->state = SUSTAIN;
-    }
-
-    if (e->mod > 1.0) {
-        e->mod = 1.0;
-    }
-
-    e->time++;
-    */
 }
+
+//void process_env_r(struct env *e, bool amp) {
+//    e->level -= e->r_mod;
+//
+//    if (e->level < 0.0) {
+//        e->level = 0.0;
+//    }
+//    
+//    //e->time++;
+//}
+//
+//void process_env_ads(struct env *e) {
+//    // TODO: find out why in the world i did not just make mod change until it gets the right value 
+//    // could it be because i was having problems with mod jumping and becoming negative?
+//    /*
+//    this is a hopefully more logical implementation
+//
+//    if attack: increase mod. if mod > 1: decay.
+//    if decay: increase mod. if mod > sustain. sustain.
+//    if sustain: sustain
+//
+//    implementing legato will be much easier
+//    
+//    */
+//    switch (e->state) {
+//        case ATTACK:
+//            e->level += e->a_mod;
+//            if (e->level > 1.0) {
+//                e->level = 1.0;
+//                e->state = DECAY;
+//            }
+//            break;
+//        case DECAY:
+//            e->level -= e->d_mod;
+//            if (e->level < e->s_mod) {
+//                e->level = e->s_mod;
+//                e->state = DECAY;
+//            }
+//            break;
+//        case SUSTAIN:
+//            // shouldn't actually be needed
+//            e->level = e->s_mod;
+//            break;
+//    }
+//}
+
+
