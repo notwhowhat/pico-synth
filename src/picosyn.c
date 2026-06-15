@@ -23,9 +23,6 @@
 #define MUX_2_PIN 19
 #define MUX_3_PIN 20 
 
-extern inline fixed mul_fixed(fixed a, fixed b);
-extern inline fixed div_fixed(fixed a, fixed b);
-
 /*
 notes:
 the table for increments might not be necessary.

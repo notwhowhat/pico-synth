@@ -149,10 +149,10 @@ void initialize_voice(struct voice *v) {
 
     v->sync = false;
     v->ring_mod = false;
-    initialize_osc(&v->osc1, SIN);
-    initialize_osc(&v->osc2, SIN);
+    initialize_osc(&v->osc1, SQUARE);
+    initialize_osc(&v->osc2, SQUARE);
 
-    initialize_filter(&v->filter, 0.01, 1.0, v->note);
+    initialize_filter(&v->filter, 0.005, 1.0, v->note);
     initialize_lfo(&v->lfo, 2, SIN);
 }
 
@@ -242,7 +242,7 @@ fixed process_voice(struct voice *v) {
     
     // this is where the notes get stuck playing
     //if (midi_keys[voices[i].note] != 0) {
-    if (v->amp_env.level != 0.0) {
+    if (get_env_level(&v->amp_env) != 0) {
         fixed out = 0;
         //printf("mod: %f\n", v->amp_env.mod);
 
@@ -275,26 +275,19 @@ fixed process_voice(struct voice *v) {
             out = process_osc(&v->osc1, v->note, v->portamento) * 
                   process_osc(&v->osc2, v->note + 7, v->portamento);
         } else {
-            out = process_osc(&v->osc2, v->note, v->portamento);
+            out = process_osc(&v->osc1, v->note, v->portamento);
         }
         // ring mod: osc1 * osc2
 
-        // bad supersaw. it's really simple. no pitch tracking allpass filters, just a bit of detuning.
-        // sounds nothing like the original
-        //float out = 0.0;
-        //for (int i = 0; i < 7; i++) {
-        //    out += process_osc(&v->oscillators[i], v->note * 100 + max_detune[i] * pot_mod);//0.25);
-        //}
-        out *= v->amp_env.level;
+        // TODO: uncomment so env works
+        //out *= fixed_to_float(v->amp_env.level);
 
-        //out = process_filter(&v->lowpass, out, v->filter_env.mod);
-        //out = process_filter(&v->filter, out);
-        //out = process_filter(&v->lowpass, out, 1.0);
+        out = process_filter(&v->filter, out);
 
         return out;
     }
 
-    return 0.0;
+    return 0;
 }
 
 // call it with isr (interrupt service routine)

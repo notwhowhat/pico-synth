@@ -7,11 +7,11 @@
 #define OSCILLATORS_H
 
 // it's actually good if the table length is 256
-#define WAVETABLE_LENGTH 256
+#define WAVETABLE_LENGTH 1024
 
 // 128 midi notes + 1 for detune, and 100 cents/semitone
 #define INCREMENT_TABLE_LENGTH 12900 
-#define INCREMENT_SCALE 24 // 32 - log2(wavetable length)
+#define INCREMENT_SCALE 22 // 32 - log2(wavetable length)
 
 typedef enum {
     SIN,
@@ -46,13 +46,13 @@ struct lfo {
 //};
 
 extern const float LFO_MOD;
-float sin_table[WAVETABLE_LENGTH];
-float square_table[WAVETABLE_LENGTH];
-float triangle_table[WAVETABLE_LENGTH];
-float sawtooth_table[WAVETABLE_LENGTH];
+fixed sin_table[WAVETABLE_LENGTH];
+fixed square_table[WAVETABLE_LENGTH];
+fixed triangle_table[WAVETABLE_LENGTH];
+fixed sawtooth_table[WAVETABLE_LENGTH];
 uint32_t increment_table[INCREMENT_TABLE_LENGTH];
 
-void initialize_wavetable(float *table, float (*f)(float));
+void initialize_wavetable(fixed *table, float (*f)(float));
 void initialize_increment_table(void);
 
 float sin_wave(float x);

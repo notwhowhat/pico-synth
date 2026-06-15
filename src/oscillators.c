@@ -5,9 +5,14 @@
 
 const float LFO_MOD = 360.0 / SAMPLE_RATE;
 
-void initialize_wavetable(float *table, float (*f)(float)) {
+void initialize_wavetable(fixed *table, float (*f)(float)) {
     for (int i = 0; i < WAVETABLE_LENGTH; i++) {
-        table[i] =  (fixed)(f(2.0 * M_PI * i) * FIXED_MAX);
+        float result = f((float)i / (float)WAVETABLE_LENGTH);
+        if (result == 1.0) {
+            table[i] = FIXED_MAX;
+        } else {
+            table[i] = (fixed)(result * FIXED_MAX);
+        }
     }
 }
 
@@ -17,7 +22,7 @@ float sin_wave(float x) {
 }
 
 float square_wave(float x) {
-    return 2.0 * floor(sin(2.0 * M_PI * x)) + 1;
+    return 2.0 * floor(sin(2.0 * M_PI * x)) + 1.0;
 }
 
 float sawtooth_wave(float x) {
@@ -52,7 +57,7 @@ fixed process_osc(struct osc *osc, int note, float portamento) {
 
     osc->table_index += osc->table_increment;
     uint32_t index = osc->table_index >> INCREMENT_SCALE;
-    
+
     switch (osc->selected_waveform) {
         case SIN:
             return sin_table[(int)index];

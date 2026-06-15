@@ -22,13 +22,21 @@ typedef int32_t fixed;
 #define FIXED_MAX INT32_MAX
 #define FIXED_MIN INT32_MIN
 
-inline fixed mul_fixed(fixed a, fixed b) {
-    int64_t temp = (int64_t)(a * b);
-    return (fixed)temp >> 31;
+static inline fixed mul_fixed(fixed a, fixed b) {
+    int64_t temp = ((int64_t)a * (int64_t) b);
+    return (fixed)(temp >> 31);
 }
-inline fixed div_fixed(fixed a, fixed b) {
+static inline fixed div_fixed(fixed a, fixed b) {
     int64_t temp = (int64_t)(a << 31);
     return (fixed)(temp / b);
+}
+static inline fixed float_to_fixed(float x) {
+    // float should be between -1.0 and 1.0
+    return (fixed)(x * FIXED_MAX);
+}
+static inline float fixed_to_float(fixed x) {
+    // float will be between -1.0 and 1.0
+    return ((float)x / FIXED_MAX);
 }
 
 
