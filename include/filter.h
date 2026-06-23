@@ -28,7 +28,7 @@ struct filter {
     filter_mode mode;
 };
 
-void initialize_filter(struct filter *f, float cutoff, float resonance, int note);
+void init_filter(struct filter *f, float cutoff, float resonance, int note);
 float process_filter(struct filter *f, float input);
 float compute_filter_g(float cutoff, float keytrack, float keytrack_mod);
 void update_filter_cutoff(struct filter *f, float cutoff);

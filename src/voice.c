@@ -61,7 +61,7 @@ const float PORTAMENTO_MOD = 0.00009070294;
 
 struct voice voices[VOICE_COUNT] = {0};
 
-void initialize_parameters(struct parameters *p) {
+void init_parameters(struct parameters *p) {
     p->mode = POLY;
     p->portamento_factor = 0.0;
     //p->mode = MONO;
@@ -75,7 +75,7 @@ float get_amp_mod(float mod) {
 }
 
 /*
-void initialize_filter(struct filter *f, float cutoff, float resonance, filter_type mode) {
+void init_filter(struct filter *f, float cutoff, float resonance, filter_type mode) {
     f->cutoff = cutoff;
     f->resonance = resonance;
     f->mode = mode;
@@ -121,7 +121,7 @@ void update_filter_resonance(struct filter *f, float resonance) {
 
 // the minimum time: one sample
 
-void initialize_portamento(struct voice *v, int last_note) {
+void init_portamento(struct voice *v, int last_note) {
     if (last_note != -1) {
         // a negative increment and 0.001 of space prevents it from becoming zero
         v->portamento_increment =  (last_note - v->note) * (1.001 - 0.999 * global_paramaters.portamento_factor );//INV_SAMPLE_RATE * (last_note - v->note) * 2000;
@@ -131,29 +131,30 @@ void initialize_portamento(struct voice *v, int last_note) {
     }
 }
 
-void initialize_voice(struct voice *v) {
+void init_voice(struct voice *v) {
     v->used = false;
     v->note = -1;
     v->age = 0;
     v->new = false;
     v->portamento = 0.0;
+    v->mix = FIXED_MIN; // only osc a
 
-    initialize_env(&v->amp_env, LIN, 0.0);
+    init_env(&v->amp_env, LIN, 0.0);
     // TODO: remove. shouldn't be needed if updated regularly in loop
     set_env_sustain_mod(&v->amp_env, 0.5);
     set_env_attack_mod(&v->amp_env, 0.01);
     set_env_decay_mod(&v->amp_env, 0.01);
     set_env_release_mod(&v->amp_env, 0.01);
 
-    //initialize_env(&v->filter_env, 0.0);
+    //init_env(&v->filter_env, 0.0);
 
     v->sync = false;
     v->ring_mod = false;
-    initialize_osc(&v->osc1, SQUARE);
-    initialize_osc(&v->osc2, SQUARE);
+    init_osc(&v->osc_a, SQUARE);
+    init_osc(&v->osc_b, SQUARE);
 
-    initialize_filter(&v->filter, 0.005, 1.0, v->note);
-    initialize_lfo(&v->lfo, 2, SIN);
+    init_filter(&v->filter, 0.005, 1.0, v->note);
+    init_lfo(&v->lfo, 2, SIN);
 }
 
 void start_voice_mono_legato(struct voice *v, int note) {
@@ -164,17 +165,17 @@ void start_voice_mono_legato(struct voice *v, int note) {
 
 
     if (global_paramaters.mode == LEGATO) {
-        initialize_env(&v->amp_env, LIN, get_env_level(&v->amp_env));
-        initialize_env(&v->filter_env, LIN, get_env_level(&v->filter_env));
+        init_env(&v->amp_env, LIN, get_env_level(&v->amp_env));
+        init_env(&v->filter_env, LIN, get_env_level(&v->filter_env));
     } else {
-        initialize_env(&v->amp_env, EXP, 0.0);
-        initialize_env(&v->filter_env, EXP, 0.0);
+        init_env(&v->amp_env, EXP, 0.0);
+        init_env(&v->filter_env, EXP, 0.0);
     }
 
     // max 11025 cycles per semitone as portamento speed
     // portamento speed = 1 / number of cycles per semitone
     //v->portamento_increment = global_paramaters.portamento_factor * PORTAMENTO_MOD * (lv->osc1.tune - v->osc1.tune);
-    initialize_portamento(v, last_note);
+    init_portamento(v, last_note);
 }
 
 void start_voice_poly(struct voice *v, struct voice *lv, int note) {
@@ -182,10 +183,10 @@ void start_voice_poly(struct voice *v, struct voice *lv, int note) {
     v->used = true;
     v->age = 0;
 
-    initialize_env(&v->amp_env, LIN, 0.0);
-    initialize_env(&v->filter_env, LIN,  0.0);
+    init_env(&v->amp_env, LIN, 0.0);
+    init_env(&v->filter_env, LIN,  0.0);
     printf("n: %d, l: %d\n", v->note, lv->note);
-    initialize_portamento(v, lv->note);
+    init_portamento(v, lv->note);
 }
 
 void reset_voice(struct voice *v) {
@@ -196,11 +197,11 @@ void reset_voice(struct voice *v) {
     v->ring_mod = false;
 
     // envelopes are not reset here to make a future legato toggle possible
-    initialize_osc(&v->osc1, SIN);
-    initialize_osc(&v->osc2, SIN);
+    init_osc(&v->osc_a, SIN);
+    init_osc(&v->osc_b, SIN);
 
-    initialize_filter(&v->filter, 0.01, 1.0, v->note);
-    initialize_lfo(&v->lfo, 2, SIN);
+    init_filter(&v->filter, 0.01, 1.0, v->note);
+    init_lfo(&v->lfo, 2, SIN);
 }
 
 // remove and make into two functions
@@ -227,7 +228,7 @@ fixed process_voice(struct voice *v) {
             if (v->amp_env.level <= 0) {
                 //printf("sound off\n");
 
-                //initialize_voice(v);
+                //init_voice(v);
                 reset_voice(v);
             }
         } else {
@@ -259,8 +260,8 @@ fixed process_voice(struct voice *v) {
 
         // osc1 is leader for sync.
         if (v->sync) {
-            if (v->osc1.table_index < v->osc1.table_increment) {
-                v->osc2.table_index = 0.0;
+            if (v->osc_a.table_index < v->osc_a.table_increment) {
+                v->osc_b.table_index = 0.0;
             } 
         }
 
@@ -272,12 +273,21 @@ fixed process_voice(struct voice *v) {
         }
         
         if (v->ring_mod) {
-            out = process_osc(&v->osc1, v->note, v->portamento) * 
-                  process_osc(&v->osc2, v->note + 7, v->portamento);
+            out = process_osc(&v->osc_a, v->note, v->portamento) * 
+                  process_osc(&v->osc_b, v->note + 7, v->portamento);
         } else {
-            out = process_osc(&v->osc1, v->note, v->portamento);
+            fixed mix_factor = v->mix << 1;
+            fixed a = process_osc(&v->osc_a, v->note, v->portamento) >> 1;
+            fixed b = process_osc(&v->osc_b, v->note, v->portamento) >> 1;
+
+            if (v->mix < 0) {
+                // a is louder
+                out = a + mul_fixed(a, -(mix_factor)) + mul_fixed(b, (FIXED_MAX + mix_factor));
+            } else {
+                // b is louder
+                out = mul_fixed(a, (FIXED_MAX - mix_factor)) + mul_fixed(b, mix_factor);
+            }
         }
-        // ring mod: osc1 * osc2
 
         // TODO: uncomment so env works
         //out *= fixed_to_float(v->amp_env.level);

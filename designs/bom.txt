@@ -2,13 +2,10 @@ for hardware experimentation i'll need several parts.
 these will be used in the final design:
 - 10kb pots (https://www.aliexpress.com/w/wholesale-10k-ohm-potentiometer.html?spm=a2g0o.productlist.auto_suggest.2.20925ef8kdRLWm)
 - high buttons (https://www.aliexpress.com/item/33008167304.html?spm=a2g0o.productlist.main.7.35e51a79EG7xri&algo_pvid=795bb129-943b-4df0-9b50-620db28fdb81&algo_exp_id=795bb129-943b-4df0-9b50-620db28fdb81-6&pdp_ext_f=%7B%22order%22%3A%223%22%2C%22eval%22%3A%221%22%2C%22fromPage%22%3A%22search%22%7D&pdp_npi=6%40dis%21SEK%2123.45%2121.60%21%21%212.41%212.22%21%40211b629217645343325628539e5646%2167051074279%21sea%21SE%210%21ABX%211%210%21n_tag%3A-29910%3Bd%3Afc641a14%3Bm03_new_user%3A-29895&curPageLogUid=HZLRC5kLKAjM&utparam-url=scene%3Asearch%7Cquery_from%3A%7Cx_object_id%3A33008167304%7C_p_origin_prod%3A)
-- multiplexers. i'll either use 2/3 8-channel ones or one 16-channel
-    - 2x 74HC4051 DIP-16 8ch (https://www.electrokit.com/74hc4051-dip-16-8ch-analog-mulitplexer/demultiplexer)
-    or
-    - 74HC4067 DIP-24 (https://www.aliexpress.com/item/1005009231345592.html?spm=a2g0o.productlist.main.2.8afa5e482pNjyf&algo_pvid=028135de-bd31-476b-8e6e-2b89603ba14b&algo_exp_id=028135de-bd31-476b-8e6e-2b89603ba14b-1&pdp_ext_f=%7B%22order%22%3A%228%22%2C%22eval%22%3A%221%22%2C%22fromPage%22%3A%22search%22%7D&pdp_npi=6%40dis%21SEK%2124.98%219.37%21%21%212.64%210.99%21%402103847817664962028305977e5b02%2112000048405238696%21sea%21SE%210%21ABX%211%210%21n_tag%3A-29910%3Bd%3Afc641a14%3Bm03_new_user%3A-29895%3BpisId%3A5000000187626745&curPageLogUid=7u1tyPss8i3C&utparam-url=scene%3Asearch%7Cquery_from%3A%7Cx_object_id%3A1005009231345592%7C_p_origin_prod%3A)
-    or
-    - 4067B SOIC-24 Single 16ch (https://www.electrokit.com/4067b-sow-24-single-16ch-analog-multiplexer/demultiplexer)
-    - Adapter SOIC-24 - DIP-24W (https://www.electrokit.com/adapterkort-soic-24-dip-24w)
+- multiplexers. i'll  use 8-channel ones.
+    - 3x 74HC4051 DIP-16 8ch (https://www.electrokit.com/74hc4051-dip-16-8ch-analog-mulitplexer/demultiplexer)
+- io expanders. i'll use 1 or 2 16-channel ones depending on how many buttons are needed.
+    - 2x MCP23017-E/SP DIP-28N I2C I/O expander (https://www.electrokit.com/mcp23017-e/sp-dip-28n-i2c-i/o-expander)
 - stripboard (https://www.electrokit.com/experimentkort-fr2-hela-banor-100-x-500mm)
 - led (https://www.electrokit.com/led-3mm-rod-diffus-1300mcd)
 

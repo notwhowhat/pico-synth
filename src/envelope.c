@@ -31,7 +31,7 @@ when r is sample rate and t is time.
 
 */
 
-void initialize_env_mod_tables(void) {
+void init_env_mod_tables(void) {
     for (int i = 0; i < ENV_MOD_TABLE_LENGTH; i++) {
         // t = min * (max / min) ^ x
         float t = ENV_MIN_TIME * pow(ENV_MAX_TIME / ENV_MIN_TIME, (double)i / (double)ENV_MOD_TABLE_LENGTH);
@@ -44,7 +44,7 @@ void initialize_env_mod_tables(void) {
     }
 }
 
-void initialize_env(struct env *e, env_mode mode, fixed level) {
+void init_env(struct env *e, env_mode mode, fixed level) {
     // TODO: make it possible to use linear mode.
     // right now the time is not set up.
     e->mode = mode;
@@ -108,8 +108,8 @@ void update_env_s(struct env *e, float time_mod) {
 }
 
 void update_env_mode(struct env *e) {
-    if (e->mode == LIN) {
-        e->mode == EXP;
+    if (e->mode == LIN) { 
+        e->mode == EXP; 
     } else {
         e->mode == LIN;
     }

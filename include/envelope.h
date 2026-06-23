@@ -9,7 +9,8 @@
 #define ENV_MOD_TABLE_LENGTH 128
 
 typedef enum {
-    LIN, EXP,
+    LIN,
+    EXP,
 } env_mode;
 
 typedef enum {
@@ -19,7 +20,7 @@ typedef enum {
 struct env {
     fixed level;
     env_state state;
-    env_mode mode;
+    bool mode;
 
     fixed s_mod;
     fixed a_mod;
@@ -30,9 +31,9 @@ struct env {
 fixed env_mod_table_exp[ENV_MOD_TABLE_LENGTH];
 fixed env_mod_table_lin[ENV_MOD_TABLE_LENGTH];
 
-void initialize_env_mod_tables(void);
+void init_env_mod_tables(void);
 
-void initialize_env(struct env *e, env_mode mode, fixed level);
+void init_env(struct env *e, env_mode mode, fixed level);
 void process_env_r(struct env *e);
 void process_env_ads(struct env *e);
 float get_env_level(struct env *e);
@@ -65,7 +66,7 @@ void update_env_mode(struct env *e);
 //    float r_mod;
 //};
 
-//void initialize_env(struct env *e, env_mode mode, float level);
+//void init_env(struct env *e, env_mode mode, float level);
 //void process_env_r(struct env *e);
 //void process_env_ads(struct env *e);
 //float get_env_level(struct env *e);

@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 #ifndef PICOSYN_H
 #define PICOSYN_H

@@ -27,8 +27,9 @@ struct voice {
 
     bool sync;
     bool ring_mod;
-    struct osc osc1;
-    struct osc osc2;
+    struct osc osc_a;
+    struct osc osc_b;
+    fixed mix;
 
     float portamento_increment;
     float portamento;
@@ -55,7 +56,7 @@ struct parameters {
     float osc_a_detune;
     float osc_b_detune;
 
-    float osc_blend;
+    float osc_mix;
     float osc_fm;
     bool osc_sync;
     bool osc_ring_mod;
@@ -94,19 +95,19 @@ struct parameters {
 struct parameters global_paramaters;
 extern struct voice voices[VOICE_COUNT];
 
-void initialize_parameters(struct parameters *p);
-//void initialize_filter(struct filter *f, float cutoff, float resonance, int note);
+void init_parameters(struct parameters *p);
+//void init_filter(struct filter *f, float cutoff, float resonance, int note);
 //float process_filter(struct filter *f, float input);
 //float compute_filter_g(float cutoff, float keytrack, float keytrack_mod);
 //void update_filter_cutoff(struct filter *f, float cutoff);
 //void update_filter_resonance(struct filter *f, float resonance);
-//void initialize_filter(struct filter *f, float cutoff, float resonance, filter_type mode);
+//void init_filter(struct filter *f, float cutoff, float resonance, filter_type mode);
 //float process_lowpass(struct filter *f, float input);
 //void update_filter_cutoff(struct filter *f, float cutoff);
 //void update_filter_resonance(struct filter *f, float resonance);
 float get_amp_mod(float mod);
 
-void initialize_voice(struct voice *v);
+void init_voice(struct voice *v);
 //void start_voice(struct voice *v, struct voice *nv, int note);
 void start_voice_mono_legato(struct voice *v, int note);
 void start_voice_poly(struct voice *v, struct voice *lv, int note);

@@ -4,7 +4,6 @@ add_executable(tests
     ../src/midi.c
     ../src/voice.c
     ../src/envelope.c 
-    ../src/controls.c
     ../src/filter.c
     ../src/tables.c
     ../src/oscillators.c

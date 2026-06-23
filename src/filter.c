@@ -6,7 +6,7 @@
 
 #include <math.h>
 
-void initialize_filter(struct filter *f, float cutoff, float resonance, int note) {
+void init_filter(struct filter *f, float cutoff, float resonance, int note) {
     // 0 < cutoff, resonance < 1
     f->cutoff = cutoff;
     f->resonance = resonance;

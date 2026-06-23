@@ -70,22 +70,22 @@ void test_filter(struct voice *v) {
     uint32_t sampling_duration = 1010;
     fixed data[sampling_duration];
 
-    run_note(v, 60, data, note_duration, sampling_duration);
+    run_note(v, 36, data, note_duration, sampling_duration);
     write_data(data, sampling_duration);
     plot_data();
 }
 
 int main(void) {
-    initialize_wavetable(sin_table,      sin_wave);
-    initialize_wavetable(triangle_table, triangle_wave);
-    initialize_wavetable(sawtooth_table, sawtooth_wave);
-    initialize_wavetable(square_table,   square_wave);
-    initialize_increment_table();
+    init_wavetable(sin_table,      sin_wave);
+    init_wavetable(triangle_table, triangle_wave);
+    init_wavetable(sawtooth_table, sawtooth_wave);
+    init_wavetable(square_table,   square_wave);
+    init_increment_table();
 
-    initialize_env_mod_tables();
+    init_env_mod_tables();
 
     struct voice v;
-    initialize_voice(&v);
+    init_voice(&v);
 
     //test_env(&v);
     test_filter(&v);

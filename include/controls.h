@@ -1,24 +1,116 @@
-#include "interface.h"
-
 #include "voice.h"
 
 #ifndef CONTROLS_H
 #define CONTROLS_H
 
+#define BUTTON_COUNT 25
+#define POT_COUNT 25
+
+// TODO: unionize!
+struct controls {
+    voice_mode mode;
+
+    waveform osc_a_waveform; 
+    waveform osc_b_waveform; 
+    uint8_t osc_a_coarse_detune;
+    uint8_t osc_b_coarse_detune;
+    uint8_t osc_a_fine_detune;
+    uint8_t osc_b_fine_detune;
+
+    uint8_t osc_mix;
+    uint8_t osc_fm;
+    bool osc_sync;
+    bool osc_ring_mod;
+
+    uint8_t amp_attack;
+    uint8_t amp_decay;
+    uint8_t amp_sustain;
+    uint8_t amp_release;
+    bool amp_env_mode;
+
+    uint8_t mod_attack;
+    uint8_t mod_decay;
+    uint8_t mod_sustain;
+    uint8_t mod_release;
+    bool mod_env_mode;
+
+    uint8_t filter_attack;
+    uint8_t filter_decay;
+    uint8_t filter_sustain;
+    uint8_t filter_release;
+    bool filter_env_mode;
+    uint8_t filter_mod;
+
+    uint8_t filter_mode;
+    uint8_t filter_cutoff;
+    uint8_t filter_resonance;
+    uint8_t filter_keytrack;
+
+    waveform lfo_a_waveform;
+    waveform lfo_b_waveform;
+    uint8_t lfo_a_rate;
+    uint8_t lfo_b_rate;
+
+    uint8_t portamento_factor;
+};
+
+// all updates of voice values should be based on this
+struct controls global_controls;
+extern const size_t CONTROL_COUNT;
+bool selected_osc;
+bool selected_lfo;
+int selected_env;
+
 extern const float POT_MODIFIER;
 
 // in this case, they are ADSR for the amp envelope
 float controls[4];
+
+// the previous read values
+int pots[POT_COUNT];
+int buttons[BUTTON_COUNT];
+
+// the index of controls that is changed
+uint16_t prev_values;
+int changed_pots[POT_COUNT];
+int changed_buttons[BUTTON_COUNT];
+
+int changed_pot_count;
+int changed_button_count;
+
 extern const int CONTROL_NUM;
 extern const int NOISE_THRESHOLD;
 
-void initialize_controls(void);
+extern const uint8_t BANK_COUNT;
+extern const uint8_t BANK_SIZE;
+uint8_t bank;
+uint8_t preset;
+
+bool load_preset_flag;
+bool save_preset_flag;
+
+void init_controls(void);
 void read_pots(void);
-void process_pot_inputs(int input);
+void process_changed_buttons(void);
+void process_changed_pots(void);
+
+void increment_bank(void);
+void decrement_bank(void);
+void increment_preset(void);
+void decrement_preset(void);
+void save_preset(struct parameters *p);
+void load_preset(struct parameters *p);
+
 /*
 buttons that toggle features should be updated and checked immediately.
 buttons that change which layer to be used will only get updated when a pot updates.
 pots will always get updated.
+*/
+/*
+for every button and pot there needs to be an old value stored somewhere.
+otherwise. the value of the control should only be changed if they are changed,
+even when changing presets.
+
 */
 
 /*

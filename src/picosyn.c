@@ -55,7 +55,6 @@ decay is a bit weird, because the sustain can be changed, which results in somet
 the desired operation
 */
 
-
 void core1_entry(void) {
     gpio_set_function(AUDIO_PIN, GPIO_FUNC_PWM);
 
@@ -121,8 +120,6 @@ int main(void) {
     irq_set_exclusive_handler(UART1_IRQ, on_uart_interrupt);
     irq_set_enabled(UART1_IRQ, true);
 
-    //*/
-
     gpio_init(ERR_LED_PIN);
     gpio_set_dir(ERR_LED_PIN, GPIO_OUT);
     
@@ -156,23 +153,20 @@ int main(void) {
     int midi_counter = 0;
     uint8_t midi_cmd[] = {0, 0, 0};
 
-    // problem fixed. caused by passing a factor instead of the time
-    // XXX: the program is stopping at initialize_voice(). find out why
-    // there is something in initialize_env() that causes the crash
-    initialize_parameters(&global_paramaters);
+    init_parameters(&global_paramaters);
+
+    init_controls();
+
+    init_wavetable(sin_table, sin_wave);
+    init_wavetable(square_table, square_wave);
+    init_wavetable(sawtooth_table, sawtooth_wave);
+    init_wavetable(sawtooth_table, triangle_wave);
+    init_increment_table();
 
     for (int i = 0; i < VOICE_COUNT; i++) {
-        initialize_voice(&voices[i]);
+        init_voice(&voices[i]);
         
     }
-
-    initialize_controls();
-
-    initialize_wavetable(sin_table, sin_wave);
-    initialize_wavetable(square_table, square_wave);
-    initialize_wavetable(sawtooth_table, sawtooth_wave);
-    initialize_wavetable(sawtooth_table, triangle_wave);
-    initialize_increment_table();
 
     multicore_launch_core1(core1_entry);
 
