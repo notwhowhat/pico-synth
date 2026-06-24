@@ -11,10 +11,11 @@
 // these sizes can be changed but not increased 
 
 #define IO_EXP_INT_PIN 23
+#define MUX_A_PIN 17
+#define MUX_B_PIN 19
+#define MUX_C_PIN 20
 
-const size_t CONTROL_COUNT = sizeof(struct controls);
-const uint8_t BANK_COUNT = 8;
-const uint8_t BANK_SIZE = 64;
+const uint8_t MUX_COUNT = 3;
 
 const float POT_MODIFIER = 1.0 / 4096.0;
 const int POT_SCALE = 16; // to scale down from 12-bit to 8-bit
@@ -22,12 +23,22 @@ const int CONTROL_NUM = 4;
 const int NOISE_THRESHOLD = 10;
 
 // address is 7-bit
-static uint8_t addr = 0x20;
+const uint8_t IO_EXPANDER_I2C_ADDR = 0x20;
+const uint8_t EEPROM_I2C_ADDR = 0x50;
+
+// 64 bytes per preset/page
+const uint8_t PRESET_COUNT = 64; // per bank
+const uint8_t BANK_COUNT = 8;
+const uint16_t PRESET_SIZE = 0x40; // 64 bytes
+const uint16_t BANK_SIZE = 0x1000; // 4096 bytes
+
+uint16_t current_preset_addr = 0x00;
+
+const uint8_t EEPROM_SEND_SIZE = CONTROL_COUNT + 2;
 
 void init_controls(void) {
-    for (int i; i < CONTROL_NUM -1; i++) {
-        controls[i] = -1.0;
-    }
+    bank = preset = load_preset_flag = save_preset_flag = 0;
+    init_io_expander(0, true);
 }
 
 void init_io_expander(uint8_t hardware_addr, bool isinput) {
@@ -47,7 +58,7 @@ void init_io_expander(uint8_t hardware_addr, bool isinput) {
     0x06 GPPU: gpio pullup (0xFF, on)
     */
 
-    uint8_t addr = 0x20 + hardware_addr;
+    uint8_t addr = IO_EXPANDER_I2C_ADDR + hardware_addr;
 
     if (isinput) {
         // IOCON: config (0x6A (01101010), see p.21)
@@ -68,7 +79,7 @@ void init_io_expander(uint8_t hardware_addr, bool isinput) {
         write_i2c(addr, data, 3, false);
 
     } else {
-        // TODO: add!
+        // TODO: add for leds!
     }
 }
 
@@ -80,10 +91,22 @@ void process_controls(void) {
     process_changed_pots();
     
     // deal with presets here
+    if (load_preset_flag) {
+        load_preset();
+        load_preset_flag = false;
+        save_preset_flag = false;
+    }
+    if (save_preset_flag) {
+        save_preset();
+        save_preset_flag = false;
+    }
+    
 }
 
 void get_changed_buttons(void) {
+    // TODO: do for both expanders maybe :)
     if (read_gpio(IO_EXP_INT_PIN)) {
+        changed_button_count = 0;
         //// get which registers have updated (i hope it's usually one)
         //uint8_t intf_reg = 0x0E;
         //uint8_t changed_pins[2];
@@ -94,8 +117,8 @@ void get_changed_buttons(void) {
         // but INTCAP has to be cleared anyways, so this is actually faster.
         uint8_t reg = 0x10; // INTCAP
         uint8_t values[2];
-        write_i2c(addr, &reg, 1, true);
-        read_i2c(addr, values, 2, false);
+        write_i2c(IO_EXPANDER_I2C_ADDR, &reg, 1, true);
+        read_i2c(IO_EXPANDER_I2C_ADDR, values, 2, false);
 
         uint16_t new_values = ((uint16_t)values[0] << 8) + (uint16_t)values[1];
         uint16_t changes = new_values ^ prev_values;
@@ -113,19 +136,6 @@ void get_changed_buttons(void) {
             }
         }
     }
-    //changed_button_count = 0;
-
-
-    //for (int i = 0; i < BUTTON_COUNT; i++) {
-    //    // should be taken in with i2c chip. right now, the values will just be the same
-    //    int input = read_gpio(pin);
-    //    
-    //    if (input != buttons[i]) {
-    //        buttons[i] = input;
-    //        changed_buttons[changed_button_count] = i;
-    //        changed_button_count++;
-    //    }
-    //}
 }
 
 // not done
@@ -150,19 +160,19 @@ void process_changed_buttons(void) {
                 selected_lfo = !selected_lfo;
                 break;
             case 3: // ring mod
-                global_controls.osc_ring_mod = !global_controls.osc_ring_mod;
+                global_controls[OSC_RING_MOD] = !global_controls[OSC_RING_MOD];
                 break;
             case 4: // sync
-                global_controls.osc_sync = !global_controls.osc_sync;
+                global_controls[OSC_SYNC] = !global_controls[OSC_SYNC];
                 break;
             case 5: // amp env mode
-                global_controls.amp_env_mode = !global_controls.amp_env_mode;
+                global_controls[AMP_ENV_MODE] = !global_controls[AMP_ENV_MODE];
                 break;
             case 6: // mod env mode
-                global_controls.mod_env_mode = !global_controls.mod_env_mode;
+                global_controls[MOD_ENV_MODE] = !global_controls[MOD_ENV_MODE];
                 break;
             case 7: // filter env mode
-                global_controls.filter_env_mode = !global_controls.filter_env_mode;
+                global_controls[FILTER_ENV_MODE] = !global_controls[FILTER_ENV_MODE];
                 break;
             case 8: // bank
                 change_bank();
@@ -189,20 +199,26 @@ void process_changed_buttons(void) {
 }
 
 void get_changed_pots(void) {
-    // does all sorts of muxing and sends updated pots to be processed
     changed_pot_count = 0;
-    for (int i = 0; i < POT_COUNT; i++) {
-        // the inputs should be read from the muxes but now only one is connected.
-        int input = read_adc();
+    for (int i = 0; i < 8; i++) {
+        write_gpio(MUX_A_PIN, i & 1); // 1: (1 << 0)
+        write_gpio(MUX_B_PIN, (i & 2) >> 1); // 2 : (1 << 1)
+        write_gpio(MUX_C_PIN, (i & 4) >> 2); // 4: (1 << 2)
 
-        if (abs(pots[i] - input) > NOISE_THRESHOLD) {
-            pots[i] = input / POT_SCALE;
-            changed_pots[changed_pot_count] = i;
-            changed_pot_count++;
+        for (int j = 0; j < MUX_COUNT; j++) {
+            select_adc_input(j);
+            uint16_t input = read_adc();
+            // the pot number
+            uint8_t n = i + j * 8;
+
+            if (abs(pots[n] - input) > NOISE_THRESHOLD) {
+                pots[i] = input / POT_SCALE;
+                changed_pots[changed_pot_count] = n;
+                changed_pot_count++;
+            }
         }
     }
 }
-
 
 void process_changed_pots(void) {
     // no function pointers, because the function paramaters must be of the same type
@@ -234,17 +250,23 @@ void process_changed_pots(void) {
     }
 }
 
+void save_preset(void) {
+    uint8_t data[EEPROM_SEND_SIZE] = {0};
 
-void save_preset(struct parameters *p) {
-    save_preset_flag = false;
-    uint8_t data[CONTROL_COUNT];
-    for (int i = 0; i < CONTROL_COUNT; i++) {
-        // cast parameters as union and iterate over values as array.
-    }
+    data[0] = (uint8_t)(current_preset_addr >> 8);
+    data[1] = (uint8_t)current_preset_addr;
+    memcpy(&data[2], global_controls, CONTROL_COUNT);
+
+    write_i2c(EEPROM_I2C_ADDR, data, EEPROM_SEND_SIZE, false);
 }
 
-void load_preset(struct parameters *p) {
-    load_preset_flag = false;
+void load_preset(void) {
+    uint8_t read_addr[2];
+    read_addr[0] = (uint8_t)(current_preset_addr >> 8);
+    read_addr[1] = (uint8_t)current_preset_addr;
+
+    write_i2c(EEPROM_I2C_ADDR, read_addr, 2, true);
+    read_i2c(EEPROM_I2C_ADDR, global_controls, CONTROL_COUNT, false);
 }
 
 void change_bank(void) {
@@ -252,220 +274,21 @@ void change_bank(void) {
     if (bank > BANK_COUNT) {
         bank = 0;
     }
+    current_preset_addr = bank * BANK_SIZE + preset * PRESET_SIZE;
 }
 
 void increment_preset(void) {
     preset++;
-    if (preset > BANK_SIZE) {
+    if (preset > PRESET_COUNT) {
         preset = 0;
     }
+    current_preset_addr = bank * BANK_SIZE + preset * PRESET_SIZE;
 }
 void decrement_preset(void) {
     preset--;
     if (preset < 0) {
         preset = 0;
     }
+    current_preset_addr = bank * BANK_SIZE + preset * PRESET_SIZE;
 }
-
-
-
-
-/*
-const int INPUT_COUNT = POT_COUNT + BUTTON_COUNT;
-
-void process_controls(void) {
-    changed_pots_counter = 0;
-    changed_buttons_counter = 0;
-    memset(changed_buttons, 0, sizeof(changed_buttons));
-    memset(changed_buttons_number, 0, sizeof(changed_buttons_number));
-    memset(changed_pots, 0, sizeof(changed_pots));
-    memset(changed_pots_number, 0, sizeof(changed_pots_number));
-
-    check_inputs();
-
-    for (int v = 0; v < VOICE_COUNT; v++) {
-        for (int i = 0; i < changed_buttons_counter; i++) {
-            process_button_inputs(&voices[v], changed_buttons_number[i], changed_buttons[i]);
-        }
-        for (int i = 0; i < changed_pots_counter; i++) {
-            process_pots_inputs(&voices[v], changed_pots_number[i], changed_pots[i]);
-        }
-    }
-}
-
-void check_inputs(void) {
-    // check for new values, change them, and update the voices
-    for (int i = 0; i < BUTTON_COUNT; i++) {
-        bool input = read_gpio(button_pins[i]);
-        if (input != button_inputs[i]) {
-            // keep old value for comparing
-            changed_buttons[i] = input;
-            changed_buttons_number[i] = i;
-            changed_buttons_counter++;
-        }
-    }
-
-    for (int i = 0; i < POT_COUNT; i++) {
-        // implement 4th mux pin when added
-        write_gpio(MUX_PIN_1, i);
-        write_gpio(MUX_PIN_2, i>>1);
-        write_gpio(MUX_PIN_3, i>>2);
-
-        int input = adc_read();
-
-        // because of ground noise, this will vary every cycle
-        if (input != pot_inputs[i]) {
-            // keep old value for comparing
-            changed_pots[i] = input;
-            changed_pots_number[i] = i;
-            changed_pots_counter++;
-        }
-    }
-}
-
-void process_button_inputs(struct voice *v, int changed_button, int value) {
-    // will only change when toggled to true. this only works because of booleans.
-    if (value) {
-        switch (changed_button) {
-            case OSC_SELECTED:
-                selected_osc = ! selected_osc;
-                break;
-
-            case OSC_WAVEFORM:
-                update_osc_waveform(selected_osc ? &v->osc1 : &v->osc2);
-                break;
-
-            case OSC_SUPER:
-                // TODO: implement!
-                // v->super = ! v->super;
-                break;
-
-            case OSC_SYNC:
-                v->sync = ! v->sync;
-                break;
-
-            case OSC_RING_MOD:
-                v->ring_mod = ! v->ring_mod;
-                break;
-
-            case ENV_SELECTED:
-                // add third env!
-                selected_env = ! selected_env;
-                break;
-
-            case FIL_MODE:
-                v->filter.mode++;
-                if (v->filter.mode == COUNT) {
-                    v->filter.mode = LOW;
-                }
-                break;
-            
-            case LFO_WAVEFORM:
-                update_lfo_waveform(&v->lfo);
-                break;
-
-            case LFO_DEST:
-                // to be implemented
-                break;
-        }
-
-        button_inputs[changed_button] = value;
-    }
-} 
-
-
-void process_pots_inputs(struct voice *v, int changed_pot, int value) {
-    switch (changed_pot) {
-        case OSC_TUNE:
-            // TODO: adjust value to range
-            update_osc_detune(selected_osc ? &v->osc1 : &v->osc2, value);
-            break;
-        case OSC_BLEND:
-            // make exponential maybe
-            v->osc2.gain = value * POT_MOD;
-            v->osc1.gain = 1.0 - v->osc2.gain;
-            break;
-        case ENV_ATTACK:
-            update_env_a(selected_env ? &v->amp_env : &v->filter_env, value * POT_MOD);
-            break;
-        case ENV_DECAY:
-            update_env_d(selected_env ? &v->amp_env : &v->filter_env, value * POT_MOD);
-            break;
-        case ENV_SUSTAIN:
-            update_env_s(selected_env ? &v->amp_env : &v->filter_env, value * POT_MOD);
-            break;
-        case ENV_RELEASE:
-            update_env_r(selected_env ? &v->amp_env : &v->filter_env, value * POT_MOD);
-            break;
-        case FIL_CUTOFF:
-            update_filter_cutoff(&v->filter, value * POT_MOD);
-            break;
-        case FIL_RESONANCE:
-            update_filter_resonance(&v->filter, value * POT_MOD);
-            break;
-        case FIL_ENV_AMOUNT:
-            v->filter_env_mod = value * POT_MOD;
-            break;
-        case LFO_RATE:
-            // make exponential
-            update_lfo_rate(&v->lfo, 205.78 * POT_MOD - 20.58);
-            break;
-        case LFO_AMOUNT:
-            // to be implemented
-            break;
-
-    }
-}
-*/
-
-
-/*
-void process_controls(void) {
-    // get the new controls
-    // then push them to all voices
-    float changed_controls[INPUT_COUNT] = {0};
-    int changed_controls_number[INPUT_COUNT] = {0};
-    int changed_controls_counter = 0;
-
-    for (int i = 0; i < INPUT_COUNT; i++) {
-        if (controls[i] != prev_controls[i]) {
-            changed_controls_number[changed_controls_counter] = i;
-            changed_controls[changed_controls_counter] = controls[i];
-            changed_controls_counter++;
-        }
-    }
-
-    for (int i = 0; i < changed_controls_counter; i++) {
-        for (int j = 0; j < VOICE_COUNT; j++) {
-            update_control(&voices[j], changed_controls_number[i], changed_controls[i]);
-        }
-    }
-}
-
-void update_control(struct voice *v, inputs control, float value) {
-    // i know this is ugly. a solution with function pointers looks better,
-    // but this is readable and maintainable
-    switch (control) {
-        case AMP_A:
-            update_env_a(&v->amp_env, value);
-            break;
-        case AMP_D:
-            update_env_d(&v->amp_env, value);
-            break;
-        case AMP_R:
-            update_env_r(&v->amp_env, value);
-            break;
-        case AMP_S:
-            update_env_s(&v->amp_env, value);
-            break;
-        case FILTER_CUTOFF:
-            //update_filter_cutoff(&v->lowpass, value);
-            break;
-        case FILTER_RESONANCE:
-            //update_filter_resonance(&v->lowpass, value);
-            break;
-    }
-}
-*/
-
 

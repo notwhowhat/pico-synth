@@ -8,6 +8,8 @@
 #include "hardware/adc.h"
 #include "hardware/i2c.h"
 
+#define LOWEST_ADC_PIN 26
+
 void write_pwm(int value) {
     pwm_set_gpio_level(AUDIO_PIN, (uint16_t)value);
 }
@@ -50,5 +52,9 @@ void write_i2c(uint8_t addr, const uint8_t *src, size_t len, bool nostop) {
 
 void read_i2c(uint8_t addr, uint8_t *dst, size_t len, bool nostop) {
     i2c_read_blocking(i2c0, addr, dst, len, nostop);
+}
+
+void select_adc_input(uint8_t input) {
+    adc_select_input(input + LOWEST_ADC_PIN);
 }
 

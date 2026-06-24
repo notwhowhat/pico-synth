@@ -55,20 +55,52 @@ struct controls {
 };
 
 // all updates of voice values should be based on this
-struct controls global_controls;
-extern const size_t CONTROL_COUNT;
+enum {
+    VOICE_MODE,
+    OSC_A_WAVEFORM,
+    OSC_A_COARSE_DETUNE,
+    OSC_A_FINE_DETUNE,
+    OSC_B_WAVEFORM,
+    OSC_B_COARSE_DETUNE,
+    OSC_B_FINE_DETUNE,
+    OSC_MIX,
+    OSC_FM,
+    OSC_SYNC,
+    OSC_RING_MOD,
+    AMP_ATTACK,
+    AMP_DECAY,
+    AMP_SUSTAIN,
+    AMP_RELEASE,
+    AMP_ENV_MODE,
+    MOD_ATTACK,
+    MOD_DECAY,
+    MOD_SUSTAIN,
+    MOD_RELEASE,
+    MOD_ENV_MODE,
+    FILTER_ATTACK,
+    FILTER_DECAY,
+    FILTER_SUSTAIN,
+    FILTER_RELEASE,
+    FILTER_ENV_MODE,
+    FILTER_MOD,
+    FILTER_MODE,
+    FILTER_CUTOFF,
+    FILTER_RESONANCE,
+    FILTER_KEYTRACK,
+    LFO_A_WAVEFORM,
+    LFO_A_RATE,
+    LFO_B_WAVEFORM,
+    LFO_B_RATE,
+    PORTAMENTO_FACTOR,
+    CONTROL_COUNT,
+};
+uint8_t global_controls[CONTROL_COUNT];
 bool selected_osc;
 bool selected_lfo;
-int selected_env;
-
-extern const float POT_MODIFIER;
-
-// in this case, they are ADSR for the amp envelope
-float controls[4];
+uint8_t selected_env;
 
 // the previous read values
 int pots[POT_COUNT];
-int buttons[BUTTON_COUNT];
 
 // the index of controls that is changed
 uint16_t prev_values;
@@ -78,11 +110,6 @@ int changed_buttons[BUTTON_COUNT];
 int changed_pot_count;
 int changed_button_count;
 
-extern const int CONTROL_NUM;
-extern const int NOISE_THRESHOLD;
-
-extern const uint8_t BANK_COUNT;
-extern const uint8_t BANK_SIZE;
 uint8_t bank;
 uint8_t preset;
 
@@ -90,16 +117,19 @@ bool load_preset_flag;
 bool save_preset_flag;
 
 void init_controls(void);
-void read_pots(void);
+void init_io_expander(uint8_t hardware_addr, bool isinput);
+
+void process_controls(void);
+void get_changed_buttons(void);
+void get_changed_pots(void);
 void process_changed_buttons(void);
 void process_changed_pots(void);
 
 void increment_bank(void);
-void decrement_bank(void);
 void increment_preset(void);
 void decrement_preset(void);
-void save_preset(struct parameters *p);
-void load_preset(struct parameters *p);
+void save_preset(void);
+void load_preset(void);
 
 /*
 buttons that toggle features should be updated and checked immediately.

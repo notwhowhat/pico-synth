@@ -15,5 +15,6 @@ int read_gpio(int pin);
 void init_i2c_interface(void);
 void write_i2c(uint8_t addr, const uint8_t *src, size_t len, bool nostop);
 void read_i2c(uint8_t addr, uint8_t *dst, size_t len, bool nostop);
+void select_adc_input(uint8_t input);
 
 #endif
