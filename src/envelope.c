@@ -85,25 +85,25 @@ void set_env_release_mod(struct env *e, uint8_t mod) {
     e->r_mod = env_mod_table_exp[mod];
 }
 
-void update_env_a(struct env *e, float time_mod) {
+void update_env_a(struct env *e, uint8_t mod) {
     if (e->state == ATTACK) {
-        set_env_attack_mod(e, time_mod);
+        set_env_attack_mod(e, mod);
     }
 }
 
-void update_env_d(struct env *e, float time_mod) {
+void update_env_d(struct env *e, uint8_t mod) {
     if (e->state == ATTACK && e->state == DECAY) {
-        set_env_decay_mod(e, time_mod);
+        set_env_decay_mod(e, mod);
     }
 }
 
-void update_env_r(struct env *e, float time_mod) {
-        set_env_release_mod(e, time_mod);
+void update_env_r(struct env *e, uint8_t mod) {
+        set_env_release_mod(e, mod);
 }
 
-void update_env_s(struct env *e, float time_mod) {
+void update_env_s(struct env *e, uint8_t mod) {
     if (e->state == ATTACK && e->state == DECAY) {
-        e->s_mod = time_mod;
+        e->s_mod = mod;
     }
 }
 

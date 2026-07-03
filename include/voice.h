@@ -30,6 +30,7 @@ struct voice {
     struct osc osc_a;
     struct osc osc_b;
     fixed mix;
+    fixed fm; // TODO: implement! ratio of how much to add osc a to osc b
 
     float portamento_increment;
     float portamento;
@@ -37,13 +38,14 @@ struct voice {
     //struct osc oscillators[7];
 
     struct env amp_env;
+    struct env mod_env;
     struct env filter_env;
     float filter_env_mod;
 
-    //struct filter lowpass;
     struct filter filter;
 
-    struct lfo lfo;
+    struct lfo lfo_a;
+    struct lfo lfo_b;
 };
 
 struct parameters {
@@ -113,6 +115,9 @@ void start_voice_mono_legato(struct voice *v, int note);
 void start_voice_poly(struct voice *v, struct voice *lv, int note);
 void reset_voice(struct voice *v);
 fixed process_voice(struct voice *v);
+
+void update_osc_ring_mod(struct voice *v);
+void update_osc_sync(struct voice *v);
 
 void on_pwm_interrupt(void);
 

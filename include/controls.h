@@ -6,55 +6,46 @@
 #define BUTTON_COUNT 25
 #define POT_COUNT 25
 
-// TODO: unionize!
-struct controls {
-    voice_mode mode;
-
-    waveform osc_a_waveform; 
-    waveform osc_b_waveform; 
-    uint8_t osc_a_coarse_detune;
-    uint8_t osc_b_coarse_detune;
-    uint8_t osc_a_fine_detune;
-    uint8_t osc_b_fine_detune;
-
-    uint8_t osc_mix;
-    uint8_t osc_fm;
-    bool osc_sync;
-    bool osc_ring_mod;
-
-    uint8_t amp_attack;
-    uint8_t amp_decay;
-    uint8_t amp_sustain;
-    uint8_t amp_release;
-    bool amp_env_mode;
-
-    uint8_t mod_attack;
-    uint8_t mod_decay;
-    uint8_t mod_sustain;
-    uint8_t mod_release;
-    bool mod_env_mode;
-
-    uint8_t filter_attack;
-    uint8_t filter_decay;
-    uint8_t filter_sustain;
-    uint8_t filter_release;
-    bool filter_env_mode;
-    uint8_t filter_mod;
-
-    uint8_t filter_mode;
-    uint8_t filter_cutoff;
-    uint8_t filter_resonance;
-    uint8_t filter_keytrack;
-
-    waveform lfo_a_waveform;
-    waveform lfo_b_waveform;
-    uint8_t lfo_a_rate;
-    uint8_t lfo_b_rate;
-
-    uint8_t portamento_factor;
-};
-
 // all updates of voice values should be based on this
+/* done update functions:
+    VOICE_MODE
+    x OSC_A_WAVEFORM
+    x OSC_A_COARSE_DETUNE
+    x OSC_A_FINE_DETUNE
+    x OSC_B_WAVEFORM
+    x OSC_B_COARSE_DETUNE
+    x OSC_B_FINE_DETUNE
+    x? OSC_MIX
+    x? OSC_FM
+    x OSC_SYNC
+    x OSC_RING_MOD
+    x AMP_ATTACK
+    x AMP_DECAY
+    x AMP_SUSTAIN
+    x AMP_RELEASE
+    x AMP_ENV_MODE
+    x MOD_ATTACK
+    x MOD_DECAY
+    x MOD_SUSTAIN
+    x MOD_RELEASE
+    x MOD_ENV_MODE
+    x FILTER_ATTACK
+    x FILTER_DECAY
+    x FILTER_SUSTAIN
+    x FILTER_RELEASE
+    x FILTER_ENV_MODE
+    FILTER_MOD
+    FILTER_MODE
+    FILTER_CUTOFF
+    FILTER_RESONANCE
+    FILTER_KEYTRACK
+    x LFO_A_WAVEFORM
+    LFO_A_RATE
+    x LFO_B_WAVEFORM
+    LFO_B_RATE
+    PORTAMENTO_FACTOR
+    CONTROL_COUNT
+*/
 enum {
     VOICE_MODE,
     OSC_A_WAVEFORM,

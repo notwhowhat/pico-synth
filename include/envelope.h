@@ -44,10 +44,10 @@ void set_env_attack_mod(struct env *e, uint8_t mod);
 void set_env_decay_mod(struct env *e, uint8_t mod);
 void set_env_release_mod(struct env *e, uint8_t mod);
 
-void update_env_a(struct env *e, float time_mod);
-void update_env_d(struct env *e, float time_mod);
-void update_env_r(struct env *e, float time_mod);
-void update_env_s(struct env *e, float time_mod);
+void update_env_a(struct env *e, uint8_t mod);
+void update_env_d(struct env *e, uint8_t mod);
+void update_env_r(struct env *e, uint8_t mod);
+void update_env_s(struct env *e, uint8_t mod);
 
 void update_env_mode(struct env *e);
 

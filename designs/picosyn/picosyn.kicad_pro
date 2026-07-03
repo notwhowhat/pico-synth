@@ -224,7 +224,7 @@
       "no_connect_dangling": "warning",
       "pin_not_connected": "error",
       "pin_not_driven": "error",
-      "pin_to_pin": "warning",
+      "pin_to_pin": "error",
       "power_pin_not_driven": "error",
       "similar_labels": "warning",
       "simulation_model_issue": "ignore",
@@ -386,6 +386,18 @@
     [
       "75ef5ae5-8a6b-4ae7-bab1-ad864705762e",
       "Root"
+    ],
+    [
+      "99d1e5d4-5982-40f8-8bfe-ccc5529f697f",
+      "knobs"
+    ],
+    [
+      "5dc97c36-0f83-4bcf-b8b7-56e48fcfe833",
+      "buttons"
+    ],
+    [
+      "118030eb-ba3c-4691-a7fc-0ecf021c88ef",
+      "leds"
     ]
   ],
   "text_variables": {}

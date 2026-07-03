@@ -10,11 +10,6 @@
 
 // these sizes can be changed but not increased 
 
-#define IO_EXP_INT_PIN 23
-#define MUX_A_PIN 17
-#define MUX_B_PIN 19
-#define MUX_C_PIN 20
-
 const uint8_t MUX_COUNT = 3;
 
 const float POT_MODIFIER = 1.0 / 4096.0;
@@ -105,7 +100,7 @@ void process_controls(void) {
 
 void get_changed_buttons(void) {
     // TODO: do for both expanders maybe :)
-    if (read_gpio(IO_EXP_INT_PIN)) {
+    if (read_gpio(IO_EXPANDER_INT_PIN)) {
         changed_button_count = 0;
         //// get which registers have updated (i hope it's usually one)
         //uint8_t intf_reg = 0x0E;
@@ -140,6 +135,7 @@ void get_changed_buttons(void) {
 
 // not done
 void process_changed_buttons(void) {
+    // TODO: refactor. this is wayyy to big
     for (int i = 0; i < changed_button_count; i++) {
 
         // cycle stuff in control struct
@@ -159,36 +155,66 @@ void process_changed_buttons(void) {
             case 2: // selected lfo
                 selected_lfo = !selected_lfo;
                 break;
-            case 3: // ring mod
+            case 3: // waveform
+                if (selected_osc) {
+                    for (int j = 0; j < VOICE_COUNT; j++)
+                        update_osc_waveform(&voices[j].osc_a);
+                    global_controls[OSC_A_WAVEFORM] = voices[0].osc_a.selected_waveform;
+                } else {
+                    for (int j = 0; j < VOICE_COUNT; j++)
+                        update_osc_waveform(&voices[j].osc_b);
+                    global_controls[OSC_B_WAVEFORM] = voices[0].osc_b.selected_waveform;
+                }
+                break;
+            case 4: // ring mod
                 global_controls[OSC_RING_MOD] = !global_controls[OSC_RING_MOD];
+                for (int j = 0; j < VOICE_COUNT; j++)
+                    update_osc_ring_mod(&voices[j]);
                 break;
-            case 4: // sync
+            case 5: // sync
                 global_controls[OSC_SYNC] = !global_controls[OSC_SYNC];
+                for (int j = 0; j < VOICE_COUNT; j++)
+                    update_osc_sync(&voices[j]);
                 break;
-            case 5: // amp env mode
+            case 6: // amp env mode
                 global_controls[AMP_ENV_MODE] = !global_controls[AMP_ENV_MODE];
+                for (int j = 0; j < VOICE_COUNT; j++)
+                    update_env_mode(&voices[j].amp_env);
                 break;
-            case 6: // mod env mode
+            case 7: // mod env mode
                 global_controls[MOD_ENV_MODE] = !global_controls[MOD_ENV_MODE];
+                for (int j = 0; j < VOICE_COUNT; j++)
+                    update_env_mode(&voices[j].mod_env);
                 break;
-            case 7: // filter env mode
+            case 8: // filter env mode
                 global_controls[FILTER_ENV_MODE] = !global_controls[FILTER_ENV_MODE];
+                for (int j = 0; j < VOICE_COUNT; j++)
+                    update_env_mode(&voices[j].filter_env);
                 break;
-            case 8: // bank
+            case 9: // lfo waveform
+                if (selected_lfo) {
+                    for (int j = 0; j < VOICE_COUNT; j++)
+                        update_lfo_waveform(&voices[j].lfo_a);
+                } else {
+                    for (int j = 0; j < VOICE_COUNT; j++)
+                        update_lfo_waveform(&voices[j].lfo_b);
+                }
+                break;
+            case 25: // bank // TODO: change number
                 change_bank();
                 break;
-            case 9: // preset up
+            case 10: // preset up
                 increment_preset();
                 break;
-            case 10: // preset down
+            case 11: // preset down
                 decrement_preset();
                 break;
-            case 11: // load preset
+            case 12: // load preset
                 if (changed_buttons[i] == true) {
                     load_preset_flag = true;
                 }
                 break;
-            case 12: // save -||-
+            case 13: // save -||-
                 if (changed_buttons[i] == true) {
                     save_preset_flag = true;
                 }
@@ -220,32 +246,63 @@ void get_changed_pots(void) {
     }
 }
 
+void update_env(uint8_t selected_env, uint8_t mod, void (*f)(struct osc* osc, uint8_t mod)) {
+    if (selected_env == 0) {
+        for (int j = 0; j < VOICE_COUNT; j++)
+            f(&voices[j].amp_env, mod);
+    } else if (selected_env == 1) {
+        for (int j = 0; j < VOICE_COUNT; j++)
+            f(&voices[j].mod_env, mod);
+    } else {
+        for (int j = 0; j < VOICE_COUNT; j++)
+            f(&voices[j].filter_env, mod);
+    }
+}
+
 void process_changed_pots(void) {
     // no function pointers, because the function paramaters must be of the same type
     // most pots are dependent on states of buttons
     for (int i = 0; i < changed_pot_count; i++) {
-        for (int j = 0; j < VOICE_COUNT; j++) {
-            switch (changed_pots[i]) { // which pots have been changed?
-                case 0: // osc coarse tune
-                    if (selected_osc) {
+        switch (changed_pots[i]) { // which pots have been changed?
+            case 0: // osc coarse tune
+                if (selected_osc) {
+                    for (int j = 0; j < VOICE_COUNT; j++)
                         update_osc_coarse_detune(&voices[j].osc_a, pots[i]);
-                    } else {
+                } else {
+                    for (int j = 0; j < VOICE_COUNT; j++)
                         update_osc_coarse_detune(&voices[j].osc_b, pots[i]);
-                    }
-                    break;
-                case 1: // osc fine tune
-                    if (selected_osc) {
+                }
+                break;
+            case 1: // osc fine tune
+                if (selected_osc) {
+                    for (int j = 0; j < VOICE_COUNT; j++)
                         update_osc_fine_detune(&voices[j].osc_a, pots[i]);
-                    } else {
+                } else {
+                    for (int j = 0; j < VOICE_COUNT; j++)
                         update_osc_fine_detune(&voices[j].osc_b, pots[i]);
-                    }
-                    break;
-                case 2: // osc mix
-                    // TODO: find some good way to scale to fixed full range
-                    voices[j].mix = FIXED_MIN;
-
-                    break;
-            }
+                }
+                break;
+            case 2: // osc mix
+                // TODO: find some good way to scale to fixed full range
+                for (int j = 0; j < VOICE_COUNT; j++)
+                    voices[j].mix = byte_to_fixed(pots[i]);
+                break;
+            case 3: // osc fm
+                for (int j = 0; j < VOICE_COUNT; j++)
+                    voices[j].fm = byte_to_fixed(pots[i]) >> 1;
+                break;
+            case 4: // attack
+                update_env(selected_env, pots[i], update_env_a);
+                break;
+            case 5: // decay 
+                update_env(selected_env, pots[i], update_env_d);
+                break;
+            case 6: // sustain 
+                update_env(selected_env, pots[i], update_env_s);
+                break;
+            case 7: // release
+                update_env(selected_env, pots[i], update_env_r);
+                break;
         }
     }
 }

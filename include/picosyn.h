@@ -9,6 +9,11 @@
 #define MIDI_LED_PIN 15
 #define AUDIO_PIN 2
 
+#define IO_EXPANDER_INT_PIN 23
+#define MUX_A_PIN 17
+#define MUX_B_PIN 19
+#define MUX_C_PIN 20
+
 #define VOICE_COUNT 8
 #define GAIN 10//8192 // 2^(16-3)
 
@@ -24,12 +29,12 @@ typedef int32_t fixed;
 #define FIXED_MIN INT32_MIN
 
 static inline fixed mul_fixed(fixed a, fixed b) {
-    int64_t temp = ((int64_t)a * (int64_t) b);
-    return (fixed)(temp >> 31);
+    int64_t tmp = ((int64_t)a * (int64_t) b);
+    return (fixed)(tmp >> 31);
 }
 static inline fixed div_fixed(fixed a, fixed b) {
-    int64_t temp = (int64_t)(a << 31);
-    return (fixed)(temp / b);
+    int64_t tmp = (int64_t)(a << 31);
+    return (fixed)(tmp / b);
 }
 static inline fixed float_to_fixed(float x) {
     // float should be between -1.0 and 1.0
@@ -39,6 +44,11 @@ static inline float fixed_to_float(fixed x) {
     // float will be between -1.0 and 1.0
     return ((float)x / FIXED_MAX);
 }
+static inline fixed byte_to_fixed(uint8_t x) {
+    // scales so value is centered around 0ish.
+    return (int64_t)x * 16843009 - FIXED_MAX;
+}
+
 
 
 

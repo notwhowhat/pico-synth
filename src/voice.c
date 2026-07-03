@@ -300,6 +300,14 @@ fixed process_voice(struct voice *v) {
     return 0;
 }
 
+void update_osc_ring_mod(struct voice *v) {
+    v->ring_mod = !v->ring_mod;
+}
+
+void update_osc_sync(struct voice *v) {
+    v->sync = !v->sync;
+}
+
 // call it with isr (interrupt service routine)
 void on_pwm_interrupt() {
     reset_interrupt();

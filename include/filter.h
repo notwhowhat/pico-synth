@@ -10,6 +10,7 @@ typedef enum {
     LOW, BAND, HIGH, NOTCH, FILTER_COUNT
 } filter_mode;
 
+// the filter will have to use q8.24 instead of 1.31.
 struct filter {
     float cutoff;
     float resonance;
