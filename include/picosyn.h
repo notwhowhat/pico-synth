@@ -48,7 +48,9 @@ static inline fixed byte_to_fixed(uint8_t x) {
     // scales so value is centered around 0ish.
     return (int64_t)x * 16843009 - FIXED_MAX;
 }
-
+static inline int sign(int x) {
+    return (x > 0) - (x < 0);
+}
 
 
 

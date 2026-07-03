@@ -32,8 +32,8 @@ struct voice {
     fixed mix;
     fixed fm; // TODO: implement! ratio of how much to add osc a to osc b
 
-    float portamento_increment;
-    float portamento;
+    fixed portamento_increment;
+    fixed portamento;
 
     //struct osc oscillators[7];
 

@@ -56,8 +56,8 @@ follower.table_index is set to 0.
 
 const float INV_SAMPLE_RATE = 1.0 / 44100.0;
 
-const float PORTAMENTO_MOD = 0.00009070294;
-
+//const float PORTAMENTO_MOD = 0.00009070294;
+const fixed PORTAMENTO_MOD = (4 * (int64_t)FIXED_MAX / 5)
 
 struct voice voices[VOICE_COUNT] = {0};
 
@@ -121,13 +121,26 @@ void update_filter_resonance(struct filter *f, float resonance) {
 
 // the minimum time: one sample
 
-void init_portamento(struct voice *v, int last_note) {
+void init_portamento(struct voice *v, fixed mod, int last_note) {
     if (last_note != -1) {
-        // a negative increment and 0.001 of space prevents it from becoming zero
-        v->portamento_increment =  (last_note - v->note) * (1.001 - 0.999 * global_paramaters.portamento_factor );//INV_SAMPLE_RATE * (last_note - v->note) * 2000;
+        v->portamento_increment =  mul_fixed(100 * (last_note - v->note), FIXED_MAX - mod);
+
+        // this is done so the glide never can be infinate
+        if (v->portamento_increment = 0)
+            v->portamento_increment = -1 * sign(last_note - v->note); 
+        //v->portamento_increment =  (last_note - v->note) * (1.0 - 0.999 * global_paramaters.portamento_factor);//INV_SAMPLE_RATE * (last_note - v->note) * 2000;
         v->portamento = 100 * (last_note - v->note);
     } else {
         v->portamento_increment = v->portamento = 0;
+    }
+}
+
+void process_portamento(struct voice *v) {
+    if (v->portamento_increment < 0 && v->portamento >= v->portamento_increment ||
+        v->portamento_increment > 0 && v->portamento <= v->portamento_increment) {
+        v->portamento = 0;
+    } else {
+        v->portamento -= v->portamento_increment;
     }
 }
 
@@ -154,7 +167,7 @@ void init_voice(struct voice *v) {
     init_osc(&v->osc_b, SQUARE);
 
     init_filter(&v->filter, 0.005, 1.0, v->note);
-    init_lfo(&v->lfo, 2, SIN);
+    init_lfo(&v->lfo_a, 2, SIN);
 }
 
 void start_voice_mono_legato(struct voice *v, int note) {
@@ -201,7 +214,7 @@ void reset_voice(struct voice *v) {
     init_osc(&v->osc_b, SIN);
 
     init_filter(&v->filter, 0.01, 1.0, v->note);
-    init_lfo(&v->lfo, 2, SIN);
+    init_lfo(&v->lfo_a, 2, SIN);
 }
 
 // remove and make into two functions
@@ -265,12 +278,7 @@ fixed process_voice(struct voice *v) {
             } 
         }
 
-        if (v->portamento_increment < 0 && v->portamento >= v->portamento_increment ||
-            v->portamento_increment > 0 && v->portamento <= v->portamento_increment) {
-            v->portamento = 0.0;
-        } else {
-            v->portamento -= v->portamento_increment;
-        }
+        process_portamento(v);
         
         if (v->ring_mod) {
             out = process_osc(&v->osc_a, v->note, v->portamento) * 
