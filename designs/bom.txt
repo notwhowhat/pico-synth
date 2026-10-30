@@ -14,5 +14,63 @@ just for prototyping:
 
 electrokit bom:
 
+41011482 4, MCP23017-E/SP DIP-28N I2C I/O expander
+41032855 1, 24LC256-I/P DIP-8 EEPROM 256kbit I2C
+40374051 2, 74HC4051 DIP-16 8ch analog mulitplexer/demultiplexer
+41003038 12, Keramisk 100nF 50V Y5V 5mm
+41036230 1, Tantal 47uF 16V 20% 2.54mm
+41024341 20, Taktil omkopplare PCB 12x12x7mm 1.6N
+41024343 20, Topp för tryckknapp 12x12mm - svart
+40812014 35, Motstånd 1W 5% 150ohm (150R)
+40812006 1, Motstånd 1W 5% 33ohm (33R)
+40812000 1, Motstånd 1W 5% 10ohm (10R)
+40812028 1, Motstånd 1W 5% 2.2kohm (2k2)
+40812027 1, Motstånd 1W 5% 1.8kohm (1k8)
+41011655 1, DIL-hållare 6-pin
+40410008 1, DIL-hållare 8-pin
+40410028 4, DIL-hållare 28-pin 0.3"
+40410016 3, DIL-hållare 16-pin
+41013488 2, Hylslist 2.54mm 1x20p
+41003799 2, Stiftlist 2.54mm 1x40p vinklad brytbar
+41001167 2, Stiftlist 2.54mm 1x40p brytbar
+41002835 1, DIN hona 5-pol 180° chassi
+41036089 4, Gänginsats M4 L: 7.4mm mässing
 
+
+headers: (b=bent:, s=straight)
+    2x: 6s 7b
+    4x: 4s 1b
+    5x: 1s 1b
+    6x: 1s 1b
+    7x: 2s 2b
+    8x: 1s 0b
+    9x: 1s 1b
+    10x: 1s 1b
+
+41011482 4,
+41032855 1, 
+40374051 2, 
+41003038 12,
+41036230 1, 
+41024341 20,
+41024343 20,
+40812014 35,
+40812006 1, 
+40812000 1, 
+40812028 1, 
+40812027 1, 
+41011655 1, 
+40410008 1, 
+40410028 4, 
+40410016 3, 
+41013488 2, 
+41003799 2, 
+41001167 2, 
+41002835 1, 
+41036089 4, 
+
+
+board sizes:
+- main 24xfull
+- long 10xfull
 

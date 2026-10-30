@@ -1,8 +1,5 @@
 #include "picosyn.h"
 
-#include <stdint.h>
-#include <stdbool.h>
-
 #ifndef ENVELOPE_H
 #define ENVELOPE_H
 

@@ -1,9 +1,5 @@
 #include "picosyn.h"
 
-//#include "pico/stdlib.h"   // stdlib 
-#include <stdint.h>
-#include <stdbool.h>
-
 #include "envelope.h"
 #include "filter.h"
 #include "oscillators.h"
@@ -14,14 +10,15 @@
 // TODO: add triangle wave
 
 typedef enum {
-    MONO, LEGATO, POLY
+    MONO, LEGATO, POLY, VOICE_MODE_COUNT,
 } voice_mode;
-
+voice_mode mode;
 
 // the voice gets allocated a note, which it reads
 struct voice {
     bool used;
     int note; // which note in midi_keys it's connected to
+    int last_note;
     int age;
     bool new;
 
@@ -118,6 +115,7 @@ fixed process_voice(struct voice *v);
 
 void update_osc_ring_mod(struct voice *v);
 void update_osc_sync(struct voice *v);
+void update_portamento(struct voice *v, fixed mod);
 
 void on_pwm_interrupt(void);
 

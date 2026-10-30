@@ -62,22 +62,22 @@ fixed process_osc(struct osc *osc, int note, float portamento) {
     osc->table_increment = increment_table[50 + osc->tune_cents];
 
     osc->table_index += osc->table_increment;
-    uint32_t index = osc->table_index >> INCREMENT_SCALE;
+    uint32_t index = osc->table_index >> WAVETABLE_SCALE;
 
     fixed out = 0;
 
     switch (osc->selected_waveform) {
         case SIN:
-            out = sin_table[(int)index];
+            out = SIN_TABLE[(int)index];
             break;
         case TRI:
-            out = triangle_table[(int)index];
+            out = TRI_TABLE[(int)index];
             break;
         case SAW:
-            out = sawtooth_table[(int)index];
+            out = SAW_TABLE[(int)index];
             break;
         case SQUARE:
-            out = square_table[(int)index];
+            out = SQUARE_TABLE[(int)index];
             break;
         default:
             break;
@@ -113,7 +113,7 @@ void init_lfo(struct lfo *lfo, uint32_t rate, waveform selected_waveform) {
 
 fixed process_lfo(struct lfo *lfo) {
     lfo->table_index += (UINT32_MAX - lfo->rate);
-    uint32_t index = lfo->table_index >> INCREMENT_SCALE;
+    uint32_t index = lfo->table_index >> WAVETABLE_SCALE;
     
     switch (lfo->selected_waveform) {
         case SIN:
@@ -140,6 +140,9 @@ void update_lfo_waveform(struct lfo *lfo) {
     }
 }
 
+// TODO: make use uint32_t
 void update_lfo_rate(struct lfo *lfo, uint32_t rate) {
-    lfo->rate = rate;
+    lfo->rate =  - (byte_to_fixed(rate) + FIXED_MAX);
+    if (lfo->rate == 0)
+        lfo->rate = 1;
 }

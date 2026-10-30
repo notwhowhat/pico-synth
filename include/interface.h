@@ -1,6 +1,4 @@
-#include <stdint.h>
-#include <stdbool.h>
-#include <stddef.h>
+#include "picosyn.h"
 
 #ifndef INTERFACE_H
 #define INTERFACE_H

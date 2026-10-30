@@ -35,7 +35,7 @@ void note_on(int note, int velocity) {
     midi_previous_keys[note] = midi_keys[note];
     midi_keys[note] = velocity;
             
-    if (global_paramaters.mode == POLY) {
+    if (mode == POLY) {
         struct voice *selected_voice = voices; // &voices[0], because array's are mad
         struct voice *last_voice = voices;
         bool theft = false;
@@ -153,7 +153,7 @@ void on_uart_interrupt(void) {
         midi_counter++;
 
         if (midi_counter == 3) {
-            if (midi_cmd < 128) {
+            if (midi_cmd[0] < 128) {
                 if (channel_is_known) {
                     // running state
                     // status byte is ommited if note on/off on same ch

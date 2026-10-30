@@ -1,4 +1,4 @@
-#include "voice.h"
+#include "picosyn.h"
 
 #ifndef CONTROLS_H
 #define CONTROLS_H
@@ -40,11 +40,11 @@
     FILTER_RESONANCE
     FILTER_KEYTRACK
     x LFO_A_WAVEFORM
-    LFO_A_RATE
+    x LFO_A_RATE
     x LFO_B_WAVEFORM
-    LFO_B_RATE
-    PORTAMENTO_FACTOR
-    CONTROL_COUNT
+    x LFO_B_RATE
+    x PORTAMENTO_FACTOR
+    x CONTROL_COUNT
 */
 enum {
     VOICE_MODE,

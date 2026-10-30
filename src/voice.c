@@ -57,8 +57,8 @@ follower.table_index is set to 0.
 const float INV_SAMPLE_RATE = 1.0 / 44100.0;
 
 //const float PORTAMENTO_MOD = 0.00009070294;
-const fixed PORTAMENTO_MOD = (4 * (int64_t)FIXED_MAX / 5)
-
+const fixed PORTAMENTO_MOD = (4 * (int64_t)FIXED_MAX / 5);
+voice_mode mode = POLY;
 struct voice voices[VOICE_COUNT] = {0};
 
 void init_parameters(struct parameters *p) {
@@ -119,17 +119,16 @@ void update_filter_resonance(struct filter *f, float resonance) {
 */
 
 
-// the minimum time: one sample
+void change_voice_mode(void) {
+    if (mode != POLY) {
+        for (int i = 1; i < VOICE_COUNT; i++)
+            reset_voice(&voices[i]);
+    }
+}
 
-void init_portamento(struct voice *v, fixed mod, int last_note) {
-    if (last_note != -1) {
-        v->portamento_increment =  mul_fixed(100 * (last_note - v->note), FIXED_MAX - mod);
-
-        // this is done so the glide never can be infinate
-        if (v->portamento_increment = 0)
-            v->portamento_increment = -1 * sign(last_note - v->note); 
-        //v->portamento_increment =  (last_note - v->note) * (1.0 - 0.999 * global_paramaters.portamento_factor);//INV_SAMPLE_RATE * (last_note - v->note) * 2000;
-        v->portamento = 100 * (last_note - v->note);
+void init_portamento(struct voice *v) {
+    if (v->last_note != -1) {
+        v->portamento = 100 * (v->last_note - v->note);
     } else {
         v->portamento_increment = v->portamento = 0;
     }
@@ -144,9 +143,17 @@ void process_portamento(struct voice *v) {
     }
 }
 
+void update_portamento(struct voice *v, fixed mod) {
+    v->portamento_increment =  mul_fixed(100 * (v->last_note - v->note), FIXED_MAX - mod);
+
+    // this is done so the glide never can be infinate
+    if (v->portamento_increment = 0)
+        v->portamento_increment = -1 * sign(v->last_note - v->note);
+}
+
 void init_voice(struct voice *v) {
     v->used = false;
-    v->note = -1;
+    v->note = v->last_note = -1;
     v->age = 0;
     v->new = false;
     v->portamento = 0.0;
@@ -163,19 +170,18 @@ void init_voice(struct voice *v) {
 
     v->sync = false;
     v->ring_mod = false;
-    init_osc(&v->osc_a, SQUARE);
+    init_osc(&v->osc_a, SAW);
     init_osc(&v->osc_b, SQUARE);
 
-    init_filter(&v->filter, 0.005, 1.0, v->note);
+    init_filter(&v->filter, 0.01, 1.0, v->note);
     init_lfo(&v->lfo_a, 2, SIN);
 }
 
 void start_voice_mono_legato(struct voice *v, int note) {
-    int last_note = v->note;
+    v->last_note = v->note;
     v->note = note;
     v->used = true;
     v->age = 0;
-
 
     if (global_paramaters.mode == LEGATO) {
         init_env(&v->amp_env, LIN, get_env_level(&v->amp_env));
@@ -188,18 +194,19 @@ void start_voice_mono_legato(struct voice *v, int note) {
     // max 11025 cycles per semitone as portamento speed
     // portamento speed = 1 / number of cycles per semitone
     //v->portamento_increment = global_paramaters.portamento_factor * PORTAMENTO_MOD * (lv->osc1.tune - v->osc1.tune);
-    init_portamento(v, last_note);
+    init_portamento(v);
 }
 
 void start_voice_poly(struct voice *v, struct voice *lv, int note) {
     v->note = note;
+    v->last_note = lv->note;
     v->used = true;
     v->age = 0;
 
     init_env(&v->amp_env, LIN, 0.0);
     init_env(&v->filter_env, LIN,  0.0);
-    printf("n: %d, l: %d\n", v->note, lv->note);
-    init_portamento(v, lv->note);
+    printf("n: %d, l: %d\n", v->note, v->last_note);
+    init_portamento(v);
 }
 
 void reset_voice(struct voice *v) {
@@ -288,9 +295,11 @@ fixed process_voice(struct voice *v) {
             fixed a = process_osc(&v->osc_a, v->note, v->portamento) >> 1;
             fixed b = process_osc(&v->osc_b, v->note, v->portamento) >> 1;
 
+            // TODO: fix, cause this doesn't work
             if (v->mix < 0) {
                 // a is louder
-                out = a + mul_fixed(a, -(mix_factor)) + mul_fixed(b, (FIXED_MAX + mix_factor));
+                out = a;
+                //out = a + mul_fixed(a, -(mix_factor)) + mul_fixed(b, (FIXED_MAX + mix_factor));
             } else {
                 // b is louder
                 out = mul_fixed(a, (FIXED_MAX - mix_factor)) + mul_fixed(b, mix_factor);

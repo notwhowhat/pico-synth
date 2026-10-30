@@ -1,6 +1,6 @@
-#include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #ifndef PICOSYN_H
 #define PICOSYN_H
@@ -19,11 +19,6 @@
 
 #define SAMPLE_RATE 44100
 
-// fixed type is used to avoid incorrect usage. it is a decimal type with one sign bit 
-// and 31 fractional bits, i.e q31
-// the fixed type should be used to represent fractions between -1.0 and 1.0
-
-// rpi pico is little endian
 typedef int32_t fixed;
 #define FIXED_MAX INT32_MAX
 #define FIXED_MIN INT32_MIN
@@ -52,6 +47,12 @@ static inline int sign(int x) {
     return (x > 0) - (x < 0);
 }
 
+
+// fixed type is used to avoid incorrect usage. it is a decimal type with one sign bit 
+// and 31 fractional bits, i.e q31
+// the fixed type should be used to represent fractions between -1.0 and 1.0
+
+// rpi pico is little endian
 
 
 /*

@@ -61,7 +61,7 @@ void test_env(struct voice *v) {
 
 void test_filter(struct voice *v) {
     // sustain must be set before release and decay.
-    set_env_sustain_mod(&v->amp_env, 127);
+    set_env_sustain_mod(&v->amp_env, 255);
     set_env_attack_mod(&v->amp_env, 0);
     set_env_decay_mod(&v->amp_env, 0);
     set_env_release_mod(&v->amp_env, 0);
@@ -70,7 +70,7 @@ void test_filter(struct voice *v) {
     uint32_t sampling_duration = 1010;
     fixed data[sampling_duration];
 
-    run_note(v, 36, data, note_duration, sampling_duration);
+    run_note(v, 48, data, note_duration, sampling_duration);
     write_data(data, sampling_duration);
     plot_data();
 }

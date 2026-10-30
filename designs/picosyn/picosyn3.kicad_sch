@@ -11597,7 +11597,7 @@
 			)
 		)
 		(instances
-			(project "picosyn"
+			(project "picosyn3"
 				(path "/75ef5ae5-8a6b-4ae7-bab1-ad864705762e"
 					(page "4")
 				)
@@ -11635,7 +11635,7 @@
 			)
 		)
 		(instances
-			(project "picosyn"
+			(project "picosyn3"
 				(path "/75ef5ae5-8a6b-4ae7-bab1-ad864705762e"
 					(page "3")
 				)
@@ -11682,7 +11682,7 @@
 			)
 		)
 		(instances
-			(project "picosyn"
+			(project "picosyn3"
 				(path "/75ef5ae5-8a6b-4ae7-bab1-ad864705762e"
 					(page "2")
 				)

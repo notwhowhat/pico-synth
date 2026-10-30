@@ -133,6 +133,13 @@ void get_changed_buttons(void) {
     }
 }
 
+void update_voice_mode(void) {
+    global_controls[VOICE_MODE]++;
+    if (global_controls[VOICE_MODE] == VOICE_MODE_COUNT)
+        global_controls[VOICE_MODE] == MONO;
+    mode = global_controls[VOICE_MODE];
+}
+
 // not done
 void process_changed_buttons(void) {
     // TODO: refactor. this is wayyy to big
@@ -218,6 +225,10 @@ void process_changed_buttons(void) {
                 if (changed_buttons[i] == true) {
                     save_preset_flag = true;
                 }
+            case 13: // voice mode
+                update_voice_mode();
+                change_voice_mode();
+                break;
             default:
                 break;
         }
@@ -302,6 +313,19 @@ void process_changed_pots(void) {
                 break;
             case 7: // release
                 update_env(selected_env, pots[i], update_env_r);
+                break;
+            case 23: // lfo rate
+                if (selected_lfo) {
+                    for (int j = 0; j < VOICE_COUNT; j++)
+                        update_lfo_rate(&voices[j].lfo_a, pots[i]);
+                } else {
+                    for (int j = 0; j < VOICE_COUNT; j++)
+                        update_lfo_rate(&voices[j].lfo_b, pots[i]);
+                }
+                break;
+            case 24: // portamento
+                for (int j = 0; j < VOICE_COUNT; j++)
+                    update_portamento(&voices[j], pots[i]);
                 break;
         }
     }

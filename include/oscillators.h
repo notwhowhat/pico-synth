@@ -1,17 +1,8 @@
 #include "picosyn.h"
-
-#include <stdint.h>
-#include <stdbool.h>
+#include "tables.h"
 
 #ifndef OSCILLATORS_H
 #define OSCILLATORS_H
-
-// it's actually good if the table length is 256
-#define WAVETABLE_LENGTH 1024
-
-// 128 midi notes + 1 for detune, and 100 cents/semitone
-#define INCREMENT_TABLE_LENGTH 12900 
-#define INCREMENT_SCALE 22 // 32 - log2(wavetable length)
 
 typedef enum {
     SIN,
