@@ -173,7 +173,7 @@ void init_voice(struct voice *v) {
     init_osc(&v->osc_a, SAW);
     init_osc(&v->osc_b, SQUARE);
 
-    init_filter(&v->filter, 0.01, 1.0, v->note);
+    init_filter(&v->filter, v->note);
     init_lfo(&v->lfo_a, 2, SIN);
 }
 
@@ -220,7 +220,7 @@ void reset_voice(struct voice *v) {
     init_osc(&v->osc_a, SIN);
     init_osc(&v->osc_b, SIN);
 
-    init_filter(&v->filter, 0.01, 1.0, v->note);
+    init_filter(&v->filter, v->note);
     init_lfo(&v->lfo_a, 2, SIN);
 }
 
@@ -309,7 +309,7 @@ fixed process_voice(struct voice *v) {
         // TODO: uncomment so env works
         //out *= fixed_to_float(v->amp_env.level);
 
-        out = process_filter(&v->filter, out);
+        out = process_filter(&v->filter, out, FIXED_MAX);
 
         return out;
     }

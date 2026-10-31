@@ -14,6 +14,8 @@ NOTE_COUNT: int = 128
 INCTABLE_LENGTH: int = (NOTE_COUNT + 1) * 100
 SAMPLE_RATE: int = 44100
 ONE_LINE: bool = False
+INT_MAX: int = 2147483647
+UINT_MAX: int = 4294967295
 
 def triangle_wave(x: float):
     return np.arcsin(np.sin(2.0 * np.pi * x)) * 2.0 / np.pi
@@ -23,7 +25,7 @@ def gen_wavetable(length: int, func: Callable) -> np.ndarray:
     increment: float = 2.0 * np.pi / length
 
     for i in range(length):
-        table[i] = int(func(i * increment) * 2147483647) # INT_MAX
+        table[i] = int(func(i * increment) * INT_MAX)
 
     return table
 
@@ -32,7 +34,7 @@ def gen_inctable(length: int) -> np.ndarray:
 
     for i in range(length):
         freq: float = 440.0 * 2.0 ** ((i - 6950) / 1200.0)
-        table[i] = int(4294967295 * (freq / SAMPLE_RATE)) # UINT_MAX
+        table[i] = int(UINT_MAX * (freq / SAMPLE_RATE))
         
     return table
 
@@ -40,7 +42,7 @@ def gen_keytrack(length: int) -> np.ndarray:
     table: np.ndarray = np.zeros(length, dtype=np.int32)
 
     for i in range(length):
-        table[i] = (440 * 2 ** ((i - 57) / 12)) / SAMPLE_RATE
+        table[i] = int(INT_MAX * (440 * 2 ** ((i - 57) / 12)) / SAMPLE_RATE)
         
     return table
 

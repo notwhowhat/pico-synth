@@ -6,47 +6,41 @@
 
 #include <math.h>
 
-void init_filter(struct filter *f, float cutoff, float resonance, int note) {
+const fixed FILTER_CUTOFF_SCALE = FIXED_MAX >> 9;
+const fixed FILTER_RESONANCE_SCALE = FIXED_MAX >> 8;
+
+void init_filter(struct filter *f, uint8_t note) {
     // 0 < cutoff, resonance < 1
-    f->cutoff = cutoff;
-    f->resonance = resonance;
 
     f->keytrack = KEYTRACK_TABLE[note];
-    f->keytrack_mod = 0.0;
+    f->keytrack_mod = 0;
 
     // technically they don't need to be initialized here 
     // because they'll be set every cycle.
     //f->f = compute_filter_g(f->cutoff, f->keytrack, f->keytrack_mod);//2.0 * sinf(PI * f->cutoff / 2.0);
-    f->q = 0.5 / f->resonance;
-    f->low = f->band = f->high = 0.0;
+    f->low = f->band = f->high = 0;
 
     f->mode = LOW;
 }
 
-float compute_filter_g(float cutoff, float keytrack, float keytrack_mod) {
-    float total_cutoff = cutoff + keytrack_mod * (keytrack - cutoff);
-    //return 2.0 * SIN_TABLE[(int) (M_PI * 180.0 * total_cutoff)];
-    // TODO: look in to this. 
-    // it might be a bit wrong because right now, the table isn't based on pi
-    // g = 2 sin (pi * cutoff / fs) //[approximately]
-    // f0 = (MAX / (2 * fs))
-    // f1 = (log2(MAX) - log2(WAVETABLE_LENGTH))
-    // g = 2(sin((f0 * cutoff) >> f1)))
-    return 2.0 * SIN_TABLE[(int) (180.0 * total_cutoff)];
+void update_filter_cutoff(struct filter *f, uint8_t cutoff) {
+    f->cutoff = cutoff * FILTER_CUTOFF_SCALE;
 }
 
-void update_filter_cutoff(struct filter *f, float cutoff) {
-    f->cutoff = cutoff;
-    f->f = compute_filter_g(cutoff, f->keytrack, f->keytrack_mod);
+void update_filter_resonance(struct filter *f, uint8_t resonance) {
+    f->resonance = resonance * FILTER_RESONANCE_SCALE;
 }
 
-void update_filter_resonance(struct filter *f, float resonance) {
-    f->resonance = resonance;
-    f->q = 0.5 / resonance;
+void update_filter_mode(struct filter *f) {
+    // notch mode will not be used
+    f->mode++;
+    if (f->mode == NOTCH) {
+        f->mode = LOW;
+    }
 }
 
-fixed process_filter(struct filter *f, fixed input) {
-    // TODO: refactor to use an envelope generator 
+fixed process_filter(struct filter *f, fixed input, fixed mod) {
+    // mod is total modulation from ex. env and lfo
     /*
     ways to have filter cutoff:
 
@@ -58,14 +52,19 @@ fixed process_filter(struct filter *f, fixed input) {
     */ 
 
     // env mod amt * env mod should be ADDED and not multiplied to this later
-    fixed total_cutoff_factor = f->cutoff + f->keytrack_mod * (f->keytrack - f->cutoff);
+    fixed total_cutoff_factor = f->cutoff + mod + mul_fixed(f->keytrack_mod, (f->keytrack - f->cutoff));
 
-    f->f = 2 * SIN_TABLE[float_to_fixed(0.01) >> WAVETABLE_SCALE];
-    f->q = float_to_fixed(0.000001);
+    // filtering coefficient
+    fixed c = 2 * SIN_TABLE[float_to_fixed(0.01) >> WAVETABLE_SCALE];
+    fixed q = float_to_fixed(0.000001);
+    //fixed q = f->resonance;
+    if (q < 1) {
+        q = 1;
+    }
 
-    f->high = mul_fixed(f->q, (input - f->band)) - f->low;
-    f->band += mul_fixed(f->f, f->high);
-    f->low += mul_fixed(f->f, f->band);
+    f->high = mul_fixed(q, (input - f->band)) - f->low;
+    f->band += mul_fixed(c, f->high);
+    f->low += mul_fixed(c, f->band);
 
     switch (f->mode) {
         case LOW:

@@ -7,13 +7,12 @@ typedef enum {
     LOW, BAND, HIGH, NOTCH, FILTER_COUNT
 } filter_mode;
 
-// the filter will have to use q8.24 instead of 1.31.
 struct filter {
-    float cutoff;
-    float resonance;
+    fixed cutoff; // from 0 -> FIXED_MAX / 2
+    fixed resonance; // from 0 -> FIXED_MAX
 
-    float keytrack;
-    float keytrack_mod;
+    fixed keytrack;
+    fixed keytrack_mod;
 
     fixed f;
     fixed q;
@@ -25,11 +24,11 @@ struct filter {
     filter_mode mode;
 };
 
-void init_filter(struct filter *f, float cutoff, float resonance, int note);
-fixed process_filter(struct filter *f, fixed input);
-float compute_filter_g(float cutoff, float keytrack, float keytrack_mod);
-void update_filter_cutoff(struct filter *f, float cutoff);
-void update_filter_resonance(struct filter *f, float resonance);
+void init_filter(struct filter *f, uint8_t note);
+fixed process_filter(struct filter *f, fixed input, fixed mod);
+void update_filter_cutoff(struct filter *f, uint8_t cutoff);
+void update_filter_resonance(struct filter *f, uint8_t resonance);
+void update_filter_mode(struct filter *f);
 
 #endif
 

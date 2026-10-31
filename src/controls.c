@@ -2,6 +2,7 @@
 
 #include "controls.h"
 #include "picosyn.h"
+#include "voice.h"
 #include <math.h>
 
 // all controls can be stored with 8 bits, and scaled up later. 
